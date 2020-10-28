@@ -646,7 +646,7 @@ ORG모드를 위한 함수들
   (eval `(lsp-org-babel-enable ,lang)))
 #+END_SRC
 
-# 기타 ORG모드 설정
+기타 ORG모드 설정
 #+BEGIN_SRC elisp :tangle config.el
 (use-package! org-mac-link
   :after org
