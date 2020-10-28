@@ -1,0 +1,15 @@
+# -*- mode: snippet -*-
+# name:typescript+new+promise+funcion
+# key:tsprofunc
+# --
+
+export let %1 = (): Promise<any> =>
+  new Promise(async (resolve, reject) => {
+    try {
+      %2
+      resolve()
+    }catch(error){
+      reject(error)
+    }
+  })
+})

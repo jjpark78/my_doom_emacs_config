@@ -1,0 +1,871 @@
+#+TITLE:   My custom DOOM EMACS Config
+#+DATE:    July 23, 2020
+#+AUTHOR:  jjpark89@outlook.com
+#+STARTUP: showeverything
+** Initialize
+*** Load Config from files
+우선 한곳에 모든 설정들을 모아두면 알아보기 힘드니 대략적인 기능별로
+파일을 나누어 관리한다.
+#+BEGIN_SRC elisp :tangle config.el
+(load! "+custom_funcs")
+(load! "+private")
+;; prodigy를 사용해서 빌드 명령어를 돌릴려고 했는데 버퍼 출력이 어마어마해져서 그냥 터미널에서 하는게 속 편하다는 걸 알았다.
+;; (load! "+startup")
+;; (add-to-list 'load-path "~/.doom.d/legacy/org-weather")
+#+END_SRC
++private.el 파일에는 공개하기 곤란한 개인 토큰이나 패스워드등이 담겨 있다.
+*** Packages
+#+BEGIN_SRC elisp :tangle packages.el
+(package! rainbow-delimiters)
+(package! expand-region)
+(package! dotenv-mode)
+(package! wakatime-mode)
+(package! company-tabnine)
+(package! company-box)
+(package! org-super-agenda)
+(package! org-bullets)
+(package! gitlab-ci-mode)
+(package! org-fancy-priorities)
+(package! sql-indent)
+(package! beacon)
+(package! nyan-mode)
+(package! carbon-now-sh)
+(package! google-this)
+(package! w3m)
+(package! rg)
+(package! prettier-js)
+(package! swiper)
+(package! magit-delta)
+(package! exec-path-from-shell)
+(package! evil-matchit)
+(package! evil-textobj-anyblock)
+(package! ob-typescript)
+(package! lsp-treemacs)
+;; https://luca.cambiaghi.me/doom-gccemacs 에 따르면
+;; 이맥스 28버전과 호환성을 높이기 위해서 아래의 패키지들은
+;; 최신 버전으로 맞추는 것이 좋다고 한다.
+(unpin! dap-mode lsp-mode treemacs)
+#+END_SRC
+*** Custom Setup
+**** Store Windows Position & Size
+지금은 틸링 매니저를 쓰고 있어서 사용할 일이 거의 없지만
+예전에는 이맥스를 이전에 사용하던 위치에 그대로 이어서 계속 사용하고 싶어
+구글링을 한 끝에 찾아낸 유용한 함수들
+#+BEGIN_SRC elisp :tangle +custom_funcs.el
+(defun save-framegeometry ()
+  "Gets the current frame's geometry and saves to ~/.emacs.d/framegeometry."
+  (let (
+        (framegeometry-left (frame-parameter (selected-frame) 'left))
+        (framegeometry-top (frame-parameter (selected-frame) 'top))
+        (framegeometry-width (frame-parameter (selected-frame) 'width))
+        (framegeometry-height (frame-parameter (selected-frame) 'height))
+        (framegeometry-file (expand-file-name "~/.emacs.d/framegeometry"))
+        )
+    (when (not (number-or-marker-p framegeometry-left))
+      (setq framegeometry-left 0))
+    (when (not (number-or-marker-p framegeometry-top))
+      (setq framegeometry-top 0))
+    (when (not (number-or-marker-p framegeometry-width))
+      (setq framegeometry-width 0))
+    (when (not (number-or-marker-p framegeometry-height))
+      (setq framegeometry-height 0))
+    (with-temp-buffer
+      (insert
+       ";;; This is the previous emacs frame's geometry.\n"
+       ";;; Last generated " (current-time-string) ".\n"
+       "(setq initial-frame-alist\n"
+       "      '(\n"
+       (format "        (top . %d)\n" (max framegeometry-top 0))
+       (format "        (left . %d)\n" (max framegeometry-left 0))
+       (format "        (width . %d)\n" (max framegeometry-width 0))
+       (format "        (height . %d)))\n" (max framegeometry-height 0)))
+       (when (file-writable-p framegeometry-file)
+       (write-file framegeometry-file))))
+)
+
+(defun load-framegeometry ()
+  (let ((framegeometry-file (expand-file-name "~/.emacs.d/framegeometry")))
+    (when (file-readable-p framegeometry-file)
+      (load-file framegeometry-file)))
+)
+#+END_SRC
+
+**** Startup Setup
+이맥스 관련 일반적인 사항들을 지정한다.
+주로 특정 모드가 아닌 이맥스에 글로벌 설정들이 포함된다.
+#+BEGIN_SRC elisp :tangle config.el
+;; 사용자 이름 설정
+(setq user-full-name "Jaejin Park"
+      user-mail-address "jjpark78@outlook.com")
+(setq-default frame-title-format '("DOOM EMACS"))
+
+;; 바쁘게 버퍼전환 하는 와중에 화면이 울렁거리는게 멀미날것 같아서 프리뷰 옵션을 껐다
+(setq +ivy-buffer-preview nil)
+;; (setq ivy-tab-space t)
+(setq avy-all-windows t)
+(setq ivy-read-action-function #'ivy-hydra-read-action)
+;; dired를 두개 열어 놓고 왔다 갔다하며 복사 붙여넣기 할때 편하다
+(setq dired-dwim-target t)
+
+(setq which-key-idle-delay 0.5)
+(setq which-key-allow-multiple-replacements t)
+(after! which-key
+  (pushnew!
+   which-key-replacement-alist
+   '(("" . "\\`+?evil[-:]?\\(?:a-\\)?\\(.*\\)") . (nil . "◂\\1"))
+   '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "◃\\1"))
+   ))
+
+;; Restore Frame size and location, if we are using gui emacs
+(if window-system
+  (progn
+    (add-hook 'after-init-hook 'load-framegeometry)
+    (add-hook 'kill-emacs-hook 'save-framegeometry))
+)
+
+;; 수동으로 직접 프레임 위치를 지정해줘 본다.
+;; (setq initial-frame-alist '((top . 23) (left . 1147) (width . 128) (height . 80)))
+;; 좌우로 여백을 활성화 시킨다.
+;; (defun my-fringe-mode-hook ()
+;;   (fringe-mode '(15 . 15)))
+;; (add-hook 'prog-mode-hook 'my-fringe-mode-hook)
+;; (add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
+;; (add-hook 'org-mode-hook  'my-fringe-mode-hook)
+(global-evil-matchit-mode)
+;; make open url function to use webkit
+(setq browse-url-browser-function 'xwidget-webkit-browse-url)
+
+;; 스나이프를 화면 보이는 영역으로 제한한다.
+(setq evil-snipe-scope 'whole-visible)
+(setq evil-snipe-repeat-scope 'whole-visible)
+
+;; 와카타임이라고 본인이 얼마나 열심히 일했는지
+;; 하루 일과를 잘 보여준다.
+;; 개인으로만 쓰면 공짜인것도 매력임.
+(global-wakatime-mode)
+#+END_SRC
+
+**** Enable Auto-reverse
+파일이 외부에서 변경되었을때 자동으로 버퍼를 리프레쉬한다.
+#+BEGIN_SRC elisp :tangle config.el
+ ;; Auto refresh buffers
+(global-auto-revert-mode 1)
+;; Also auto refresh dired, but be quiet about it
+(setq global-auto-revert-non-file-buffers t)
+(setq auto-revert-verbose nil)
+#+END_SRC
+
+**** UTF & Korean Input
+한글 관련 설정
+#+BEGIN_SRC elisp :tangle config.el
+;; 한글 입력기 on
+(setq default-input-method "korean-hangul")
+(set-language-environment "Korean")
+(setq locale-coding-system 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+(set-selection-coding-system 'utf-8)
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
+#+END_SRC
+
+**** UIs
+이맥스의 ui설정에 관련된 사항.
+#+BEGIN_SRC elisp :tangle config.el
+
+;; 둠의 기본 테마 설정
+;; 이것 저것 많이 바꿔봤지만 역시 기본 테마가 젤 이쁘다
+(setq doom-theme 'doom-one)
+
+(setq all-the-icons-scale-factor 1.0)
+;; (setq all-the-icons-rvy-rich-mode 1)
+;; (ivy-rich-mode 1)
+
+;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
+(setq doom-font (font-spec :family "Fira Code" :size 14))
+
+;; add icons to ivy
+;; 아이비 메뉴에 아이콘이 들어가면 호박에 줄그어서 수박이 되는 경험을 할 수 있다.
+;; (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
+
+#+END_SRC
+
+**** Doom Modeline
+Doom modeline 관련 수정
+#+BEGIN_SRC elisp :tangle config.el
+(after! doom-modeline
+  (setq lsp-modeline-diagnostics-scope ':buffer)
+  (setq doom-modeline-major-mode-icon t)
+  (setq doom-modeline-persp-name t)
+  (setq doom-modeline-buffer-encoding nil)
+  (setq doom-modeline-persp-icon nil)
+  (setq doom-modeline-icon (display-graphic-p))
+  (setq doom-modeline-buffer-file-name-style 'file-name))
+#+END_SRC
+
+**** Fine-tune
+이맥스를 맥과 고해상도(FHD이상의 해상도)에서 쓰다보면 스크롤이 엄청 느려지는 경우가 있다.
+여러 이슈들을 확인한 결과 어쩔수 없다 함.
+해당 현상을 완화하는데 조금이나마 도움이 된다하여서
+구글링을 통해 찾은 각종 튜닝들을 여기다가 넣어 놓았다.
+#+BEGIN_SRC elisp :tangle config.el
+
+;; 라인 넘버표시 하지 않는게 더 빠르다
+;; 이유는 모름.
+;; (setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type nil)
+
+;; 더블버퍼링이 동작하도록 설정한다.
+(add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
+(setq scroll-conservatively 101)
+
+;; lsp 관련 설정 메뉴들
+;; 이맥스를 느리게 만드는 범인중 십중팔구 LSP가 관련되어져 있다고 함.
+;; 해당 튜닝도 구글링을 통해서 찾았다.
+(setq gc-cons-threshold 100000000)
+(setq read-process-output-max (* 1024 1024))
+#+END_SRC
+*** Useful Bindings
+**** Bindings 1
+단축키 설정
+#+BEGIN_SRC elisp :tangle config.el
+;; 스프릿된 화면들을 넘어다닐때 아주 유용하다.
+(map! "C-h" #'evil-window-left)
+(map! "C-j" #'evil-window-down)
+(map! "C-k" #'evil-window-up)
+(map! "C-l" #'evil-window-right)
+
+(map! :leader :prefix "g" :desc "ediff style diff from working-tree" "d" #'magit-ediff-show-working-tree)
+
+;; go back, go references
+(map! :n "gb" #'evil-jump-backward)
+(map! :n "gr" #'+lookup/references)
+;; 검색할때 브라우저를 찾는 수고를 줄여 준다.
+(map! :leader :prefix "s" :desc "Search Google.com" "g" #'google-search)
+(map! :leader :prefix "s" :desc "Search StackOverFlow" "v" #'stackoverflow-search)
+(map! :leader :prefix "s" :desc "Search Buffers" "b" #'swiper-all)
+(map! :leader :prefix "s" :desc "new project search file" "p" #'rg-project)
+;; 가끔씩 즐겨보는 블로그들의 rss를 피드로 받아와서 읽을때 사용한다.
+(map! :leader :prefix "o" :desc "Open news form RSS with ELfeed" "n" #'elfeed)
+;; 버퍼끼리 화면 전환할때 프로젝트를 벗어 나지 않도록 강제한다.
+(map! :leader :desc "workspace buffer list" "," #'+ivy/switch-workspace-buffer)
+;; ORG 모드에서 쓰는 단축키들
+(map! :leader :desc "Tangle Export" "ee" #'org-babel-tangle)
+;; 커스텀 함수로 정의해둔 쉘 설정 파일불러오는 함수에게 단축기를 할당했음.
+;; 자주 쓰지는 않는데 있어보이는 척 할때 아주 좋다.
+(map! :leader :prefix "f" :desc "Open Shell init file on other windows" "i" #'er-find-shell-init-file)
+;; 코드를 입력받아서 이쁜 화면으로 만들어주는 패키지에 단축기를 할당했다.
+(map! :leader :prefix "t" :desc "Capture Code with Carbon now" "t" #'carbon-now-sh)
+
+;; change window split mode
+;; 이맥스를 넓게 쓰다가 길게 쓰다가 할때마다 자주 쓰이는 레이아웃 번경 맛집 함수
+(map! :leader :prefix "t" :desc "Toggle Window Split Style" "s" #'toggle-window-split)
+
+;; evil 에서 라인 처음과 마지막으로 더 빨리 점프할 수 있도록 한다.
+(define-key evil-visual-state-map (kbd "H") 'beginning-of-line-text)
+(define-key evil-visual-state-map (kbd "L") 'evil-end-of-line)
+(define-key evil-normal-state-map (kbd "H") 'beginning-of-line-text)
+(define-key evil-normal-state-map (kbd "L") 'evil-end-of-line)
+;; evil multi edit recommanded setting
+(define-key evil-visual-state-map (kbd "M-s-m") 'evil-multiedit-match-all)
+(define-key evil-normal-state-map (kbd "M-s-m") 'evil-multiedit-match-all)
+(define-key evil-insert-state-map (kbd "M-s-m") 'evil-multiedit-match-all)
+;; 블럭 단위로 한번에 선택하고 싶을때 사용하면 좋다.
+;; 기본 단축키가 너무 불편해서 변경했다.
+(define-key evil-normal-state-map (kbd "M-s-k") #'er/expand-region)
+(define-key evil-normal-state-map (kbd "M-s-j") #'er/contract-region)
+(define-key evil-insert-state-map (kbd "M-s-k") #'er/expand-region)
+(define-key evil-insert-state-map (kbd "M-s-j") #'er/contract-region)
+;;ivy 미니 버퍼에서 컨트롤 키로 아이템을 선택하는건 새끼손가락에 죄를 짓는 일이다.
+(map! :after ivy :map ivy-minibuffer-map "TAB" 'next-line)
+
+;; ORG 모드에서 헤더 레벨 설정할때 쓰기 편한 단축키
+(map! :after org-mode :map org-mode-map ">" 'org-cyclt-level)
+
+#+END_SRC
+**** Bindings 2
+조금 복잡해지는 바인딩들. 그래도 이것들이 있어서 편하다.
+#+BEGIN_SRC elisp :tangle config.el
+;; 둠 이맥스 디스코드 채널에서 고수가 제안한 새로운 바인딩
+;; https://discord.com/channels/406534637242810369/695450585758957609/759868990909841438
+(after! evil
+  (require 'evil-textobj-anyblock)
+  (evil-define-text-object my-evil-textobj-anyblock-inner-quote
+    (count &optional beg end type)
+    "Select the closest outer quote."
+    (let ((evil-textobj-anyblock-blocks
+           '(("'" . "'")
+             ("\"" . "\"")
+             ("`" . "`")
+             ("“" . "”"))))
+      (evil-textobj-anyblock--make-textobj beg end type count nil)))
+
+  (evil-define-text-object my-evil-textobj-anyblock-a-quote
+    (count &optional beg end type)
+    "Select the closest outer quote."
+    (let ((evil-textobj-anyblock-blocks
+           '(("'" . "'")
+             ("\"" . "\"")
+             ("`" . "`")
+             ("“" . "”"))))
+      (evil-textobj-anyblock--make-textobj beg end type count t)))
+
+  (define-key evil-inner-text-objects-map "q" 'my-evil-textobj-anyblock-inner-quote)
+  (define-key evil-outer-text-objects-map "q" 'my-evil-textobj-anyblock-a-quote)
+  )
+
+;; 다국어를 사용할때 느낀 불편함을 해소하는 것들
+;; 하나의 단축기로 등록된 여러개의 입력기를 순환하며 선택한다.
+(add-hook 'evil-normal-state-entry-hook 'custom-input-method-hook)
+(define-key evil-normal-state-map (kbd "C-\\") #'choose-input-from-rotated-list)
+(define-key evil-insert-state-map (kbd "C-\\") #'choose-input-from-rotated-list)
+ #+END_SRC
+
+** Programming
+*** Vue & Typescript Custom Setting
+Vue와 타입스크립트를 위한 커스텀 설정 모드.
+#+BEGIN_SRC elisp :tangle +custom_funcs.el
+(defun setup-custom-prog-mode ()
+  ;; 기본 인덴테이션을 설정한다.
+  (setq typescript-indent-level 2)
+  (setq emmet-indentation 2)
+  (setq js-indent-level 2)
+  ;; (setq global-git-gutter-mode t)
+  (setq web-mode-code-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-markup-indent-offset 2)
+  (flycheck-mode +1)
+  ;; (fringe-mode '(20 . 20))
+  (my/use-eslint-from-node-modules)
+  (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (setq lsp-ui-peek-fontify 'always)
+  (setq flycheck-check-syntax-automatically '(save mode-enabled))
+  (add-hook 'before-save-hook #'prettier-js nil 'local))
+
+(defun custom-ts-mode ()
+  "Custom hooks for ts-mode"
+  (if (not (equal buffer-file-name 'nil))
+      (let ((extname (file-name-extension buffer-file-name)))
+        (when (or (string-equal "tsx" extname)
+                  (string-equal "ts" extname))
+          (setup-custom-prog-mode)
+          ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
+          (flycheck-select-checker 'javascript-eslint)))))
+
+(defun my/use-eslint-from-node-modules ()
+  "Use local eslint from node_modules before global."
+  (let* ((root (locate-dominating-file
+                 (or (buffer-file-name) default-directory)
+                     "node_modules"))
+         (eslint (and root
+                    (expand-file-name "node_modules/eslint/bin/eslint.js"
+                                      root))))
+        (when (and eslint (file-executable-p eslint))
+              (setq-local flycheck-javascript-eslint-executable eslint))))
+
+(defun custom-vue-mode ()
+  "Custom hooks for vue-mode"
+  (if (not (equal buffer-file-name 'nil))
+      (let ((extname (file-name-extension buffer-file-name)))
+        (when (string-equal "vue" extname)
+          (setup-custom-prog-mode)
+          ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
+          (flycheck-select-checker 'javascript-eslint)
+          ))))
+
+#+END_SRC
+
+주로 사용하는 언어들 관련 설정. lsp관련 설정들을 모아 놓았다.
+#+BEGIN_SRC elisp :tangle config.el
+;; 뷰모드가 느리게 동작하고 아직 버그가 많아서 웹 모드로 바꾼다.
+(add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.env\\'" . dotenv-mode))
+
+;; disable CamelCase syntax
+(global-subword-mode nil)
+
+(add-hook 'web-mode-hook 'custom-vue-mode)
+(add-hook 'typescript-mode-hook 'custom-ts-mode)
+
+(after! web-mode
+  (set-company-backend! 'web-mode '(company-capf company-yasnippet)))
+
+(after! typescript-mode
+  (set-company-backend! 'typescript-mode '(company-tabnine company-capf company-yasnippet)))
+
+(setq flycheck-global-modes '(not gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
+;; all-the-icons에 아이콘 색깔을 바꾸기 위해서 수동으로 설정한다.
+(add-hook 'company-mode-hook 'company-box-mode)
+(setq company-box-icons-alist 'company-box-icons-idea)
+
+(setq company-tooltip-minimum-width 60)
+(setq company-tooltip-maximum-width 60)
+(setq company-box-doc-enable nil)
+
+;; 린트 에러 버퍼를 오픈하면 포커스가 자동으로 이동하지 않는다.
+;; 이거 없으면 생각보다 귀찮아진다.
+(add-hook 'flycheck-error-list-mode-hook (lambda () (switch-to-buffer-other-window "*Flycheck errors*")))
+#+END_SRC
+
+**** LSP & Tabnine
+Tabnine관련 설정들
+아쉽게도 아직까지 이 모듈을 완벽하게 이맥스에서 다른 company-backends랑 같이 동작하게
+설정하는 법을 찾을 수 없었다.
+#+BEGIN_SRC elisp :tangle config.el
+(add-hook! 'lsp-completion-mode-hook
+  (defun init-company-tabnine-h ()
+    (when lsp-completion-mode
+      (setq-local company-backends (cons 'company-tabnine company-backends)))))
+#+END_SRC
+
+**** Programming ETC
+ 개발관련 기타 설정들
+#+BEGIN_SRC elisp :tangle config.el
+;; dash docs setup
+;; 무슨 이유인지 모르겠으나 dash docs를 자동 인식 못함. 수동으로 추가해줌
+(setq dash-docs-docsets (list "VueJS" "TypeScript" "MomentJS" "NodeJS" "Stylus" "Pug" "HTML" "CSS"
+                              "Express" "Mongoose" "ElasticSearch" "Docker" "Jekyll" "Mocha"
+                              "Bootstrap_4" "Bootstrap_5" "jQuery" "React" "Dart"))
+
+;; 1초라도 빨리 팝업 띄우고 싶어서
+;; 그러나 실제 체감속도 향상은 없음
+(setq company-idle-delay 0.0)
+
+;; elfeed 관련 목록 커스텀 컬럼 설정
+(after! elfeed
+  (setq elfeed-search-print-entry-function #'feed-reader/search-print))
+
+;; lsp 설정 이후에 불필요한 옵션들은 전부다 끈다.
+(after! lsp
+  ;; These take up a lot of space on my big font size
+  (setq lsp-ui-sideline-show-code-actions nil
+        lsp-ui-sideline-show-diagnostics nil
+        lsp-signature-render-all nil))
+#+END_SRC
+** Magit / Forge
+magit이나 dired등과 같이 유틸리티 관련 설정들을 모아 놓았다.
+#+BEGIN_SRC elisp :tangle config.el
+;; vc & magit 관련 설정
+(setq vc-follow-symlinks t)
+(setq find-file-visit-truename t)
+(setq magit-refresh-status-buffer 'switch-to-buffer)
+(setq magit-rewrite-inclusive 'ask)
+(setq magit-save-some-buffers t)
+(setq magit-set-upstream-on-push 'askifnotset)
+(setq magit-diff-refine-hunk 'all)
+
+(magit-delta-mode)
+
+(setq ghub-use-workaround-for-emacs-bug 'force)
+(setq forge-topic-list-limit '(200 . 10))
+
+;; ediff를 닫을때 항상 물어보는 거 금지!!
+(defadvice! shut-up-ediff-quit (orig-fn &rest args)
+  :around #'ediff-quit
+  (letf! (defun y-or-n-p (&rest _) t)
+    (apply orig-fn args)))
+#+END_SRC
+
+Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스에서
+편하게 생성할 수 있다.
+하는 김에 단축기도 좀 편하게 evil스타일로 변경해본다.
+#+BEGIN_SRC elisp :tangle config.el
+(after! forge
+  (setq auth-sources '("~/.authinfo"))
+  (add-to-list 'forge-alist '("gitlab.jjsoft.kr" "gitlab.jjsoft.kr/api/v4" "gitlab.jjsoft.kr" forge-gitlab-repository))
+  ;; O-T (Open This)바인딩으로 브라우저에서 링크를 열 수 있도록 지원한다.
+  (define-key forge-topic-title-section-map (kbd "ot") 'forge-custom-open-url)
+  (define-key forge-topic-marks-section-map (kbd "ot") 'forge-custom-open-url)
+  (define-key forge-topic-state-section-map (kbd "ot") 'forge-custom-open-url)
+  (define-key forge-topic-labels-section-map (kbd "ot") 'forge-custom-open-url)
+  (define-key forge-topic-milestone-section-map (kbd "ot") 'forge-custom-open-url)
+  (define-key forge-topic-assignees-section-map (kbd "ot") 'forge-custom-open-url)
+  (define-key forge-post-section-map (kbd "ot") 'forge-custom-open-url)
+  ;; Y-T (Yank This)바인딩으로 이슈와 커멘트들의 링크를 복사한다.
+  (define-key forge-topic-title-section-map (kbd "yt") 'forge-copy-url-at-point-as-kill)
+  (define-key forge-topic-marks-section-map (kbd "yt") 'forge-copy-url-at-point-as-kill)
+  (define-key forge-topic-state-section-map (kbd "yt") 'forge-copy-url-at-point-as-kill)
+  (define-key forge-topic-labels-section-map (kbd "yt") 'forge-copy-url-at-point-as-kill)
+  (define-key forge-topic-milestone-section-map (kbd "yt") 'forge-copy-url-at-point-as-kill)
+  (define-key forge-topic-assignees-section-map (kbd "yt") 'forge-copy-url-at-point-as-kill)
+  (define-key forge-post-section-map (kbd "yt") 'forge-copy-url-at-point-as-kill)
+  ;; E-T i(Edit This)바인딩으로 간편하게 모든걸 수정하자
+  (define-key forge-topic-title-section-map (kbd "et") 'forge-edit-topic-title)
+  (define-key forge-topic-marks-section-map (kbd "et") 'forge-edit-topic-marks)
+  (define-key forge-topic-state-section-map (kbd "et") 'forge-edit-topic-state)
+  (define-key forge-topic-labels-section-map (kbd "et") 'forge-edit-topic-labels)
+  (define-key forge-topic-milestone-section-map (kbd "et") 'forge-edit-topic-milestone)
+  (define-key forge-topic-assignees-section-map (kbd "et") 'forge-edit-topic-assignees)
+  (define-key forge-post-section-map (kbd "et") 'forge-edit-post)
+  (define-key forge-post-section-map (kbd "dt") 'forge-delete-comment)
+  (define-key forge-topic-mode-map (kbd "ar") 'forge-create-post)
+  ;; 팝업을 별도의 버퍼로 띄우도록 한다.
+  ;; (setq magit-display-buffer-function #'+magit-my-display-buffer-fn)
+  (setq markdown-display-remote-images t)
+  )
+#+END_SRC
+
+** Org-Mode
+
+ORG모드를 위한 함수들
+#+BEGIN_SRC elisp :tangle +custom_funcs.el
+(defun my-org-config/after-org-mode-load ()
+  (visual-line-mode)
+  (require 'org-indent)
+  (org-indent-mode)
+  (setq org-fontify-quote-and-verse-blocks nil
+        org-fontify-whole-heading-line nil
+        org-hide-leading-stars nil
+        org-startup-indented nil)
+  )
+#+END_SRC
+
+요즘 열공중인 그렇게 대단하다 침이 마르지 않게 칭찬해대는 ORG모드에 대한 설정들을 따로 모아 놓았다.
+#+BEGIN_SRC elisp :tangle config.el
+;; start my org settings
+
+;; config some hooks
+(add-hook 'org-mode-hook 'my-org-config/after-org-mode-load)
+
+;;basic org mode config
+(setq
+  org-hide-emphasis-markers t
+  org-log-state-notes-into-drawer t
+  org-directory "~/org/"
+  org-agenda-skip-scheduled-if-done t
+  org-ellipsis " ▾ "
+  org-tags-column -80
+  org-agenda-span 30
+  org-agenda-files '("~/org")
+  org-log-done 'time
+  org-refile-targets (quote ((nil :maxlevel . 1)))
+  ;; org-capture-templates '(("x" "JW.ORG" entry
+  ;;                         (file+olp+datetree "jw.org")
+  ;;                         "**** [ ] %U %?" :prepend t :kill-buffer t)
+  ;;                         ("t" "JJSOFT" entry
+  ;;                         (file+headline "jjsoft.org")
+  ;;                         "* [ ] %?\n%i" :prepend t :ill-buffer t))
+  +doom-dashboard-banner-file (expand-file-name "logo.png" doom-private-dir)
+  +org-capture-todo-file "tasks.org")
+
+;; config org-super-agenda
+(setq org-super-agenda-mode t)
+(setq org-super-agenda-header-map nil)
+(setq org-deadline-warning-days 7)
+(setq org-agenda-skip-scheduled-if-done t)
+(setq org-agenda-block-separator 9472)
+(setq org-agenda-start-on-weekday nil)
+(setq org-super-agenda-groups '((:name "Today"
+                                   :time-grid t
+                                   :scheduled today)
+                                (:name "Due today"
+                                    :deadline today)
+                                (:name "Important"
+                                    :priority "A")
+                                (:name "Overdue"
+                                    :deadline past)
+                                (:name "Due soon"
+                                    :deadline future)))
+ #+END_SRC
+
+헤더 스타일을 커스텀으로 변경한다.
+#+BEGIN_SRC elisp :tangle config.el
+(after! org
+  (set-face-attribute 'org-link nil :weight 'normal :background nil)
+  (set-face-attribute 'org-code nil :foreground "#a9a1e1" :background nil)
+  (set-face-attribute 'org-date nil :foreground "#5B6268" :background nil)
+  (set-face-attribute 'org-level-1 nil :foreground "steelblue2" :background nil :height 1.2 :weight 'normal)
+  (set-face-attribute 'org-level-2 nil :foreground "slategray2" :background nil :height 1.0 :weight 'normal)
+  (set-face-attribute 'org-level-3 nil :foreground "SkyBlue2" :background nil :height 1.0 :weight 'normal)
+  (set-face-attribute 'org-level-4 nil :foreground "DodgerBlue2" :background nil :height 1.0 :weight 'normal)
+  (set-face-attribute 'org-level-5 nil :weight 'normal)
+  (set-face-attribute 'org-level-6 nil :weight 'normal)
+  (set-face-attribute 'org-document-title nil :foreground "SlateGray1" :background nil :height 1.75 :weight 'bold)
+  (setq org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
+  (setq org-fontify-quote-and-verse-blocks nil
+        org-fontify-whole-heading-line nil
+        org-hide-leading-stars nil
+        org-startup-indented nil)
+  (set-face-attribute 'org-document-title nil
+                      :foreground "White"
+                      :height 1.2
+                      :weight 'bold))
+
+;; 기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
+(use-package org-bullets
+  :init
+  (setq org-bullets-bullet-list '("✸" "✸" "✸" "✸" "✸"))
+  :config
+  (add-hook 'org-mode-hook
+            (lambda () (org-bullets-mode 1)))
+)
+#+END_SRC
+
+바벨을 사용할때 언어, lsp를 지원하기 위한 추가적인 세팅
+#+BEGIN_SRC elisp :tangle config.el
+(setq org-edit-src-content-indentation 0)
+(setq org-src-tab-acts-natively t)
+(setq org-src-preserve-indentation t)
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((ts . t)
+   (js . t)
+   (emacs-lisp . t)
+   (python . t)
+   (shell . t)
+   ))
+
+(cl-defmacro lsp-org-babel-enable (lang)
+  "Support LANG in org source code block."
+  (setq centaur-lsp 'lsp-mode)
+  (cl-check-type lang stringp)
+  (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
+         (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
+    `(progn
+       (defun ,intern-pre (info)
+         (let ((file-name (->> info caddr (alist-get :file))))
+           (unless file-name
+             (setq file-name (make-temp-file "babel-lsp-")))
+           (setq buffer-file-name file-name)
+           (lsp-deferred)))
+       (put ',intern-pre 'function-documentation
+            (format "Enable lsp-mode in the buffer of org source block (%s)."
+                    (upcase ,lang)))
+       (if (fboundp ',edit-pre)
+           (advice-add ',edit-pre :after ',intern-pre)
+         (progn
+           (defun ,edit-pre (info)
+             (,intern-pre info))
+           (put ',edit-pre 'function-documentation
+                (format "Prepare local buffer environment for org source block (%s)."
+                        (upcase ,lang))))))))
+(defvar org-babel-lang-list
+  '("emacs-lisp" "python" "javascript" "bash" "sh" "vue"))
+(dolist (lang org-babel-lang-list)
+  (eval `(lsp-org-babel-enable ,lang)))
+#+END_SRC
+
+# 기타 ORG모드 설정
+#+BEGIN_SRC elisp :tangle config.el
+(use-package! org-mac-link
+  :after org
+  :config
+  (setq org-mac-grab-Acrobat-app-p nil)
+  (setq org-mac-grab-devonthink-app-p nil)
+  (map! :leader
+        :map org-mode-map
+        :desc "link from mac apps"
+        "mlm"  #'org-mac-grab-link))
+(setq org-html-htmlize-output-type 'css)
+(setq org-download-method 'attach)
+(setq global-org-pretty-table-mode t)
+;; (use-package org-weather)
+;; (setq org-weather-location "Daejoen,KR")
+;; (org-weather-refresh)
+#+END_SRC
+** RSS Feed
+
+*** Custom Elfeed Search Column
+기본 피드 목록 화면은 한글 제목의 문자열 길이 계산에 버그가 있는지
+컬럼 정렬이 뒤죽박죽이다.
+그래서 컬럼 순서에서 제목 부분을 제일 뒤로 두어 깔끔하게 정렬되도록 한다.
+구글링 해서 찾았음.
+#+BEGIN_SRC elisp :tangle +custom_funcs.el
+(defun feed-reader/search-print (entry)
+      "Print ENTRY to the buffer."
+      (let* ((feed-width 16)
+              (tags-width 8)
+              (title (or (elfeed-meta entry :title) (elfeed-entry-title entry) ""))
+              (title-faces (elfeed-search--faces (elfeed-entry-tags entry)))
+              (feed (elfeed-entry-feed entry))
+              (feed-title
+              (when feed
+              (or (elfeed-meta feed :title) (elfeed-feed-title feed))))
+              (tags (mapcar #'symbol-name (elfeed-entry-tags entry)))
+              (tags-str (concat "[" (mapconcat 'identity tags ",") "]"))
+              (title-width (- (window-width) feed-width tags-width 4))
+              (title-column (elfeed-format-column
+                              title (elfeed-clamp
+                              elfeed-search-title-min-width
+                              title-width
+                              elfeed-search-title-max-width)
+                              :left))
+              (tag-column (elfeed-format-column
+                      tags-str (elfeed-clamp (length tags-str) tags-width tags-width)
+                      :left))
+              (feed-column (elfeed-format-column
+                      feed-title (elfeed-clamp feed-width feed-width feed-width)
+                      :left)))
+      (insert (propertize feed-column 'face 'elfeed-search-feed-face) " ")
+      (insert (propertize tag-column 'face 'elfeed-search-tag-face) " ")
+      (insert (propertize title 'face title-faces 'kbd-help title))))
+
+#+END_SRC
+
+이맥스에서 RSS피드를 받아 보기에 편하다.
+#+BEGIN_SRC elisp :tangle config.el
+(setq elfeed-feeds '(
+"http://www.bloter.net/feed"
+"https://blog.elementary.io/feed.xml"
+"https://d2.naver.com/d2.atom"
+"https://engineering.linecorp.com/ko/feed/"
+"https://tech.lezhin.com/rss/"
+"https://emacsredux.com/atom.xml"
+"http://sachachua.com/blog/category/emacs/feed"
+"https://planet.emacslife.com/atom.xml"
+"https://www.emacswiki.org/emacs?action=rss;match=%5E%5Cd%5Cd%5Cd%5Cd-%5Cd%5Cd-%5Cd%5Cd"
+"https://feeds.feedburner.com/zdkorea"
+"https://www.producthunt.com/feed?category=undefined"
+"https://www.reddit.com/r/linux.rss"
+"https://www.gamingonlinux.com/article_rss.php"
+"https://hackaday.com/blog/feed/"
+"https://opensource.com/feed"
+"https://linux.softpedia.com/backend.xml"
+"https://itsfoss.com/feed/"
+"https://www.zdnet.com/topic/linux/rss.xml"
+"https://www.phoronix.com/rss.php"
+"http://feeds.feedburner.com/d0od"
+"https://www.computerworld.com/index.rss"
+"https://www.networkworld.com/category/linux/index.rss"
+"https://www.techrepublic.com/rssfeeds/topic/open-source/"
+"https://betanews.com/feed"
+"http://lxer.com/module/newswire/headlines.rss"
+"https://distrowatch.com/news/dwd.xml"
+))
+#+END_SRC
+** Utils
+*** Ripgrep
+rg.el 관련 설정.
+#+BEGIN_SRC elisp :tangle config.el
+(use-package rg
+  :config
+  (setq rg-group-result t)
+  (setq rg-hide-command t)
+  (setq rg-show-columns nil)
+  (setq rg-show-header t)
+  (setq rg-custom-type-aliases nil)
+  (setq rg-default-alias-fallback "all"))
+
+;; 버퍼가 열리면 포커스를 그쪽으로 이동시킨다.
+;; 이거 없으면 생각보다 귀찮아진다.
+(add-hook 'rg-mode-hook (lambda () (switch-to-buffer-other-window "*rg*")))
+#+END_SRC
+
+*** Google, StackOverFlow Search
+구글 검색, 각종 사이트 검색을 편리하게 하기 위한 간단한 유틸리티 함수들
+구글링으로 찾았다.
+#+BEGIN_SRC elisp :tangle +custom_funcs.el
+(defun stackoverflow-search ()
+"search keyword in google code search and stackoverflow.com"
+    (interactive)
+    (require 'w3m)
+    (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
+      (xwidget-webkit-browse-url (concat "http://www.google.com/search?hl=en&q=" keyword "+site:stackoverflow.com")))
+)
+
+(defun google-search ()
+"search word under cursor in google code search and google.com"
+    (interactive)
+    (require 'w3m)
+    (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
+      (xwidget-webkit-browse-url (concat "http://www.google.com/search?hl=en&q=" keyword )))
+)
+
+#+END_SRC
+
+
+*** Custom Emacs Multi-InputMethod Cycle
+기존의 이맥스에서는 여러 외국어를 입력할때 변환이 매우 번거로웠지만
+간단한 함수를 만들어서 순환형식으로 빠르게 입력기 변환을 수행한다。
+가장 좋은 방법은 OS의 입력기에 맞춰서 이맥스의 입력기도 함께 변환되도록 연동하는 것이겠지만
+어떻게 하는건지는 모르겠음.
+#+BEGIN_SRC elisp :tangle +custom_funcs.el
+(defun custom-input-method-hook ()
+  (when (equal nil (string-equal nil evil-input-method))
+      (setq evil-input-method nil)
+      )
+  )
+
+(defvar my-input-list '("korean-hangul"
+                        "japanese"
+                        "pyim"))
+
+(defun choose-input-from-rotated-list ()
+  "change input method"
+  (interactive)
+  (setq my-input-list (append (cdr my-input-list) (cons (car my-input-list) ())))
+  (message (car my-input-list))
+  (set-input-method (car my-input-list))
+  )
+#+END_SRC
+
+*** Forge Custom Open Link
+Forge에서 브라우저로 바로 열수 있는 함수를 사용한다.
+#+BEGIN_SRC elisp :tangle +custom_funcs.el
+(defun forge-custom-open-url ()
+  (interactive)
+  (if-let ((url (forge-get-url (or (forge-post-at-point)
+                                   (forge-current-topic)))))
+      (progn
+        (message "Open Url: %S" url)
+        (browse-url-generic url)))
+  )
+#+END_SRC
+
+*** Toggle Window Layout
+윈도우를 두개로 나누었을때 가로, 세로 나누기로 변경하는 함수.
+#+BEGIN_SRC elisp :tangle +custom_funcs.el
+(defun toggle-window-split ()
+  (interactive)
+  (if (= (count-windows) 2)
+      (let* ((this-win-buffer (window-buffer))
+             (next-win-buffer (window-buffer (next-window)))
+             (this-win-edges (window-edges (selected-window)))
+             (next-win-edges (window-edges (next-window)))
+             (this-win-2nd (not (and (<= (car this-win-edges)
+                                         (car next-win-edges))
+                                     (<= (cadr this-win-edges)
+                                         (cadr next-win-edges)))))
+             (splitter
+              (if (= (car this-win-edges)
+                     (car (window-edges (next-window))))
+                  'split-window-horizontally
+                'split-window-vertically)))
+        (delete-other-windows)
+        (let ((first-win (selected-window)))
+          (funcall splitter)
+          (if this-win-2nd (other-window 1))
+          (set-window-buffer (selected-window) this-win-buffer)
+          (set-window-buffer (next-window) next-win-buffer)
+          (select-window first-win)
+          (if this-win-2nd (other-window 1))))))
+#+END_SRC
+** ETC
+*** Shell Utils
+쉘 설정 파일을 바로 불어 올 수 있는 함수.
+단축기와 연동하여 사용한다.
+zsh관련 설정 파일을 만질 일이 있을때 요긴하게 잘 사용한다.
+#+BEGIN_SRC elisp :tangle +custom_funcs.el
+(defun er-find-shell-init-file ()
+  "Edit the shell init file in another window."
+  (interactive)
+  (let* ((shell (car (reverse (split-string (getenv "SHELL") "/"))))
+         (shell-init-file (cond
+                           ((string-equal "zsh" shell) ".zshrc")
+                           ((string-equal "bash" shell) ".bashrc")
+                           (t (error "Unknown shell")))))
+    (find-file-other-window (expand-file-name shell-init-file (getenv "HOME")))))
+#+END_SRC
+
+*** Custom Variables
+#+BEGIN_SRC elisp :tangle custom.el
+(custom-set-variables
+ '(warning-suppress-types '((initialization) (lsp-mode))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+#+END_SRC

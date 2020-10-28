@@ -1,0 +1,28 @@
+# -*- mode: snippet -*-
+# name: vue+composition-api+pug+typescript
+# key: vuecomp
+# --
+<template lang="pug">
+</template>
+
+<script lang="ts">
+import {defineComponent, computed reactive, watch} from '@vue/composition-api'
+
+export default defineComponent({
+  setup(props, {root}) {
+    const state = reactive({
+    })
+    // watch(
+    //   () => ,
+    //   () => {},
+    // )
+
+    return {
+      state,
+    }
+  },
+})
+</script>
+
+<style lang="stylus" scoped>
+</style>
