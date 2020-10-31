@@ -27,23 +27,23 @@
    ))
 
 ;; Restore Frame size and location, if we are using gui emacs
-(if window-system
-  (progn
-    (add-hook 'after-init-hook 'load-framegeometry)
-    (add-hook 'kill-emacs-hook 'save-framegeometry))
-)
+;; (if window-system
+;;   (progn
+;;     (add-hook 'after-init-hook 'load-framegeometry)
+;;     (add-hook 'kill-emacs-hook 'save-framegeometry))
+;; )
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-;; (setq initial-frame-alist '((top . 23) (left . 1147) (width . 128) (height . 80)))
+(setq initial-frame-alist '((top . 23) (left . 1147) (width . 128) (height . 80)))
 ;; 좌우로 여백을 활성화 시킨다.
-;; (defun my-fringe-mode-hook ()
-;;   (fringe-mode '(15 . 15)))
-;; (add-hook 'prog-mode-hook 'my-fringe-mode-hook)
-;; (add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
-;; (add-hook 'org-mode-hook  'my-fringe-mode-hook)
+(defun my-fringe-mode-hook ()
+   (fringe-mode '(15 . 15)))
+  (add-hook 'prog-mode-hook 'my-fringe-mode-hook)
+  (add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
+  (add-hook 'org-mode-hook  'my-fringe-mode-hook)
 (global-evil-matchit-mode)
 ;; make open url function to use webkit
-(setq browse-url-browser-function 'xwidget-webkit-browse-url)
+;; (setq browse-url-browser-function 'xwidget-webkit-browse-url)
 
 ;; 스나이프를 화면 보이는 영역으로 제한한다.
 (setq evil-snipe-scope 'whole-visible)
@@ -81,6 +81,9 @@
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
 (setq doom-font (font-spec :family "Fira Code" :size 14))
 
+;;고양이를 켜서 그나마 좀 재미나게 바꿔본다.
+(nyan-mode)
+(nyan-start-animation)
 ;; add icons to ivy
 ;; 아이비 메뉴에 아이콘이 들어가면 호박에 줄그어서 수박이 되는 경험을 할 수 있다.
 ;; (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
@@ -110,10 +113,10 @@
 (setq read-process-output-max (* 1024 1024))
 
 ;; 스프릿된 화면들을 넘어다닐때 아주 유용하다.
-(map! "C-h" #'evil-window-left)
-(map! "C-j" #'evil-window-down)
-(map! "C-k" #'evil-window-up)
-(map! "C-l" #'evil-window-right)
+(map! "C-h" #'tmux-pane-omni-window-left)
+(map! "C-j" #'tmux-pane-omni-window-down)
+(map! "C-k" #'tmux-pane-omni-window-up)
+(map! "C-l" #'tmux-pane-omni-window-right)
 
 (map! :leader :prefix "g" :desc "ediff style diff from working-tree" "d" #'magit-ediff-show-working-tree)
 
@@ -479,3 +482,62 @@
 ;; 버퍼가 열리면 포커스를 그쪽으로 이동시킨다.
 ;; 이거 없으면 생각보다 귀찮아진다.
 (add-hook 'rg-mode-hook (lambda () (switch-to-buffer-other-window "*rg*")))
+
+(add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
+(use-package! mu4e)
+(after! mu4e
+  (message "init mu4e variables")
+  (setq mu4e-attachment-dir "~/Downloads"
+        mu4e-compose-signature-auto-include nil
+        mu4e-get-mail-command "mbsync -a"
+        mu4e-maildir "~/Mailbox"
+        mu4e-update-interval 60
+        mu4e-use-fancy-chars t
+        mu4e-view-show-addresses t
+        mu4e-view-show-images t
+        mu4e-index-update-in-background t
+        mu4e-compose-signature-auto-include t
+        mu4e-compose-format-flowed t
+        ;; +mu4e-min-header-frame-width 142
+        mu4e-headers-date-format "%y/%m/%d"
+        mu4e-headers-time-format "⧖ %H:%M"
+        mu4e-headers-results-limit 1000
+        mu4e-index-cleanup t)
+)
+
+(set-email-account! "Outlook"
+                    '((user-mail-address      . "jjpark78@outlook.com")
+                      (user-full-name         . "Jaejin Park")
+                      (smtpmail-smtp-server   . "smtp.office365.com")
+                      (smtpmail-smtp-service  . 587)
+                      (smtpmail-stream-type   . starttls)
+                      (smtpmail-debug-info    . t)
+                      (mu4e-drafts-folder     . "/Drafts")
+                      (mu4e-refile-folder     . "/Archive")
+                      (mu4e-sent-folder       . "/Sent Items")
+                      (mu4e-trash-folder      . "/Deleted Items")
+                      ;(mu4e-sent-messages-behavior . 'delete)
+                      )
+                    nil)
+
+(use-package! mu4e-views
+  :after mu4e
+  :defer nil
+  :bind (:map mu4e-headers-mode-map
+	    ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
+	    ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
+	    ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
+	    )
+  :config
+  (setq mu4e-views-completion-method 'ivy) ;; use ivy for completion
+  (setq mu4e-views-default-view-method "html") ;; make xwidgets default
+  (mu4e-views-mu4e-use-view-msg-method "html") ;; select the default
+  (setq mu4e-views-next-previous-message-behaviour 'always-switch-to-view))
+
+(use-package mu4e-alert
+  :config
+  (message "loaded mu4e-alert")
+  (mu4e-alert-set-default-style 'notifier)
+  (mu4e-alert-enable-notifications)
+  (mu4e-alert-enable-mode-line-display)
+)
