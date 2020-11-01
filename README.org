@@ -131,13 +131,15 @@
 ;; )
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-(setq initial-frame-alist '((top . 23) (left . 1147) (width . 128) (height . 80)))
+(setq initial-frame-alist '((top . 23) (left . 1147) (width . 130) (height . 80)))
+
 ;; 좌우로 여백을 활성화 시킨다.
 (defun my-fringe-mode-hook ()
    (fringe-mode '(15 . 15)))
-  (add-hook 'prog-mode-hook 'my-fringe-mode-hook)
-  (add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
-  (add-hook 'org-mode-hook  'my-fringe-mode-hook)
+
+(add-hook 'prog-mode-hook 'my-fringe-mode-hook)
+(add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
+(add-hook 'org-mode-hook  'my-fringe-mode-hook)
 (global-evil-matchit-mode)
 ;; make open url function to use webkit
 ;; (setq browse-url-browser-function 'xwidget-webkit-browse-url)
@@ -151,9 +153,17 @@
 ;; 개인으로만 쓰면 공짜인것도 매력임.
 (global-wakatime-mode)
 
-
 #+END_SRC
-
+**** Message buffer
+메세지 버퍼에 타임스탬프도 찍어서 메세지 발생 시간을 확인할 수 있게 한다.
+#+BEGIN_SRC elisp :tangle config.el
+;; (defadvice! message-with-timestamp (args)
+;;   :filter-args #'message
+;;   (setcar args (format "%s %s"
+;;                        (format-time-string "[%F %T.%3N %Z]")
+;;                        (car args)))
+;;   args)
+#+END_SRC
 **** Enable Auto-reverse
 파일이 외부에서 변경되었을때 자동으로 버퍼를 리프레쉬한다.
 #+BEGIN_SRC elisp :tangle config.el
@@ -216,6 +226,7 @@ Doom modeline 관련 수정
   (setq doom-modeline-major-mode-icon t)
   (setq doom-modeline-persp-name t)
   (setq doom-modeline-buffer-encoding nil)
+  (setq doom-modeline-buffer-state-icon nil)
   (setq doom-modeline-persp-icon nil)
   (setq doom-modeline-icon (display-graphic-p))
   (setq doom-modeline-buffer-file-name-style 'file-name))
@@ -240,7 +251,7 @@ Doom modeline 관련 수정
 ;; lsp 관련 설정 메뉴들
 ;; 이맥스를 느리게 만드는 범인중 십중팔구 LSP가 관련되어져 있다고 함.
 ;; 해당 튜닝도 구글링을 통해서 찾았다.
-(setq gc-cons-threshold 100000000)
+;; (setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024))
 #+END_SRC
 *** Useful Bindings
@@ -533,7 +544,7 @@ ORG모드를 위한 함수들
   (require 'org-indent)
   (org-indent-mode)
   (setq org-fontify-quote-and-verse-blocks nil
-        org-fontify-whole-heading-line nil
+        org-fontify-whole-heading-line t
         org-hide-leading-stars nil
         org-startup-indented nil)
   )
@@ -885,8 +896,8 @@ mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많�
         mu4e-headers-time-format "%H:%M:%S"
         mu4e-index-cleanup t)
   ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
-  (setq mu4e-headers-fields '((:flags         . 12)
-                              (:human-date    . 12)
+  (setq mu4e-headers-fields '((:human-date    . 12)
+                              (:flags         . 6)
                               ;; (:acctshortname . 4)
                               ;; (:foldername    . 25)
                               (:from-or-to    . 30)

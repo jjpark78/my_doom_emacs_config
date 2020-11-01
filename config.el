@@ -34,13 +34,15 @@
 ;; )
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-(setq initial-frame-alist '((top . 23) (left . 1147) (width . 128) (height . 80)))
+(setq initial-frame-alist '((top . 23) (left . 1147) (width . 130) (height . 80)))
+
 ;; 좌우로 여백을 활성화 시킨다.
 (defun my-fringe-mode-hook ()
    (fringe-mode '(15 . 15)))
-  (add-hook 'prog-mode-hook 'my-fringe-mode-hook)
-  (add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
-  (add-hook 'org-mode-hook  'my-fringe-mode-hook)
+
+(add-hook 'prog-mode-hook 'my-fringe-mode-hook)
+(add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
+(add-hook 'org-mode-hook  'my-fringe-mode-hook)
 (global-evil-matchit-mode)
 ;; make open url function to use webkit
 ;; (setq browse-url-browser-function 'xwidget-webkit-browse-url)
@@ -53,6 +55,13 @@
 ;; 하루 일과를 잘 보여준다.
 ;; 개인으로만 쓰면 공짜인것도 매력임.
 (global-wakatime-mode)
+
+;; (defadvice! message-with-timestamp (args)
+;;   :filter-args #'message
+;;   (setcar args (format "%s %s"
+;;                        (format-time-string "[%F %T.%3N %Z]")
+;;                        (car args)))
+;;   args)
 
  ;; Auto refresh buffers
 (global-auto-revert-mode 1)
@@ -98,6 +107,7 @@
   (setq doom-modeline-major-mode-icon t)
   (setq doom-modeline-persp-name t)
   (setq doom-modeline-buffer-encoding nil)
+  (setq doom-modeline-buffer-state-icon nil)
   (setq doom-modeline-persp-icon nil)
   (setq doom-modeline-icon (display-graphic-p))
   (setq doom-modeline-buffer-file-name-style 'file-name))
@@ -114,7 +124,7 @@
 ;; lsp 관련 설정 메뉴들
 ;; 이맥스를 느리게 만드는 범인중 십중팔구 LSP가 관련되어져 있다고 함.
 ;; 해당 튜닝도 구글링을 통해서 찾았다.
-(setq gc-cons-threshold 100000000)
+;; (setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024))
 
 ;; 스프릿된 화면들을 넘어다닐때 아주 유용하다.
@@ -508,8 +518,8 @@
         mu4e-headers-time-format "%H:%M:%S"
         mu4e-index-cleanup t)
   ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
-  (setq mu4e-headers-fields '((:flags         . 12)
-                              (:human-date    . 12)
+  (setq mu4e-headers-fields '((:human-date    . 12)
+                              (:flags         . 6)
                               ;; (:acctshortname . 4)
                               ;; (:foldername    . 25)
                               (:from-or-to    . 30)

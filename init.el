@@ -33,7 +33,7 @@
        ;; hydra
        ;; indent-guides    ; highlighted indent columns
        minimap             ; show a map of the code on the side
-       (modeline +icons)   ; snazzy, Atom-inspired modeline, plus API
+       (modeline)   ; snazzy, Atom-inspired modeline, plus API
        nav-flash           ; blink cursor line after big motions
        ;; neotree          ; a project drawer, like NERDTree for vim
        ophints             ; highlight the region an operation acts on

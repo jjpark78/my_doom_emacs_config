@@ -88,7 +88,7 @@
   (require 'org-indent)
   (org-indent-mode)
   (setq org-fontify-quote-and-verse-blocks nil
-        org-fontify-whole-heading-line nil
+        org-fontify-whole-heading-line t
         org-hide-leading-stars nil
         org-startup-indented nil)
   )
