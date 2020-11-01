@@ -79,7 +79,12 @@
 ;; (ivy-rich-mode 1)
 
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
-(setq doom-font (font-spec :family "Fira Code" :size 14))
+(setq doom-font (font-spec :family "Monaco" :size 13))
+
+;; 한글 관련 폰트미치 스케일링 설정
+(set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
+(setq face-font-rescale-alist
+      '(("NanumGothicCoding" . 1.2307692307692308)))
 
 ;;고양이를 켜서 그나마 좀 재미나게 바꿔본다.
 (nyan-mode)
@@ -488,7 +493,7 @@
 (after! mu4e
   (message "init mu4e variables")
   (setq mu4e-attachment-dir "~/Downloads"
-        mu4e-compose-signature-auto-include nil
+        mu4e-compose-signature-auto-include t
         mu4e-get-mail-command "mbsync -a"
         mu4e-maildir "~/Mailbox"
         mu4e-update-interval 60
@@ -500,9 +505,18 @@
         mu4e-compose-format-flowed t
         ;; +mu4e-min-header-frame-width 142
         mu4e-headers-date-format "%y/%m/%d"
-        mu4e-headers-time-format "⧖ %H:%M"
-        mu4e-headers-results-limit 1000
+        mu4e-headers-time-format "%H:%M:%S"
         mu4e-index-cleanup t)
+  (setq mu4e-headers-fields '((:flags         . 12)
+                              (:human-date    . 12)
+                              ;; (:acctshortname . 4)
+                              ;; (:foldername    . 25)
+                              (:from-or-to    . 30)
+                              ;(:size          . 6)
+                              (:subject       . nil)))
+  (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@outlook.com/inbox"   :key ?i)
+                                 (:maildir "/jjpark78@outlook.com/sent" :key ?s)
+                                 ))
 )
 
 (set-email-account! "Outlook"

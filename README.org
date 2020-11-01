@@ -151,6 +151,7 @@
 ;; 개인으로만 쓰면 공짜인것도 매력임.
 (global-wakatime-mode)
 
+
 #+END_SRC
 
 **** Enable Auto-reverse
@@ -190,7 +191,12 @@
 ;; (ivy-rich-mode 1)
 
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
-(setq doom-font (font-spec :family "Fira Code" :size 14))
+(setq doom-font (font-spec :family "Monaco" :size 13))
+
+;; 한글 관련 폰트미치 스케일링 설정
+(set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
+(setq face-font-rescale-alist
+      '(("NanumGothicCoding" . 1.2307692307692308)))
 
 ;;고양이를 켜서 그나마 좀 재미나게 바꿔본다.
 (nyan-mode)
@@ -200,6 +206,7 @@
 ;; (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
 
 #+END_SRC
+
 
 **** Doom Modeline
 Doom modeline 관련 수정
@@ -853,14 +860,18 @@ Forge에서 브라우저로 바로 열수 있는 함수를 사용한다.
           (select-window first-win)
           (if this-win-2nd (other-window 1))))))
 #+END_SRC
+
 ** Mail
+*** Basic Coonfiguration
+Mail관련 설정을 추가 한다.
+mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많이 자료가 존재한다. 고마워요 구글.
 #+BEGIN_SRC elisp :tangle config.el
 (add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
 (use-package! mu4e)
 (after! mu4e
   (message "init mu4e variables")
   (setq mu4e-attachment-dir "~/Downloads"
-        mu4e-compose-signature-auto-include nil
+        mu4e-compose-signature-auto-include t
         mu4e-get-mail-command "mbsync -a"
         mu4e-maildir "~/Mailbox"
         mu4e-update-interval 60
@@ -872,17 +883,29 @@ Forge에서 브라우저로 바로 열수 있는 함수를 사용한다.
         mu4e-compose-format-flowed t
         ;; +mu4e-min-header-frame-width 142
         mu4e-headers-date-format "%y/%m/%d"
-        mu4e-headers-time-format "%H:%M"
-        mu4e-headers-results-limit 1000
+        mu4e-headers-time-format "%H:%M:%S"
         mu4e-index-cleanup t)
+  ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
+  (setq mu4e-headers-fields '((:flags         . 12)
+                              (:human-date    . 12)
+                              ;; (:acctshortname . 4)
+                              ;; (:foldername    . 25)
+                              (:from-or-to    . 30)
+                              ;(:size          . 6)
+                              (:subject       . nil)))
+  ;;메일 폴더를 빠르게 선택할 수 있는 단축키도 지정한다.
+  (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@outlook.com/inbox"   :key ?i)
+                                 (:maildir "/jjpark78@outlook.com/sent"    :key ?s)
+                                 ))
 )
 
 #+END_SRC
 
+*** SMTP
+smtp 서버를 설정한다.
 #+BEGIN_SRC elisp :tangle config.el
 (set-email-account! "Outlook"
-                    '((user-mail-address      . "jjpark78@outlook.com")
-                      (user-full-name         . "Jaejin Park")
+                    '((user-full-name         . "Jaejin Park")
                       (smtpmail-smtp-server   . "smtp.office365.com")
                       (smtpmail-smtp-service  . 587)
                       (smtpmail-stream-type   . starttls)
@@ -896,6 +919,10 @@ Forge에서 브라우저로 바로 열수 있는 함수를 사용한다.
                     nil)
 #+END_SRC
 
+*** Render HTML email
+요즘의 대부분의 이메일은 raw text보다는 html + image 조합이 더 일반적인다.
+그래서 기능이 부족한 shr 보다는 그냥 webkit으로 렌더링 하도록 한다. mu4e-views는 이를 위한 패키지이다
+이맥스에는 내가 하고 싶은 거의 모든것이 이미 구현되어 있다.
 #+BEGIN_SRC elisp :tangle config.el
 (use-package! mu4e-views
   :after mu4e
@@ -912,6 +939,8 @@ Forge에서 브라우저로 바로 열수 있는 함수를 사용한다.
   (setq mu4e-views-next-previous-message-behaviour 'always-switch-to-view))
   #+END_SRC
 
+*** Alert
+새로운 메일이 도착할때 마다 데스크탑에 알람을 표시한다.
  #+BEGIN_SRC elisp :tangle config.el
 (use-package mu4e-alert
   :config
