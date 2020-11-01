@@ -518,12 +518,10 @@
         mu4e-headers-time-format "%H:%M:%S"
         mu4e-index-cleanup t)
   ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
-  (setq mu4e-headers-fields '((:human-date    . 12)
-                              (:flags         . 6)
-                              ;; (:acctshortname . 4)
-                              ;; (:foldername    . 25)
-                              (:from-or-to    . 30)
-                              ;(:size          . 6)
+  (setq mu4e-headers-fields '((:human-date . 12)
+                              (:flags      . 6)
+                              (:from       . 20)
+                              (:to         . 20)
                               (:subject       . nil)))
   ;;메일 폴더를 빠르게 선택할 수 있는 단축키도 지정한다.
   (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@outlook.com/inbox"   :key ?i)

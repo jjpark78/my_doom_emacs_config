@@ -2,6 +2,17 @@
 #+DATE:    July 23, 2020
 #+AUTHOR:  jjpark89@outlook.com
 #+STARTUP: showeverything
+
+** Table of Contents :TOC:
+  - [[#initialize][Initialize]]
+  - [[#programming][Programming]]
+  - [[#magit--forge][Magit / Forge]]
+  - [[#org-mode][Org-Mode]]
+  - [[#rss-feed][RSS Feed]]
+  - [[#utils][Utils]]
+  - [[#mail][Mail]]
+  - [[#etc][ETC]]
+
 ** Initialize
 *** Load Config from files
 우선 한곳에 모든 설정들을 모아두면 알아보기 힘드니 대략적인 기능별로
@@ -43,6 +54,7 @@
 (package! lsp-treemacs)
 (package! tmux-pane)
 (package! mu4e-alert)
+(package! org-toc)
 (package! mu4e-views
   :recipe
   (:host githubk
@@ -896,12 +908,10 @@ mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많�
         mu4e-headers-time-format "%H:%M:%S"
         mu4e-index-cleanup t)
   ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
-  (setq mu4e-headers-fields '((:human-date    . 12)
-                              (:flags         . 6)
-                              ;; (:acctshortname . 4)
-                              ;; (:foldername    . 25)
-                              (:from-or-to    . 30)
-                              ;(:size          . 6)
+  (setq mu4e-headers-fields '((:human-date . 12)
+                              (:flags      . 6)
+                              (:from       . 20)
+                              (:to         . 20)
                               (:subject       . nil)))
   ;;메일 폴더를 빠르게 선택할 수 있는 단축키도 지정한다.
   (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@outlook.com/inbox"   :key ?i)
