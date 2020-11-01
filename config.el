@@ -1,8 +1,5 @@
 (load! "+custom_funcs")
 (load! "+private")
-;; prodigy를 사용해서 빌드 명령어를 돌릴려고 했는데 버퍼 출력이 어마어마해져서 그냥 터미널에서 하는게 속 편하다는 걸 알았다.
-;; (load! "+startup")
-;; (add-to-list 'load-path "~/.doom.d/legacy/org-weather")
 
 ;; 사용자 이름 설정
 (setq user-full-name "Jaejin Park"

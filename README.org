@@ -20,9 +20,6 @@
 #+BEGIN_SRC elisp :tangle config.el
 (load! "+custom_funcs")
 (load! "+private")
-;; prodigy를 사용해서 빌드 명령어를 돌릴려고 했는데 버퍼 출력이 어마어마해져서 그냥 터미널에서 하는게 속 편하다는 걸 알았다.
-;; (load! "+startup")
-;; (add-to-list 'load-path "~/.doom.d/legacy/org-weather")
 #+END_SRC
 +private.el 파일에는 공개하기 곤란한 개인 토큰이나 패스워드등이 담겨 있다.
 *** Packages
@@ -54,7 +51,6 @@
 (package! lsp-treemacs)
 (package! tmux-pane)
 (package! mu4e-alert)
-(package! org-toc)
 (package! mu4e-views
   :recipe
   (:host githubk
