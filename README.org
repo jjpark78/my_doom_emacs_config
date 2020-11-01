@@ -665,7 +665,7 @@ ORG모드를 위한 함수들
   (eval `(lsp-org-babel-enable ,lang)))
 #+END_SRC
 
-# 기타 ORG모드 설정
+기타 ORG모드 설정
 #+BEGIN_SRC elisp :tangle config.el
 (use-package! org-mac-link
   :after org
@@ -793,7 +793,6 @@ rg.el 관련 설정.
 
 #+END_SRC
 
-
 *** Custom Emacs Multi-InputMethod Cycle
 기존의 이맥스에서는 여러 외국어를 입력할때 변환이 매우 번거로웠지만
 간단한 함수를 만들어서 순환형식으로 빠르게 입력기 변환을 수행한다。
@@ -898,7 +897,6 @@ mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많�
                                  (:maildir "/jjpark78@outlook.com/sent"    :key ?s)
                                  ))
 )
-
 #+END_SRC
 
 *** SMTP

@@ -507,6 +507,7 @@
         mu4e-headers-date-format "%y/%m/%d"
         mu4e-headers-time-format "%H:%M:%S"
         mu4e-index-cleanup t)
+  ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
   (setq mu4e-headers-fields '((:flags         . 12)
                               (:human-date    . 12)
                               ;; (:acctshortname . 4)
@@ -514,14 +515,14 @@
                               (:from-or-to    . 30)
                               ;(:size          . 6)
                               (:subject       . nil)))
+  ;;메일 폴더를 빠르게 선택할 수 있는 단축키도 지정한다.
   (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@outlook.com/inbox"   :key ?i)
-                                 (:maildir "/jjpark78@outlook.com/sent" :key ?s)
+                                 (:maildir "/jjpark78@outlook.com/sent"    :key ?s)
                                  ))
 )
 
 (set-email-account! "Outlook"
-                    '((user-mail-address      . "jjpark78@outlook.com")
-                      (user-full-name         . "Jaejin Park")
+                    '((user-full-name         . "Jaejin Park")
                       (smtpmail-smtp-server   . "smtp.office365.com")
                       (smtpmail-smtp-service  . 587)
                       (smtpmail-stream-type   . starttls)
