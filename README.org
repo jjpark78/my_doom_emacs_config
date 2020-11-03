@@ -24,6 +24,7 @@
 +private.el 파일에는 공개하기 곤란한 개인 토큰이나 패스워드등이 담겨 있다.
 *** Packages
 #+BEGIN_SRC elisp :tangle packages.el
+(unpin! magit forge lsp-mode dap-mode)
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
@@ -49,17 +50,13 @@
 (package! evil-textobj-anyblock)
 (package! ob-typescript)
 (package! lsp-treemacs)
-(package! tmux-pane)
+;; (package! tmux-pane)
 (package! mu4e-alert)
 (package! mu4e-views
   :recipe
   (:host githubk
    :repo "lordpretzel/mu4e-views"))
 ;; (package! mime-setup)
-;; https://luca.cambiaghi.me/doom-gccemacs 에 따르면
-;; 이맥스 28버전과 호환성을 높이기 위해서 아래의 패키지들은
-;; 최신 버전으로 맞추는 것이 좋다고 한다.
-(unpin! dap-mode lsp-mode treemacs)
 #+END_SRC
 *** Custom Setup
 **** Store Windows Position & Size
@@ -890,22 +887,25 @@ mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많�
   (message "init mu4e variables")
   (setq mu4e-attachment-dir "~/Downloads"
         mu4e-compose-signature-auto-include t
-        mu4e-get-mail-command "mbsync -a"
+        ;; mu4e-get-mail-command "mbsync -a"
         mu4e-maildir "~/Mailbox"
-        mu4e-update-interval 60
+        ;; mu4e-update-interval 120
         mu4e-use-fancy-chars t
         mu4e-view-show-addresses t
         mu4e-view-show-images t
         mu4e-index-update-in-background t
+        mu4e-index-update-error-warning nil
         mu4e-compose-signature-auto-include t
         mu4e-compose-format-flowed t
         ;; +mu4e-min-header-frame-width 142
         mu4e-headers-date-format "%y/%m/%d"
         mu4e-headers-time-format "%H:%M:%S"
         mu4e-index-cleanup t)
+
   ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
-  (setq mu4e-headers-fields '((:human-date . 12)
+  (setq mu4e-headers-fields '((:human-date . 10)
                               (:flags      . 6)
+                              ;; (:folder . 12)
                               (:from       . 20)
                               (:to         . 20)
                               (:subject       . nil)))
@@ -913,6 +913,19 @@ mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많�
   (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@outlook.com/inbox"   :key ?i)
                                  (:maildir "/jjpark78@outlook.com/sent"    :key ?s)
                                  ))
+  ;;리플라이나 포워딩을 할때 원본 메세지의 받은 주소를 자동으로 보내는 사람 필드에 설정한다.
+  (add-hook 'mu4e-compose-pre-hook
+  (defun my-set-from-address ()
+      "Set the From address based on the To address of the original."
+      (let ((msg mu4e-compose-parent-message)) ;; msg is shorter...
+      (when msg
+      (setq user-mail-address
+      (cond
+          ((mu4e-message-contact-field-matches msg :to "jjpark@jjsoft.kr") "jjpark@jjsoft.kr")
+          ((mu4e-message-contact-field-matches msg :to "jjpark78@gmail.com") "jjpark78@gmail.com")
+          ((mu4e-message-contact-field-matches msg :to "pjj78@naver.com") "pjj78@naver.com")
+          ((mu4e-message-contact-field-matches msg :to "admin@jjsoft.kr") "admin@jjsoft.kr")
+          (t "jjpark78@outlook.com")))))))
 )
 #+END_SRC
 
@@ -955,7 +968,7 @@ smtp 서버를 설정한다.
   #+END_SRC
 
 *** Alert
-새로운 메일이 도착할때 마다 데스크탑에 알람을 표시한다.
+새로운 메일이 도착할때 마다 데스크탑과 Emacs 상태바에 알람을 표시한다.
  #+BEGIN_SRC elisp :tangle config.el
 (use-package mu4e-alert
   :config
@@ -964,6 +977,14 @@ smtp 서버를 설정한다.
   (mu4e-alert-enable-notifications)
   (mu4e-alert-enable-mode-line-display)
 )
+
+(defun refresh-mu4e-alert-mode-line ()
+  (interactive)
+  (mu4e~proc-kill)
+  (start-process "mail updater" nil "~/.doom.d/update_mail.sh")
+  (mu4e-alert-enable-mode-line-display))
+
+(run-with-timer 0 120 'refresh-mu4e-alert-mode-line)
  #+END_SRC
 ** ETC
 *** Shell Utils

@@ -501,22 +501,25 @@
   (message "init mu4e variables")
   (setq mu4e-attachment-dir "~/Downloads"
         mu4e-compose-signature-auto-include t
-        mu4e-get-mail-command "mbsync -a"
+        ;; mu4e-get-mail-command "mbsync -a"
         mu4e-maildir "~/Mailbox"
-        mu4e-update-interval 60
+        ;; mu4e-update-interval 120
         mu4e-use-fancy-chars t
         mu4e-view-show-addresses t
         mu4e-view-show-images t
         mu4e-index-update-in-background t
+        mu4e-index-update-error-warning nil
         mu4e-compose-signature-auto-include t
         mu4e-compose-format-flowed t
         ;; +mu4e-min-header-frame-width 142
         mu4e-headers-date-format "%y/%m/%d"
         mu4e-headers-time-format "%H:%M:%S"
         mu4e-index-cleanup t)
+
   ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
-  (setq mu4e-headers-fields '((:human-date . 12)
+  (setq mu4e-headers-fields '((:human-date . 10)
                               (:flags      . 6)
+                              ;; (:folder . 12)
                               (:from       . 20)
                               (:to         . 20)
                               (:subject       . nil)))
@@ -524,6 +527,19 @@
   (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@outlook.com/inbox"   :key ?i)
                                  (:maildir "/jjpark78@outlook.com/sent"    :key ?s)
                                  ))
+  ;;리플라이나 포워딩을 할때 원본 메세지의 받은 주소를 자동으로 보내는 사람 필드에 설정한다.
+  (add-hook 'mu4e-compose-pre-hook
+  (defun my-set-from-address ()
+      "Set the From address based on the To address of the original."
+      (let ((msg mu4e-compose-parent-message)) ;; msg is shorter...
+      (when msg
+      (setq user-mail-address
+      (cond
+          ((mu4e-message-contact-field-matches msg :to "jjpark@jjsoft.kr") "jjpark@jjsoft.kr")
+          ((mu4e-message-contact-field-matches msg :to "jjpark78@gmail.com") "jjpark78@gmail.com")
+          ((mu4e-message-contact-field-matches msg :to "pjj78@naver.com") "pjj78@naver.com")
+          ((mu4e-message-contact-field-matches msg :to "admin@jjsoft.kr") "admin@jjsoft.kr")
+          (t "jjpark78@outlook.com")))))))
 )
 
 (set-email-account! "Outlook"
@@ -561,3 +577,11 @@
   (mu4e-alert-enable-notifications)
   (mu4e-alert-enable-mode-line-display)
 )
+
+(defun refresh-mu4e-alert-mode-line ()
+  (interactive)
+  (mu4e~proc-kill)
+  (start-process "mail updater" nil "~/.doom.d/update_mail.sh")
+  (mu4e-alert-enable-mode-line-display))
+
+(run-with-timer 0 120 'refresh-mu4e-alert-mode-line)

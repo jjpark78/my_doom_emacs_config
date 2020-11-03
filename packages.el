@@ -1,3 +1,4 @@
+(unpin! magit forge lsp-mode dap-mode)
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
@@ -23,14 +24,10 @@
 (package! evil-textobj-anyblock)
 (package! ob-typescript)
 (package! lsp-treemacs)
-(package! tmux-pane)
+;; (package! tmux-pane)
 (package! mu4e-alert)
 (package! mu4e-views
   :recipe
   (:host githubk
    :repo "lordpretzel/mu4e-views"))
 ;; (package! mime-setup)
-;; https://luca.cambiaghi.me/doom-gccemacs 에 따르면
-;; 이맥스 28버전과 호환성을 높이기 위해서 아래의 패키지들은
-;; 최신 버전으로 맞추는 것이 좋다고 한다.
-(unpin! dap-mode lsp-mode treemacs)
