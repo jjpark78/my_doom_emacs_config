@@ -122,6 +122,8 @@
       (insert (propertize tag-column 'face 'elfeed-search-tag-face) " ")
       (insert (propertize title 'face title-faces 'kbd-help title))))
 
+ (setq elfeed-search-print-entry-function #'feed-reader/search-print)
+
 (defun stackoverflow-search ()
 "search keyword in google code search and stackoverflow.com"
     (interactive)

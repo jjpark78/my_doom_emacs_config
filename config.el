@@ -40,7 +40,9 @@
 (add-hook 'prog-mode-hook 'my-fringe-mode-hook)
 (add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
 (add-hook 'org-mode-hook  'my-fringe-mode-hook)
+
 (global-evil-matchit-mode)
+
 ;; make open url function to use webkit
 ;; (setq browse-url-browser-function 'xwidget-webkit-browse-url)
 
@@ -121,7 +123,7 @@
 ;; lsp 관련 설정 메뉴들
 ;; 이맥스를 느리게 만드는 범인중 십중팔구 LSP가 관련되어져 있다고 함.
 ;; 해당 튜닝도 구글링을 통해서 찾았다.
-;; (setq gc-cons-threshold 100000000)
+(setq gc-cons-threshold 100000000000)
 (setq read-process-output-max (* 1024 1024))
 
 ;; 스프릿된 화면들을 넘어다닐때 아주 유용하다.
@@ -255,9 +257,6 @@
 ;; 그러나 실제 체감속도 향상은 없음
 (setq company-idle-delay 0.0)
 
-;; elfeed 관련 목록 커스텀 컬럼 설정
-(after! elfeed
-  (setq elfeed-search-print-entry-function #'feed-reader/search-print))
 
 ;; lsp 설정 이후에 불필요한 옵션들은 전부다 끈다.
 (after! lsp
@@ -276,8 +275,8 @@
 (setq magit-diff-refine-hunk 'all)
 
 (magit-delta-mode)
-
-(setq ghub-use-workaround-for-emacs-bug 'force)
+(magit-todos-mode)
+;; (setq ghub-use-workaround-for-emacs-bug 'force)
 (setq forge-topic-list-limit '(200 . 10))
 
 ;; ediff를 닫을때 항상 물어보는 거 금지!!
@@ -501,13 +500,13 @@
   (message "init mu4e variables")
   (setq mu4e-attachment-dir "~/Downloads"
         mu4e-compose-signature-auto-include t
-        ;; mu4e-get-mail-command "mbsync -a"
+        mu4e-get-mail-command "true"
         mu4e-maildir "~/Mailbox"
-        ;; mu4e-update-interval 120
+        mu4e-update-interval nil
         mu4e-use-fancy-chars t
         mu4e-view-show-addresses t
         mu4e-view-show-images t
-        mu4e-index-update-in-background t
+        mu4e-index-update-in-background nil
         mu4e-index-update-error-warning nil
         mu4e-compose-signature-auto-include t
         mu4e-compose-format-flowed t
@@ -566,8 +565,8 @@
 	    )
   :config
   (setq mu4e-views-completion-method 'ivy) ;; use ivy for completion
-  (setq mu4e-views-default-view-method "html") ;; make xwidgets default
-  (mu4e-views-mu4e-use-view-msg-method "html") ;; select the default
+  (setq mu4e-views-default-view-method "browser") ;; make xwidgets default
+  (mu4e-views-mu4e-use-view-msg-method "browser") ;; select the default
   (setq mu4e-views-next-previous-message-behaviour 'always-switch-to-view))
 
 (use-package mu4e-alert
@@ -582,6 +581,7 @@
   (interactive)
   (mu4e~proc-kill)
   (start-process "mail updater" nil "~/.doom.d/update_mail.sh")
+  ;; (mu4e-update-index)
   (mu4e-alert-enable-mode-line-display))
 
 (run-with-timer 0 120 'refresh-mu4e-alert-mode-line)

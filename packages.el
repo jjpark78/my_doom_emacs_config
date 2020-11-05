@@ -24,10 +24,11 @@
 (package! evil-textobj-anyblock)
 (package! ob-typescript)
 (package! lsp-treemacs)
-;; (package! tmux-pane)
 (package! mu4e-alert)
+(package! tmux-pane)
+;; (package! excorporate)
 (package! mu4e-views
   :recipe
   (:host githubk
    :repo "lordpretzel/mu4e-views"))
-;; (package! mime-setup)
+(package! magit-todos)

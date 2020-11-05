@@ -23,7 +23,7 @@
        (company +auto)             ; the ultimate code completion backend
        ;; helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       (ivy +icons)               ; a search engine for love and life
+       (ivy +icons +childframe)               ; a search engine for love and life
 
        :ui
        deft              ; notational velocity for Emacs
@@ -68,7 +68,7 @@
        :emacs
        (dired +icons +ranger)      ; making dired pretty [functional]
        ;;electric          ; smarter, keyword-based electric-indent
-       ;; (ibuffer +icons)    ; interactive buffer management
+       (ibuffer +icons)    ; interactive buffer management
        undo                ; persistent, smarter undo for your inevitable mistakes
        vc                  ; version-control and Emacs, sitting in a tree
 
