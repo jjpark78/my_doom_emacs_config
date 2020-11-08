@@ -55,19 +55,6 @@
 ;; 개인으로만 쓰면 공짜인것도 매력임.
 (global-wakatime-mode)
 
-;; (defadvice! message-with-timestamp (args)
-;;   :filter-args #'message
-;;   (setcar args (format "%s %s"
-;;                        (format-time-string "[%F %T.%3N %Z]")
-;;                        (car args)))
-;;   args)
-
- ;; Auto refresh buffers
-(global-auto-revert-mode nil)
-;; Also auto refresh dired, but be quiet about it
-(setq global-auto-revert-non-file-buffers nil)
-(setq auto-revert-verbose nil)
-
 ;; 한글 입력기 on
 (setq default-input-method "korean-hangul")
 (set-language-environment "Korean")
@@ -97,12 +84,8 @@
         ("AppleGothic" . 1.2307692307692308)
         ))
 
-;;고양이를 켜서 그나마 좀 재미나게 바꿔본다.
-;; (nyan-mode)
-;; (nyan-start-animation)
-;; add icons to ivy
-;; 아이비 메뉴에 아이콘이 들어가면 호박에 줄그어서 수박이 되는 경험을 할 수 있다.
-;; (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
+(after! doom-modeline
+  (setq doom-modeline-buffer-state-icon nil))
 
 ;; 라인 넘버표시 하지 않는게 더 빠르다
 ;; 이유는 모름.
@@ -118,6 +101,14 @@
 ;; 해당 튜닝도 구글링을 통해서 찾았다.
 (setq gc-cons-threshold 100000000000)
 (setq read-process-output-max (* 1024 1024))
+
+(setq scroll-step 1)
+(setq scroll-margin 1)
+(setq scroll-conservatively 101)
+(setq scroll-up-aggressively 0.01)
+(setq scroll-down-aggressively 0.01)
+(setq auto-window-vscroll nil)
+(setq fast-but-imprecise-scrolling nil)
 
 ;; 스프릿된 화면들을 넘어다닐때 아주 유용하다.
 (map! "C-h" #'tmux-pane-omni-window-left)
@@ -238,10 +229,46 @@
 ;; 이거 없으면 생각보다 귀찮아진다.
 (add-hook 'flycheck-error-list-mode-hook (lambda () (switch-to-buffer-other-window "*Flycheck errors*")))
 
-(add-hook! 'lsp-completion-mode-hook
-  (defun init-company-tabnine-h ()
-    (when lsp-completion-mode
-      (setq-local company-backends (cons 'company-tabnine company-backends)))))
+;; (add-hook! 'lsp-completion-mode-hook
+;;   (defun init-company-tabnine-h ()
+;;     (when lsp-completion-mode
+;;       (setq-local company-backends (cons 'company-tabnine company-backends)))))
+(use-package company-tabnine
+  :defer 1
+  :custom
+  (company-tabnine-max-num-results 9)
+  ;; :bind
+  ;; (("M-q" . company-other-backend)
+  ;;  ("C-z t" . company-tabnine))
+  :hook
+  (lsp-after-open . (lambda ()
+                      (setq company-tabnine-max-num-results 3)
+                      (add-to-list 'company-transformers 'company//sort-by-tabnine t)
+                      (add-to-list 'company-backends '(company-capf :with company-tabnine :separate))))
+  (kill-emacs . company-tabnine-kill-process)
+  :config
+  ;; Enable TabNine on default
+  (add-to-list 'company-backends #'company-tabnine)
+
+  ;; Integrate company-tabnine with lsp-mode
+  (defun company//sort-by-tabnine (candidates)
+    (if (or (functionp company-backend)
+            (not (and (listp company-backend) (memq 'company-tabnine company-backends))))
+        candidates
+      (let ((candidates-table (make-hash-table :test #'equal))
+            candidates-lsp
+            candidates-tabnine)
+        (dolist (candidate candidates)
+          (if (eq (get-text-property 0 'company-backend candidate)
+                  'company-tabnine)
+              (unless (gethash candidate candidates-table)
+                (push candidate candidates-tabnine))
+            (push candidate candidates-lsp)
+            (puthash candidate t candidates-table)))
+        (setq candidates-lsp (nreverse candidates-lsp))
+        (setq candidates-tabnine (nreverse candidates-tabnine))
+        (nconc (seq-take candidates-tabnine 3)
+               (seq-take candidates-lsp 6))))))
 
 ;; dash docs setup
 ;; 무슨 이유인지 모르겠으나 dash docs를 자동 인식 못함. 수동으로 추가해줌
@@ -323,7 +350,6 @@
 ;;basic org mode config
 (setq
   org-hide-emphasis-markers t
-  org-log-state-notes-into-drawer t
   org-directory "~/org/"
   org-agenda-skip-scheduled-if-done t
   org-ellipsis " ▾ "
@@ -338,7 +364,7 @@
   ;;                         ("t" "JJSOFT" entry
   ;;                         (file+headline "jjsoft.org")
   ;;                         "* [ ] %?\n%i" :prepend t :ill-buffer t))
-  +doom-dashboard-banner-file (expand-file-name "logo.png" doom-private-dir)
+  ;; +doom-dashboard-banner-file (expand-file-name "logo.png" doom-private-dir)
   +org-capture-todo-file "tasks.org")
 
 ;; config org-super-agenda
@@ -372,10 +398,6 @@
   (set-face-attribute 'org-level-6 nil :weight 'normal)
   (set-face-attribute 'org-document-title nil :foreground "SlateGray1" :background nil :height 1.75 :weight 'bold)
   (setq org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
-  (setq org-fontify-quote-and-verse-blocks nil
-        org-fontify-whole-heading-line nil
-        org-hide-leading-stars nil
-        org-startup-indented nil)
   (set-face-attribute 'org-document-title nil
                       :foreground "White"
                       :height 1.2
@@ -450,7 +472,6 @@
 
 (setq elfeed-feeds '(
 "http://www.bloter.net/feed"
-"https://blog.elementary.io/feed.xml"
 "https://d2.naver.com/d2.atom"
 "https://engineering.linecorp.com/ko/feed/"
 "https://tech.lezhin.com/rss/"
@@ -462,19 +483,6 @@
 "https://www.producthunt.com/feed?category=undefined"
 "https://www.reddit.com/r/linux.rss"
 "https://www.gamingonlinux.com/article_rss.php"
-"https://hackaday.com/blog/feed/"
-"https://opensource.com/feed"
-"https://linux.softpedia.com/backend.xml"
-"https://itsfoss.com/feed/"
-"https://www.zdnet.com/topic/linux/rss.xml"
-"https://www.phoronix.com/rss.php"
-"http://feeds.feedburner.com/d0od"
-"https://www.computerworld.com/index.rss"
-"https://www.networkworld.com/category/linux/index.rss"
-"https://www.techrepublic.com/rssfeeds/topic/open-source/"
-"https://betanews.com/feed"
-"http://lxer.com/module/newswire/headlines.rss"
-"https://distrowatch.com/news/dwd.xml"
 ))
 
 (use-package rg
@@ -505,6 +513,7 @@
         mu4e-index-update-in-background nil
         mu4e-index-update-error-warning nil
         mu4e-compose-signature-auto-include t
+        mu4e-confirm-quit nil
         mu4e-compose-format-flowed t
         ;; +mu4e-min-header-frame-width 142
         mu4e-headers-date-format "%y/%m/%d"

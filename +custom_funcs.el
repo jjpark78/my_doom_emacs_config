@@ -45,7 +45,6 @@
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-markup-indent-offset 2)
   (flycheck-mode +1)
-  ;; (fringe-mode '(20 . 20))
   (my/use-eslint-from-node-modules)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (setq lsp-ui-peek-fontify 'always)
@@ -84,13 +83,9 @@
           ))))
 
 (defun my-org-config/after-org-mode-load ()
-  (visual-line-mode)
+  ;; (visual-line-mode)
   (require 'org-indent)
   (org-indent-mode)
-  (setq org-fontify-quote-and-verse-blocks nil
-        org-fontify-whole-heading-line t
-        org-hide-leading-stars nil
-        org-startup-indented nil)
   )
 
 (defun feed-reader/search-print (entry)

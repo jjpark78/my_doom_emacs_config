@@ -162,25 +162,25 @@
 (global-wakatime-mode)
 
 #+END_SRC
-**** Message buffer
-메세지 버퍼에 타임스탬프도 찍어서 메세지 발생 시간을 확인할 수 있게 한다.
-#+BEGIN_SRC elisp :tangle config.el
-;; (defadvice! message-with-timestamp (args)
-;;   :filter-args #'message
-;;   (setcar args (format "%s %s"
-;;                        (format-time-string "[%F %T.%3N %Z]")
-;;                        (car args)))
-;;   args)
-#+END_SRC
-**** Enable Auto-reverse
-파일이 외부에서 변경되었을때 자동으로 버퍼를 리프레쉬한다.
-#+BEGIN_SRC elisp :tangle config.el
- ;; Auto refresh buffers
-(global-auto-revert-mode nil)
-;; Also auto refresh dired, but be quiet about it
-(setq global-auto-revert-non-file-buffers nil)
-(setq auto-revert-verbose nil)
-#+END_SRC
+# **** Message buffer
+# 메세지 버퍼에 타임스탬프도 찍어서 메세지 발생 시간을 확인할 수 있게 한다.
+# #+BEGIN_SRC elisp :tangle config.el
+# ;; (defadvice! message-with-timestamp (args)
+# ;;   :filter-args #'message
+# ;;   (setcar args (format "%s %s"
+# ;;                        (format-time-string "[%F %T.%3N %Z]")
+# ;;                        (car args)))
+# ;;   args)
+# #+END_SRC
+# **** Enable Auto-reverse
+# 파일이 외부에서 변경되었을때 자동으로 버퍼를 리프레쉬한다.
+# #+BEGIN_SRC elisp :tangle config.el
+#  ;; Auto refresh buffers
+# (global-auto-revert-mode nil)
+# ;; Also auto refresh dired, but be quiet about it
+# (setq global-auto-revert-non-file-buffers nil)
+# (setq auto-revert-verbose nil)
+# #+END_SRC
 
 **** UTF & Korean Input
 한글 관련 설정
@@ -218,29 +218,20 @@
       '(("NanumGothicCoding" . 1.2307692307692308)
         ("AppleGothic" . 1.2307692307692308)
         ))
-
-;;고양이를 켜서 그나마 좀 재미나게 바꿔본다.
-;; (nyan-mode)
-;; (nyan-start-animation)
-;; add icons to ivy
-;; 아이비 메뉴에 아이콘이 들어가면 호박에 줄그어서 수박이 되는 경험을 할 수 있다.
-;; (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
-
 #+END_SRC
 
-# **** Doom Modeline
-# Doom modeline 관련 수정
-# #+BEGIN_SRC elisp :tangle config.el
-# ;; (after! doom-modeline
-# ;;   (setq lsp-modeline-diagnostics-scope ':buffer)
-# ;;   (setq doom-modeline-major-mode-icon t)
-# ;;   (setq doom-modeline-persp-name t)
-# ;;   (setq doom-modeline-buffer-encoding nil)
-# ;;   (setq doom-modeline-buffer-state-icon nil)
-# ;;   (setq doom-modeline-persp-icon nil)
-# ;;   (setq doom-modeline-icon (display-graphic-p))
-# ;;   (setq doom-modeline-buffer-file-name-style 'file-name))
-# #+END_SRC
+# 고양이를 켜서 그나마 좀 재미나게 바꿔본다.
+#  (nyan-mode)
+#  (nyan-start-animation)
+#  add icons to ivy
+#  아이비 메뉴에 아이콘이 들어가면 호박에 줄그어서 수박이 되는 경험을 할 수 있다.
+#  (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
+**** Doom Modeline
+Doom modeline 관련 수정
+#+BEGIN_SRC elisp :tangle config.el
+(after! doom-modeline
+  (setq doom-modeline-buffer-state-icon nil))
+#+END_SRC
 
 **** Fine-tune
 이맥스를 맥과 고해상도(FHD이상의 해상도)에서 쓰다보면 스크롤이 엄청 느려지는 경우가 있다.
@@ -264,6 +255,18 @@
 (setq gc-cons-threshold 100000000000)
 (setq read-process-output-max (* 1024 1024))
 #+END_SRC
+
+스크롤과 관련된 튜닝. 조금더 부드러워지는 느낌이다.
+#+begin_src elisp :tangle config.el
+(setq scroll-step 1)
+(setq scroll-margin 1)
+(setq scroll-conservatively 101)
+(setq scroll-up-aggressively 0.01)
+(setq scroll-down-aggressively 0.01)
+(setq auto-window-vscroll nil)
+(setq fast-but-imprecise-scrolling nil)
+
+#+end_src
 *** Useful Bindings
 **** Bindings 1
 단축키 설정
@@ -377,7 +380,6 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-markup-indent-offset 2)
   (flycheck-mode +1)
-  ;; (fringe-mode '(20 . 20))
   (my/use-eslint-from-node-modules)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (setq lsp-ui-peek-fontify 'always)
@@ -455,10 +457,46 @@ Tabnine관련 설정들
 설정하는 법을 찾을 수 없었다.
 정상동작은 탭나인의 유추한 결과물과 LSP-Backends의 검색 결과가 
 #+BEGIN_SRC elisp :tangle config.el
-(add-hook! 'lsp-completion-mode-hook
-  (defun init-company-tabnine-h ()
-    (when lsp-completion-mode
-      (setq-local company-backends (cons 'company-tabnine company-backends)))))
+;; (add-hook! 'lsp-completion-mode-hook
+;;   (defun init-company-tabnine-h ()
+;;     (when lsp-completion-mode
+;;       (setq-local company-backends (cons 'company-tabnine company-backends)))))
+(use-package company-tabnine
+  :defer 1
+  :custom
+  (company-tabnine-max-num-results 9)
+  ;; :bind
+  ;; (("M-q" . company-other-backend)
+  ;;  ("C-z t" . company-tabnine))
+  :hook
+  (lsp-after-open . (lambda ()
+                      (setq company-tabnine-max-num-results 3)
+                      (add-to-list 'company-transformers 'company//sort-by-tabnine t)
+                      (add-to-list 'company-backends '(company-capf :with company-tabnine :separate))))
+  (kill-emacs . company-tabnine-kill-process)
+  :config
+  ;; Enable TabNine on default
+  (add-to-list 'company-backends #'company-tabnine)
+
+  ;; Integrate company-tabnine with lsp-mode
+  (defun company//sort-by-tabnine (candidates)
+    (if (or (functionp company-backend)
+            (not (and (listp company-backend) (memq 'company-tabnine company-backends))))
+        candidates
+      (let ((candidates-table (make-hash-table :test #'equal))
+            candidates-lsp
+            candidates-tabnine)
+        (dolist (candidate candidates)
+          (if (eq (get-text-property 0 'company-backend candidate)
+                  'company-tabnine)
+              (unless (gethash candidate candidates-table)
+                (push candidate candidates-tabnine))
+            (push candidate candidates-lsp)
+            (puthash candidate t candidates-table)))
+        (setq candidates-lsp (nreverse candidates-lsp))
+        (setq candidates-tabnine (nreverse candidates-tabnine))
+        (nconc (seq-take candidates-tabnine 3)
+               (seq-take candidates-lsp 6))))))
 #+END_SRC
 
 **** Programming ETC
@@ -550,13 +588,9 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
 ORG모드를 위한 함수들
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
 (defun my-org-config/after-org-mode-load ()
-  (visual-line-mode)
+  ;; (visual-line-mode)
   (require 'org-indent)
   (org-indent-mode)
-  (setq org-fontify-quote-and-verse-blocks nil
-        org-fontify-whole-heading-line t
-        org-hide-leading-stars nil
-        org-startup-indented nil)
   )
 #+END_SRC
 
@@ -570,7 +604,6 @@ ORG모드를 위한 함수들
 ;;basic org mode config
 (setq
   org-hide-emphasis-markers t
-  org-log-state-notes-into-drawer t
   org-directory "~/org/"
   org-agenda-skip-scheduled-if-done t
   org-ellipsis " ▾ "
@@ -585,7 +618,7 @@ ORG모드를 위한 함수들
   ;;                         ("t" "JJSOFT" entry
   ;;                         (file+headline "jjsoft.org")
   ;;                         "* [ ] %?\n%i" :prepend t :ill-buffer t))
-  +doom-dashboard-banner-file (expand-file-name "logo.png" doom-private-dir)
+  ;; +doom-dashboard-banner-file (expand-file-name "logo.png" doom-private-dir)
   +org-capture-todo-file "tasks.org")
 
 ;; config org-super-agenda
@@ -622,10 +655,6 @@ ORG모드를 위한 함수들
   (set-face-attribute 'org-level-6 nil :weight 'normal)
   (set-face-attribute 'org-document-title nil :foreground "SlateGray1" :background nil :height 1.75 :weight 'bold)
   (setq org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
-  (setq org-fontify-quote-and-verse-blocks nil
-        org-fontify-whole-heading-line nil
-        org-hide-leading-stars nil
-        org-startup-indented nil)
   (set-face-attribute 'org-document-title nil
                       :foreground "White"
                       :height 1.2
@@ -748,7 +777,6 @@ ORG모드를 위한 함수들
 #+BEGIN_SRC elisp :tangle config.el
 (setq elfeed-feeds '(
 "http://www.bloter.net/feed"
-"https://blog.elementary.io/feed.xml"
 "https://d2.naver.com/d2.atom"
 "https://engineering.linecorp.com/ko/feed/"
 "https://tech.lezhin.com/rss/"
@@ -760,19 +788,6 @@ ORG모드를 위한 함수들
 "https://www.producthunt.com/feed?category=undefined"
 "https://www.reddit.com/r/linux.rss"
 "https://www.gamingonlinux.com/article_rss.php"
-"https://hackaday.com/blog/feed/"
-"https://opensource.com/feed"
-"https://linux.softpedia.com/backend.xml"
-"https://itsfoss.com/feed/"
-"https://www.zdnet.com/topic/linux/rss.xml"
-"https://www.phoronix.com/rss.php"
-"http://feeds.feedburner.com/d0od"
-"https://www.computerworld.com/index.rss"
-"https://www.networkworld.com/category/linux/index.rss"
-"https://www.techrepublic.com/rssfeeds/topic/open-source/"
-"https://betanews.com/feed"
-"http://lxer.com/module/newswire/headlines.rss"
-"https://distrowatch.com/news/dwd.xml"
 ))
 #+END_SRC
 
@@ -787,8 +802,8 @@ ORG모드를 위한 함수들
 
 (add-hook 'after-init-hook 'my-elfeed-update)
 
-;; (after! elfeed
-;;   (setq elfeed-search-print-entry-function #'feed-reader/search-print))
+(after! elfeed
+   (setq elfeed-search-print-entry-function #'feed-reader/search-print))
 #+end_src
 
 ** Utils
@@ -918,6 +933,7 @@ mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많�
         mu4e-index-update-in-background nil
         mu4e-index-update-error-warning nil
         mu4e-compose-signature-auto-include t
+        mu4e-confirm-quit nil
         mu4e-compose-format-flowed t
         ;; +mu4e-min-header-frame-width 142
         mu4e-headers-date-format "%y/%m/%d"
@@ -1053,9 +1069,5 @@ zsh관련 설정 파일을 만질 일이 있을때 요긴하게 잘 사용한다
 (custom-set-variables
  '(warning-suppress-types '((initialization) (lsp-mode))))
 (custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
  )
 #+END_SRC
