@@ -3,15 +3,32 @@
 #+AUTHOR:  jjpark89@outlook.com
 #+STARTUP: showeverything
 
-** Table of Contents :TOC:
+** Table of Contents :TOC_3_gh:
   - [[#initialize][Initialize]]
+    - [[#load-config-from-files][Load Config from files]]
+    - [[#packages][Packages]]
+    - [[#custom-setup][Custom Setup]]
+    - [[#useful-bindings][Useful Bindings]]
   - [[#programming][Programming]]
+    - [[#vue--typescript-custom-setting][Vue & Typescript Custom Setting]]
   - [[#magit--forge][Magit / Forge]]
   - [[#org-mode][Org-Mode]]
   - [[#rss-feed][RSS Feed]]
+    - [[#custom-elfeed-search-column][Custom Elfeed Search Column]]
   - [[#utils][Utils]]
+    - [[#ripgrep][Ripgrep]]
+    - [[#google-stackoverflow-search][Google, StackOverFlow Search]]
+    - [[#custom-emacs-multi-inputmethod-cycle][Custom Emacs Multi-InputMethod Cycle]]
+    - [[#forge-custom-open-link][Forge Custom Open Link]]
+    - [[#toggle-window-layout][Toggle Window Layout]]
   - [[#mail][Mail]]
+    - [[#basic-coonfiguration][Basic Coonfiguration]]
+    - [[#smtp][SMTP]]
+    - [[#render-html-email][Render HTML email]]
+    - [[#alert][Alert]]
   - [[#etc][ETC]]
+    - [[#shell-utils][Shell Utils]]
+    - [[#custom-variables][Custom Variables]]
 
 ** Initialize
 *** Load Config from files
