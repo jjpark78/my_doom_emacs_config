@@ -31,7 +31,7 @@
 ;; )
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-(setq initial-frame-alist '((top . 23) (left . 1147) (width . 130) (height . 80)))
+(setq initial-frame-alist '((top . 23) (left . 1147) (width . 284) (height . 80)))
 
 ;; 좌우로 여백을 활성화 시킨다.
 (defun my-fringe-mode-hook ()
@@ -63,9 +63,9 @@
 ;;   args)
 
  ;; Auto refresh buffers
-(global-auto-revert-mode 1)
+(global-auto-revert-mode nil)
 ;; Also auto refresh dired, but be quiet about it
-(setq global-auto-revert-non-file-buffers t)
+(setq global-auto-revert-non-file-buffers nil)
 (setq auto-revert-verbose nil)
 
 ;; 한글 입력기 on
@@ -87,29 +87,22 @@
 ;; (ivy-rich-mode 1)
 
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
-(setq doom-font (font-spec :family "Monaco" :size 13))
+(setq doom-font (font-spec :family "monaco" :size 13))
 
 ;; 한글 관련 폰트미치 스케일링 설정
-(set-fontset-font t 'hangul (font-spec :name "NanumGothicCoding"))
+;; (set-face-attribute 'default nil :height 130)
+(set-fontset-font t 'hangul (font-spec :name "AppleGothic"))
 (setq face-font-rescale-alist
-      '(("NanumGothicCoding" . 1.2307692307692308)))
+      '(("NanumGothicCoding" . 1.2307692307692308)
+        ("AppleGothic" . 1.2307692307692308)
+        ))
 
 ;;고양이를 켜서 그나마 좀 재미나게 바꿔본다.
-(nyan-mode)
-(nyan-start-animation)
+;; (nyan-mode)
+;; (nyan-start-animation)
 ;; add icons to ivy
 ;; 아이비 메뉴에 아이콘이 들어가면 호박에 줄그어서 수박이 되는 경험을 할 수 있다.
 ;; (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
-
-(after! doom-modeline
-  (setq lsp-modeline-diagnostics-scope ':buffer)
-  (setq doom-modeline-major-mode-icon t)
-  (setq doom-modeline-persp-name t)
-  (setq doom-modeline-buffer-encoding nil)
-  (setq doom-modeline-buffer-state-icon nil)
-  (setq doom-modeline-persp-icon nil)
-  (setq doom-modeline-icon (display-graphic-p))
-  (setq doom-modeline-buffer-file-name-style 'file-name))
 
 ;; 라인 넘버표시 하지 않는게 더 빠르다
 ;; 이유는 모름.
@@ -157,6 +150,9 @@
 ;; change window split mode
 ;; 이맥스를 넓게 쓰다가 길게 쓰다가 할때마다 자주 쓰이는 레이아웃 번경 맛집 함수
 (map! :leader :prefix "t" :desc "Toggle Window Split Style" "s" #'toggle-window-split)
+
+;; ace-window
+(map! :leader :prefix "w" :desc "open ace window to select window" "a" #'ace-window)
 
 ;; evil 에서 라인 처음과 마지막으로 더 빨리 점프할 수 있도록 한다.
 (define-key evil-visual-state-map (kbd "H") 'beginning-of-line-text)
@@ -564,10 +560,30 @@
 	    ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
 	    )
   :config
+  (setq mu4e-views-mu4e-html-email-header-style
+          "<style type=\"text/css\">
+  .mu4e-mu4e-views-mail-headers { font-family: sans-serif; font-size: 10pt; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid #ccc; color: #000;}
+  .mu4e-mu4e-views-header-row { display:block; padding: 1px 0 1px 0; }
+  .mu4e-mu4e-views-mail-header { display: inline-block; text-transform: capitalize; font-weight: bold; }
+  .mu4e-mu4e-views-header-content { display: inline-block; padding-right: 8px; }
+  .mu4e-mu4e-views-email { display: inline-block; padding-right: 8px; }
+  .mu4e-mu4e-views-attachment { display: inline-block; padding-right: 8px; }
+  </style>")
   (setq mu4e-views-completion-method 'ivy) ;; use ivy for completion
-  (setq mu4e-views-default-view-method "browser") ;; make xwidgets default
-  (mu4e-views-mu4e-use-view-msg-method "browser") ;; select the default
-  (setq mu4e-views-next-previous-message-behaviour 'always-switch-to-view))
+  (setq mu4e-views-default-view-method "html") ;; make xwidgets default
+  (mu4e-views-mu4e-use-view-msg-method "html") ;; select the default
+  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window)
+  (map! :map mu4e-headers-mode-map
+        :n "M-b" #'mu4e-views-cursor-msg-view-window-up
+        :n "M-f" #'mu4e-views-cursor-msg-view-window-down
+        :localleader
+        :desc "Message action"        "a"   #'mu4e-views-mu4e-view-action
+        :desc "Scoll message down"    "b"   #'mu4e-views-cursor-msg-view-window-up
+        :desc "Scoll message up"      "f"   #'mu4e-views-cursor-msg-view-window-down
+        :desc "Open attachment"       "o"   #'mu4e-views-mu4e-view-open-attachment
+        :desc "Save attachment"       "s"   #'mu4e-views-mu4e-view-save-attachment
+        :desc "Save all attachments"  "S"   #'mu4e-views-mu4e-view-save-all-attachments
+        :desc "Set view method"       "v"   #'mu4e-views-mu4e-select-view-msg-method)) ;; select viewing method)
 
 (use-package mu4e-alert
   :config
@@ -579,9 +595,10 @@
 
 (defun refresh-mu4e-alert-mode-line ()
   (interactive)
-  (mu4e~proc-kill)
-  (start-process "mail updater" nil "~/.doom.d/update_mail.sh")
+  ;; (call-process-shell-command "okular&" nil 0)
+  (message "start update email")
+  (call-process-shell-command "~/.doom.d/update_mail.sh" nil 0)
   ;; (mu4e-update-index)
   (mu4e-alert-enable-mode-line-display))
 
-(run-with-timer 0 120 'refresh-mu4e-alert-mode-line)
+(run-with-timer 0 180 'refresh-mu4e-alert-mode-line)

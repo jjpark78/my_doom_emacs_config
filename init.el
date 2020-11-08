@@ -34,8 +34,8 @@
        hl-todo             ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;; hydra
        ;; indent-guides    ; highlighted indent columns
-       minimap             ; show a map of the code on the side
-       (modeline)   ; snazzy, Atom-inspired modeline, plus API
+       ;; minimap             ; show a map of the code on the side
+       modeline   ; snazzy, Atom-inspired modeline, plus API
        nav-flash           ; blink cursor line after big motions
        ;; neotree          ; a project drawer, like NERDTree for vim
        ophints             ; highlight the region an operation acts on
@@ -85,7 +85,7 @@
 
        :os
        macos               ; recent new feature
-       tty                    ;
+       ;; tty                    ;
 
        :tools
        ;;ansible
@@ -121,7 +121,7 @@
        ;; (dart +flutter +lsp)   ; paint ui and not much else
        ;;elixir            ; erlang done right
        ;;elm               ; care for a cup of TEA?
-       emacs-lisp        ; drown in parentheses
+       (emacs-lisp +lsp)       ; drown in parentheses
        ;;erlang            ; an elegant language for a more civilized age
        ;;ess               ; emacs speaks statistics
        ;;faust             ; dsp, but you get to keep your soul
