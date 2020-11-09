@@ -1,7 +1,6 @@
 #+TITLE:   My custom DOOM EMACS Config
 #+DATE:    July 23, 2020
 #+AUTHOR:  jjpark89@outlook.com
-#+STARTUP: showeverything
 
 ** Table of Contents :TOC_3_gh:
   - [[#initialize][Initialize]]
@@ -273,17 +272,17 @@ Doom modeline 관련 수정
 (setq read-process-output-max (* 1024 1024))
 #+END_SRC
 
-스크롤과 관련된 튜닝. 조금더 부드러워지는 느낌이다.
-#+begin_src elisp :tangle config.el
-(setq scroll-step 1)
-(setq scroll-margin 1)
-(setq scroll-conservatively 101)
-(setq scroll-up-aggressively 0.01)
-(setq scroll-down-aggressively 0.01)
-(setq auto-window-vscroll nil)
-(setq fast-but-imprecise-scrolling nil)
+# 스크롤과 관련된 튜닝. 조금더 부드러워지는 느낌이다.
+# #+begin_src elisp :tangle config.el
+# (setq scroll-step 1)
+# (setq scroll-margin 1)
+# (setq scroll-conservatively 101)
+# (setq scroll-up-aggressively 0.01)
+# (setq scroll-down-aggressively 0.01)
+# (setq auto-window-vscroll nil)
+# (setq fast-but-imprecise-scrolling nil)
 
-#+end_src
+# #+end_src
 *** Useful Bindings
 **** Bindings 1
 단축키 설정
@@ -597,6 +596,17 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
   ;; 팝업을 별도의 버퍼로 띄우도록 한다.
   ;; (setq magit-display-buffer-function #'+magit-my-display-buffer-fn)
   (setq markdown-display-remote-images t)
+
+  ;;section visibility
+  (setq magit-section-initial-visibility-alist
+        '((stashes . show)
+          (untracked . show)
+          (unstaged . show)
+          (staged . show)
+          (unpushed . show)
+          (todos . show)
+          (issues . show)
+          (pullreqs . show)))
   )
 #+END_SRC
 

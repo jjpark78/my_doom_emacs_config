@@ -102,14 +102,6 @@
 (setq gc-cons-threshold 100000000000)
 (setq read-process-output-max (* 1024 1024))
 
-(setq scroll-step 1)
-(setq scroll-margin 1)
-(setq scroll-conservatively 101)
-(setq scroll-up-aggressively 0.01)
-(setq scroll-down-aggressively 0.01)
-(setq auto-window-vscroll nil)
-(setq fast-but-imprecise-scrolling nil)
-
 ;; 스프릿된 화면들을 넘어다닐때 아주 유용하다.
 (map! "C-h" #'tmux-pane-omni-window-left)
 (map! "C-j" #'tmux-pane-omni-window-down)
@@ -340,6 +332,17 @@
   ;; 팝업을 별도의 버퍼로 띄우도록 한다.
   ;; (setq magit-display-buffer-function #'+magit-my-display-buffer-fn)
   (setq markdown-display-remote-images t)
+
+  ;;section visibility
+  (setq magit-section-initial-visibility-alist
+        '((stashes . show)
+          (untracked . show)
+          (unstaged . show)
+          (staged . show)
+          (unpushed . show)
+          (todos . show)
+          (issues . show)
+          (pullreqs . show)))
   )
 
 ;; start my org settings
