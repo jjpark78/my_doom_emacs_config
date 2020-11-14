@@ -26,7 +26,7 @@
 (package! lsp-treemacs)
 (package! mu4e-alert)
 (package! tmux-pane)
-;; (package! excorporate)
+(package! git-link)
 (package! mu4e-views
   :recipe
   (:host githubk

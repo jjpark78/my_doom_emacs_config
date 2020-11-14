@@ -221,10 +221,6 @@
 ;; 이거 없으면 생각보다 귀찮아진다.
 (add-hook 'flycheck-error-list-mode-hook (lambda () (switch-to-buffer-other-window "*Flycheck errors*")))
 
-;; (add-hook! 'lsp-completion-mode-hook
-;;   (defun init-company-tabnine-h ()
-;;     (when lsp-completion-mode
-;;       (setq-local company-backends (cons 'company-tabnine company-backends)))))
 (use-package company-tabnine
   :defer 1
   :custom
@@ -299,6 +295,14 @@
   :around #'ediff-quit
   (letf! (defun y-or-n-p (&rest _) t)
     (apply orig-fn args)))
+
+(after! git-link
+  (setq git-link-default-remote "upstream"
+        git-link-default-branch "develop"
+        git-link-open-in-browser nil
+  )
+  (map! :leader :prefix "g" :desc "get remote link using git-link"  "k" #'git-link)
+)
 
 (after! forge
   (setq auth-sources '("~/.authinfo"))

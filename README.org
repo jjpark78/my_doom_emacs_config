@@ -68,7 +68,7 @@
 (package! lsp-treemacs)
 (package! mu4e-alert)
 (package! tmux-pane)
-;; (package! excorporate)
+(package! git-link)
 (package! mu4e-views
   :recipe
   (:host githubk
@@ -176,7 +176,6 @@
 ;; 하루 일과를 잘 보여준다.
 ;; 개인으로만 쓰면 공짜인것도 매력임.
 (global-wakatime-mode)
-
 #+END_SRC
 # **** Message buffer
 # 메세지 버퍼에 타임스탬프도 찍어서 메세지 발생 시간을 확인할 수 있게 한다.
@@ -469,14 +468,7 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 
 **** LSP & Tabnine
 Tabnine관련 설정들
-아쉽게도 아직까지 이 모듈을 완벽하게 이맥스에서 다른 company-backends랑 같이 동작하게
-설정하는 법을 찾을 수 없었다.
-정상동작은 탭나인의 유추한 결과물과 LSP-Backends의 검색 결과가 
 #+BEGIN_SRC elisp :tangle config.el
-;; (add-hook! 'lsp-completion-mode-hook
-;;   (defun init-company-tabnine-h ()
-;;     (when lsp-completion-mode
-;;       (setq-local company-backends (cons 'company-tabnine company-backends)))))
 (use-package company-tabnine
   :defer 1
   :custom
@@ -558,6 +550,14 @@ magit이나 dired등과 같이 유틸리티 관련 설정들을 모아 놓았다
   :around #'ediff-quit
   (letf! (defun y-or-n-p (&rest _) t)
     (apply orig-fn args)))
+
+(after! git-link
+  (setq git-link-default-remote "upstream"
+        git-link-default-branch "develop"
+        git-link-open-in-browser nil
+  )
+  (map! :leader :prefix "g" :desc "get remote link using git-link"  "k" #'git-link)
+)
 #+END_SRC
 
 Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스에서
