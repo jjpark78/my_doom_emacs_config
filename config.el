@@ -171,7 +171,6 @@
              ("`" . "`")
              ("“" . "”"))))
       (evil-textobj-anyblock--make-textobj beg end type count nil)))
-
   (evil-define-text-object my-evil-textobj-anyblock-a-quote
     (count &optional beg end type)
     "Select the closest outer quote."
@@ -181,7 +180,6 @@
              ("`" . "`")
              ("“" . "”"))))
       (evil-textobj-anyblock--make-textobj beg end type count t)))
-
   (define-key evil-inner-text-objects-map "q" 'my-evil-textobj-anyblock-inner-quote)
   (define-key evil-outer-text-objects-map "q" 'my-evil-textobj-anyblock-a-quote)
   )
@@ -487,9 +485,7 @@
 "https://planet.emacslife.com/atom.xml"
 "https://www.emacswiki.org/emacs?action=rss;match=%5E%5Cd%5Cd%5Cd%5Cd-%5Cd%5Cd-%5Cd%5Cd"
 "https://feeds.feedburner.com/zdkorea"
-"https://www.producthunt.com/feed?category=undefined"
 "https://www.reddit.com/r/linux.rss"
-"https://www.gamingonlinux.com/article_rss.php"
 ))
 
 (use-package rg

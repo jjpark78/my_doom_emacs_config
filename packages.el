@@ -27,6 +27,7 @@
 (package! mu4e-alert)
 (package! tmux-pane)
 (package! git-link)
+(package! hl-line+)
 (package! mu4e-views
   :recipe
   (:host githubk

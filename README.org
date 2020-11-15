@@ -69,6 +69,7 @@
 (package! mu4e-alert)
 (package! tmux-pane)
 (package! git-link)
+(package! hl-line+)
 (package! mu4e-views
   :recipe
   (:host githubk
@@ -359,7 +360,6 @@ Doom modeline 관련 수정
              ("`" . "`")
              ("“" . "”"))))
       (evil-textobj-anyblock--make-textobj beg end type count nil)))
-
   (evil-define-text-object my-evil-textobj-anyblock-a-quote
     (count &optional beg end type)
     "Select the closest outer quote."
@@ -369,7 +369,6 @@ Doom modeline 관련 수정
              ("`" . "`")
              ("“" . "”"))))
       (evil-textobj-anyblock--make-textobj beg end type count t)))
-
   (define-key evil-inner-text-objects-map "q" 'my-evil-textobj-anyblock-inner-quote)
   (define-key evil-outer-text-objects-map "q" 'my-evil-textobj-anyblock-a-quote)
   )
@@ -761,7 +760,6 @@ ORG모드를 위한 함수들
 ;; (org-weather-refresh)
 #+END_SRC
 ** RSS Feed
-
 *** Custom Elfeed Search Column
 기본 피드 목록 화면은 한글 제목의 문자열 길이 계산에 버그가 있는지
 컬럼 정렬이 뒤죽박죽이다.
@@ -812,9 +810,7 @@ ORG모드를 위한 함수들
 "https://planet.emacslife.com/atom.xml"
 "https://www.emacswiki.org/emacs?action=rss;match=%5E%5Cd%5Cd%5Cd%5Cd-%5Cd%5Cd-%5Cd%5Cd"
 "https://feeds.feedburner.com/zdkorea"
-"https://www.producthunt.com/feed?category=undefined"
 "https://www.reddit.com/r/linux.rss"
-"https://www.gamingonlinux.com/article_rss.php"
 ))
 #+END_SRC
 
