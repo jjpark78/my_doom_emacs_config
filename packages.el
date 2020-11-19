@@ -30,6 +30,6 @@
 (package! hl-line+)
 (package! mu4e-views
   :recipe
-  (:host githubk
+  (:host github
    :repo "lordpretzel/mu4e-views"))
 (package! magit-todos)
