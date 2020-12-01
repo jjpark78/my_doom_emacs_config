@@ -1,40 +1,3 @@
-(defun save-framegeometry ()
-  "Gets the current frame's geometry and saves to ~/.emacs.d/framegeometry."
-  (let (
-        (framegeometry-left (frame-parameter (selected-frame) 'left))
-        (framegeometry-top (frame-parameter (selected-frame) 'top))
-        (framegeometry-width (frame-parameter (selected-frame) 'width))
-        (framegeometry-height (frame-parameter (selected-frame) 'height))
-        (framegeometry-file (expand-file-name "~/.emacs.d/framegeometry"))
-        )
-    (when (not (number-or-marker-p framegeometry-left))
-      (setq framegeometry-left 0))
-    (when (not (number-or-marker-p framegeometry-top))
-      (setq framegeometry-top 0))
-    (when (not (number-or-marker-p framegeometry-width))
-      (setq framegeometry-width 0))
-    (when (not (number-or-marker-p framegeometry-height))
-      (setq framegeometry-height 0))
-    (with-temp-buffer
-      (insert
-       ";;; This is the previous emacs frame's geometry.\n"
-       ";;; Last generated " (current-time-string) ".\n"
-       "(setq initial-frame-alist\n"
-       "      '(\n"
-       (format "        (top . %d)\n" (max framegeometry-top 0))
-       (format "        (left . %d)\n" (max framegeometry-left 0))
-       (format "        (width . %d)\n" (max framegeometry-width 0))
-       (format "        (height . %d)))\n" (max framegeometry-height 0)))
-       (when (file-writable-p framegeometry-file)
-       (write-file framegeometry-file))))
-)
-
-(defun load-framegeometry ()
-  (let ((framegeometry-file (expand-file-name "~/.emacs.d/framegeometry")))
-    (when (file-readable-p framegeometry-file)
-      (load-file framegeometry-file)))
-)
-
 (defun setup-custom-prog-mode ()
   ;; 기본 인덴테이션을 설정한다.
   (setq typescript-indent-level 2)
@@ -84,6 +47,7 @@
 
 (defun my-org-config/after-org-mode-load ()
   ;; (visual-line-mode)
+
   (require 'org-indent)
   (org-indent-mode)
   )
@@ -124,7 +88,7 @@
     (interactive)
     (require 'w3m)
     (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
-      (xwidget-webkit-browse-url (concat "http://www.google.com/search?hl=en&q=" keyword "+site:stackoverflow.com")))
+      (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword "+site:stackoverflow.com")))
 )
 
 (defun google-search ()
@@ -132,26 +96,8 @@
     (interactive)
     (require 'w3m)
     (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
-      (xwidget-webkit-browse-url (concat "http://www.google.com/search?hl=en&q=" keyword )))
+      (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword )))
 )
-
-(defun custom-input-method-hook ()
-  (when (equal nil (string-equal nil evil-input-method))
-      (setq evil-input-method nil)
-      )
-  )
-
-(defvar my-input-list '("korean-hangul"
-                        "japanese"
-                        "pyim"))
-
-(defun choose-input-from-rotated-list ()
-  "change input method"
-  (interactive)
-  (setq my-input-list (append (cdr my-input-list) (cons (car my-input-list) ())))
-  (message (car my-input-list))
-  (set-input-method (car my-input-list))
-  )
 
 (defun forge-custom-open-url ()
   (interactive)
@@ -186,6 +132,11 @@
           (set-window-buffer (next-window) next-win-buffer)
           (select-window first-win)
           (if this-win-2nd (other-window 1))))))
+
+(defun er-find-alacritty-init-file ()
+  "Edit the shell init file in another window."
+  (interactive)
+    (find-file-other-window (expand-file-name ".config/alacritty/alacritty.yml" (getenv "HOME"))))
 
 (defun er-find-shell-init-file ()
   "Edit the shell init file in another window."

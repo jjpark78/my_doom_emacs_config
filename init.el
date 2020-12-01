@@ -23,7 +23,7 @@
        (company +auto)             ; the ultimate code completion backend
        ;; helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       (ivy +icons +childframe)               ; a search engine for love and life
+       (ivy +icons)               ; a search engine for love and life
 
        :ui
        deft              ; notational velocity for Emacs
@@ -35,14 +35,14 @@
        ;; hydra
        ;; indent-guides    ; highlighted indent columns
        ;; minimap             ; show a map of the code on the side
-       modeline   ; snazzy, Atom-inspired modeline, plus API
+       (modeline)   ; snazzy, Atom-inspired modeline, plus API
        nav-flash           ; blink cursor line after big motions
        ;; neotree          ; a project drawer, like NERDTree for vim
        ophints             ; highlight the region an operation acts on
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
        ;; pretty-code       ; ligatures or substitute text with pretty symbols
        ;; tabs                ; an tab bar for Emacs
-       ;; treemacs            ; a rroject drawer, like neotree but cooler"doom-color"
+       treemacs            ; a rroject drawer, like neotree but cooler"doom-color"
 
        unicode             ; extended unicode support for various languages
        vc-gutter           ; vcs diff in the fringe
@@ -66,17 +66,17 @@
        ;;word-wrap         ; soft wrapping with language-aware indent
 
        :emacs
-       (dired +icons +ranger)      ; making dired pretty [functional]
+       (dired +icons)      ; making dired pretty [functional]
        ;;electric          ; smarter, keyword-based electric-indent
        ;; (ibuffer +icons)    ; interactive buffer management
        undo                ; persistent, smarter undo for your inevitable mistakes
        vc                  ; version-control and Emacs, sitting in a tree
 
        :term
-       eshell            ; the elisp shell that works everywhere
+       ;; eshell            ; the elisp shell that works everywhere
        ;;shell             ; simple shell REPL for Emacs
        ;;term              ; basic terminal emulator for Emacs
-       vterm               ; the best terminal emulation in Emacs
+       ;; vterm               ; the best terminal emulation in Emacs
 
        :checkers
        syntax              ; tasing you for every semicolon you forget
@@ -85,23 +85,23 @@
 
        :os
        macos               ; recent new feature
-       ;; tty                    ;
+       tty                    ;
 
        :tools
        ;;ansible
-       debugger         ; FIXME stepping through code, to help you add bugs
+       ;; debugger         ; FIXME stepping through code, to help you add bugs
        ;; direnv
        docker
        ;;editorconfig      ; let someone else argue about tabs vs spaces
        ;;ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
        ;;gist              ; interacting with github gists
-       (lookup +docsets)   ; navigate your code and its documentation
+       (lookup)   ; navigate your code and its documentation
        (lsp +peek)
        (magit +forge)             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
-       pdf               ; pdf enhancements
+       ;; pdf               ; pdf enhancements
        ;; prodigy           ; FIXME managing external services & code builders
        rgb               ; creating color strings
        taskrunner        ; taskrunner for all your projects

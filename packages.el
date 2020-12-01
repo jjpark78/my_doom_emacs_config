@@ -1,4 +1,3 @@
-(unpin! magit forge lsp-mode dap-mode)
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
@@ -9,12 +8,9 @@
 (package! org-bullets)
 (package! gitlab-ci-mode)
 (package! org-fancy-priorities)
-(package! sql-indent)
 (package! beacon)
-(package! nyan-mode)
 (package! carbon-now-sh)
 (package! google-this)
-(package! w3m)
 (package! rg)
 (package! prettier-js)
 (package! swiper)
@@ -22,14 +18,7 @@
 (package! exec-path-from-shell)
 (package! evil-matchit)
 (package! evil-textobj-anyblock)
-(package! ob-typescript)
 (package! lsp-treemacs)
-(package! mu4e-alert)
-(package! tmux-pane)
 (package! git-link)
-(package! hl-line+)
-(package! mu4e-views
-  :recipe
-  (:host github
-   :repo "lordpretzel/mu4e-views"))
 (package! magit-todos)
+(package! tmux-pane)

@@ -17,14 +17,8 @@
   - [[#utils][Utils]]
     - [[#ripgrep][Ripgrep]]
     - [[#google-stackoverflow-search][Google, StackOverFlow Search]]
-    - [[#custom-emacs-multi-inputmethod-cycle][Custom Emacs Multi-InputMethod Cycle]]
     - [[#forge-custom-open-link][Forge Custom Open Link]]
     - [[#toggle-window-layout][Toggle Window Layout]]
-  - [[#mail][Mail]]
-    - [[#basic-coonfiguration][Basic Coonfiguration]]
-    - [[#smtp][SMTP]]
-    - [[#render-html-email][Render HTML email]]
-    - [[#alert][Alert]]
   - [[#etc][ETC]]
     - [[#shell-utils][Shell Utils]]
     - [[#custom-variables][Custom Variables]]
@@ -40,7 +34,6 @@
 +private.el 파일에는 공개하기 곤란한 개인 토큰이나 패스워드등이 담겨 있다.
 *** Packages
 #+BEGIN_SRC elisp :tangle packages.el
-(unpin! magit forge lsp-mode dap-mode)
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
@@ -51,12 +44,9 @@
 (package! org-bullets)
 (package! gitlab-ci-mode)
 (package! org-fancy-priorities)
-(package! sql-indent)
 (package! beacon)
-(package! nyan-mode)
 (package! carbon-now-sh)
 (package! google-this)
-(package! w3m)
 (package! rg)
 (package! prettier-js)
 (package! swiper)
@@ -64,62 +54,12 @@
 (package! exec-path-from-shell)
 (package! evil-matchit)
 (package! evil-textobj-anyblock)
-(package! ob-typescript)
 (package! lsp-treemacs)
-(package! mu4e-alert)
-(package! tmux-pane)
 (package! git-link)
-(package! hl-line+)
-(package! mu4e-views
-  :recipe
-  (:host github
-   :repo "lordpretzel/mu4e-views"))
 (package! magit-todos)
+(package! tmux-pane)
 #+END_SRC
 *** Custom Setup
-**** Store Windows Position & Size
-지금은 틸링 매니저를 쓰고 있어서 사용할 일이 거의 없지만
-예전에는 이맥스를 이전에 사용하던 위치에 그대로 이어서 계속 사용하고 싶어
-구글링을 한 끝에 찾아낸 유용한 함수들
-#+BEGIN_SRC elisp :tangle +custom_funcs.el
-(defun save-framegeometry ()
-  "Gets the current frame's geometry and saves to ~/.emacs.d/framegeometry."
-  (let (
-        (framegeometry-left (frame-parameter (selected-frame) 'left))
-        (framegeometry-top (frame-parameter (selected-frame) 'top))
-        (framegeometry-width (frame-parameter (selected-frame) 'width))
-        (framegeometry-height (frame-parameter (selected-frame) 'height))
-        (framegeometry-file (expand-file-name "~/.emacs.d/framegeometry"))
-        )
-    (when (not (number-or-marker-p framegeometry-left))
-      (setq framegeometry-left 0))
-    (when (not (number-or-marker-p framegeometry-top))
-      (setq framegeometry-top 0))
-    (when (not (number-or-marker-p framegeometry-width))
-      (setq framegeometry-width 0))
-    (when (not (number-or-marker-p framegeometry-height))
-      (setq framegeometry-height 0))
-    (with-temp-buffer
-      (insert
-       ";;; This is the previous emacs frame's geometry.\n"
-       ";;; Last generated " (current-time-string) ".\n"
-       "(setq initial-frame-alist\n"
-       "      '(\n"
-       (format "        (top . %d)\n" (max framegeometry-top 0))
-       (format "        (left . %d)\n" (max framegeometry-left 0))
-       (format "        (width . %d)\n" (max framegeometry-width 0))
-       (format "        (height . %d)))\n" (max framegeometry-height 0)))
-       (when (file-writable-p framegeometry-file)
-       (write-file framegeometry-file))))
-)
-
-(defun load-framegeometry ()
-  (let ((framegeometry-file (expand-file-name "~/.emacs.d/framegeometry")))
-    (when (file-readable-p framegeometry-file)
-      (load-file framegeometry-file)))
-)
-#+END_SRC
-
 **** Startup Setup
 이맥스 관련 일반적인 사항들을 지정한다.
 주로 특정 모드가 아닌 이맥스에 글로벌 설정들이 포함된다.
@@ -131,7 +71,6 @@
 
 ;; 바쁘게 버퍼전환 하는 와중에 화면이 울렁거리는게 멀미날것 같아서 프리뷰 옵션을 껐다
 (setq +ivy-buffer-preview nil)
-;; (setq ivy-tab-space t)
 (setq avy-all-windows t)
 (setq ivy-read-action-function #'ivy-hydra-read-action)
 ;; dired를 두개 열어 놓고 왔다 갔다하며 복사 붙여넣기 할때 편하다
@@ -146,28 +85,10 @@
    '(("\\`g s" . "\\`evilem--?motion-\\(.*\\)") . (nil . "◃\\1"))
    ))
 
-;; Restore Frame size and location, if we are using gui emacs
-;; (if window-system
-;;   (progn
-;;     (add-hook 'after-init-hook 'load-framegeometry)
-;;     (add-hook 'kill-emacs-hook 'save-framegeometry))
-;; )
-
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
 (setq initial-frame-alist '((top . 23) (left . 1147) (width . 284) (height . 80)))
 
-;; 좌우로 여백을 활성화 시킨다.
-(defun my-fringe-mode-hook ()
-   (fringe-mode '(15 . 15)))
-
-(add-hook 'prog-mode-hook 'my-fringe-mode-hook)
-(add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
-(add-hook 'org-mode-hook  'my-fringe-mode-hook)
-
 (global-evil-matchit-mode)
-
-;; make open url function to use webkit
-;; (setq browse-url-browser-function 'xwidget-webkit-browse-url)
 
 ;; 스나이프를 화면 보이는 영역으로 제한한다.
 (setq evil-snipe-scope 'whole-visible)
@@ -178,25 +99,6 @@
 ;; 개인으로만 쓰면 공짜인것도 매력임.
 (global-wakatime-mode)
 #+END_SRC
-# **** Message buffer
-# 메세지 버퍼에 타임스탬프도 찍어서 메세지 발생 시간을 확인할 수 있게 한다.
-# #+BEGIN_SRC elisp :tangle config.el
-# ;; (defadvice! message-with-timestamp (args)
-# ;;   :filter-args #'message
-# ;;   (setcar args (format "%s %s"
-# ;;                        (format-time-string "[%F %T.%3N %Z]")
-# ;;                        (car args)))
-# ;;   args)
-# #+END_SRC
-# **** Enable Auto-reverse
-# 파일이 외부에서 변경되었을때 자동으로 버퍼를 리프레쉬한다.
-# #+BEGIN_SRC elisp :tangle config.el
-#  ;; Auto refresh buffers
-# (global-auto-revert-mode nil)
-# ;; Also auto refresh dired, but be quiet about it
-# (setq global-auto-revert-non-file-buffers nil)
-# (setq auto-revert-verbose nil)
-# #+END_SRC
 
 **** UTF & Korean Input
 한글 관련 설정
@@ -215,20 +117,14 @@
 **** UIs
 이맥스의 ui설정에 관련된 사항.
 #+BEGIN_SRC elisp :tangle config.el
-
-;; 둠의 기본 테마 설정
 ;; 이것 저것 많이 바꿔봤지만 역시 기본 테마가 젤 이쁘다
 (setq doom-theme 'doom-one)
 
-(setq all-the-icons-scale-factor 1.0)
-;; (setq all-the-icons-rvy-rich-mode 1)
-;; (ivy-rich-mode 1)
-
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
-(setq doom-font (font-spec :family "monaco" :size 13))
+(setq doom-font (font-spec :family "monaco" :size 14))
 
 ;; 한글 관련 폰트미치 스케일링 설정
-;; (set-face-attribute 'default nil :height 130)
+(set-face-attribute 'default nil :height 130)
 (set-fontset-font t 'hangul (font-spec :name "AppleGothic"))
 (setq face-font-rescale-alist
       '(("NanumGothicCoding" . 1.2307692307692308)
@@ -236,17 +132,11 @@
         ))
 #+END_SRC
 
-# 고양이를 켜서 그나마 좀 재미나게 바꿔본다.
-#  (nyan-mode)
-#  (nyan-start-animation)
-#  add icons to ivy
-#  아이비 메뉴에 아이콘이 들어가면 호박에 줄그어서 수박이 되는 경험을 할 수 있다.
-#  (add-hook 'after-init-hook 'all-the-icons-ivy-setup)
 **** Doom Modeline
 Doom modeline 관련 수정
 #+BEGIN_SRC elisp :tangle config.el
-(after! doom-modeline
-  (setq doom-modeline-buffer-state-icon nil))
+;; (after! doom-modeline
+;;   (setq doom-modeline-buffer-state-icon nil))
 #+END_SRC
 
 **** Fine-tune
@@ -259,8 +149,8 @@ Doom modeline 관련 수정
 ;; 라인 넘버표시 하지 않는게 더 빠르다
 ;; 이유는 모름.
 ;; (setq display-line-numbers-type 'relative)
-(setq display-line-numbers-type nil)
-
+(setq display-line-numbers-type t)
+;; (global-so-long-mode)
 ;; 더블버퍼링이 동작하도록 설정한다.
 (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
 (setq scroll-conservatively 101)
@@ -268,33 +158,21 @@ Doom modeline 관련 수정
 ;; lsp 관련 설정 메뉴들
 ;; 이맥스를 느리게 만드는 범인중 십중팔구 LSP가 관련되어져 있다고 함.
 ;; 해당 튜닝도 구글링을 통해서 찾았다.
-(setq gc-cons-threshold 100000000000)
+(setq gc-cons-threshold 1000000000)
 (setq read-process-output-max (* 1024 1024))
 #+END_SRC
 
-# 스크롤과 관련된 튜닝. 조금더 부드러워지는 느낌이다.
-# #+begin_src elisp :tangle config.el
-# (setq scroll-step 1)
-# (setq scroll-margin 1)
-# (setq scroll-conservatively 101)
-# (setq scroll-up-aggressively 0.01)
-# (setq scroll-down-aggressively 0.01)
-# (setq auto-window-vscroll nil)
-# (setq fast-but-imprecise-scrolling nil)
-
-# #+end_src
 *** Useful Bindings
 **** Bindings 1
 단축키 설정
 #+BEGIN_SRC elisp :tangle config.el
-;; 스프릿된 화면들을 넘어다닐때 아주 유용하다.
+;; 스플릿된 화면들을 넘어 다닐때 Tmux랑 연동되어 편하다.
 (map! "C-h" #'tmux-pane-omni-window-left)
 (map! "C-j" #'tmux-pane-omni-window-down)
 (map! "C-k" #'tmux-pane-omni-window-up)
 (map! "C-l" #'tmux-pane-omni-window-right)
 
 (map! :leader :prefix "g" :desc "ediff style diff from working-tree" "d" #'magit-ediff-show-working-tree)
-
 ;; go back, go references
 (map! :n "gb" #'evil-jump-backward)
 (map! :n "gr" #'+lookup/references)
@@ -312,6 +190,7 @@ Doom modeline 관련 수정
 ;; 커스텀 함수로 정의해둔 쉘 설정 파일불러오는 함수에게 단축기를 할당했음.
 ;; 자주 쓰지는 않는데 있어보이는 척 할때 아주 좋다.
 (map! :leader :prefix "f" :desc "Open Shell init file on other windows" "i" #'er-find-shell-init-file)
+(map! :leader :prefix "f" :desc "Open alacritty init file on other windows" "a" #'er-find-alacritty-init-file)
 ;; 코드를 입력받아서 이쁜 화면으로 만들어주는 패키지에 단축기를 할당했다.
 (map! :leader :prefix "t" :desc "Capture Code with Carbon now" "t" #'carbon-now-sh)
 
@@ -373,11 +252,6 @@ Doom modeline 관련 수정
   (define-key evil-outer-text-objects-map "q" 'my-evil-textobj-anyblock-a-quote)
   )
 
-;; 다국어를 사용할때 느낀 불편함을 해소하는 것들
-;; 하나의 단축기로 등록된 여러개의 입력기를 순환하며 선택한다.
-(add-hook 'evil-normal-state-entry-hook 'custom-input-method-hook)
-(define-key evil-normal-state-map (kbd "C-\\") #'choose-input-from-rotated-list)
-(define-key evil-insert-state-map (kbd "C-\\") #'choose-input-from-rotated-list)
  #+END_SRC
 
 ** Programming
@@ -509,16 +383,10 @@ Tabnine관련 설정들
 **** Programming ETC
  개발관련 기타 설정들
 #+BEGIN_SRC elisp :tangle config.el
-;; dash docs setup
-;; 무슨 이유인지 모르겠으나 dash docs를 자동 인식 못함. 수동으로 추가해줌
-(setq dash-docs-docsets (list "VueJS" "TypeScript" "MomentJS" "NodeJS" "Stylus" "Pug" "HTML" "CSS"
-                              "Express" "Mongoose" "ElasticSearch" "Docker" "Jekyll" "Mocha"
-                              "Bootstrap_4" "Bootstrap_5" "jQuery" "React" "Dart"))
 
 ;; 1초라도 빨리 팝업 띄우고 싶어서
 ;; 그러나 실제 체감속도 향상은 없음
 (setq company-idle-delay 0.0)
-
 
 ;; lsp 설정 이후에 불필요한 옵션들은 전부다 끈다.
 (after! lsp
@@ -615,6 +483,7 @@ ORG모드를 위한 함수들
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
 (defun my-org-config/after-org-mode-load ()
   ;; (visual-line-mode)
+
   (require 'org-indent)
   (org-indent-mode)
   )
@@ -623,53 +492,55 @@ ORG모드를 위한 함수들
 요즘 열공중인 그렇게 대단하다 침이 마르지 않게 칭찬해대는 ORG모드에 대한 설정들을 따로 모아 놓았다.
 #+BEGIN_SRC elisp :tangle config.el
 ;; start my org settings
-
 ;; config some hooks
-(add-hook 'org-mode-hook 'my-org-config/after-org-mode-load)
-
-;;basic org mode config
-(setq
-  org-hide-emphasis-markers t
-  org-directory "~/org/"
-  org-agenda-skip-scheduled-if-done t
-  org-ellipsis " ▾ "
-  org-tags-column -80
-  org-agenda-span 30
-  org-agenda-files '("~/org")
-  org-log-done 'time
-  org-refile-targets (quote ((nil :maxlevel . 1)))
-  ;; org-capture-templates '(("x" "JW.ORG" entry
-  ;;                         (file+olp+datetree "jw.org")
-  ;;                         "**** [ ] %U %?" :prepend t :kill-buffer t)
-  ;;                         ("t" "JJSOFT" entry
-  ;;                         (file+headline "jjsoft.org")
-  ;;                         "* [ ] %?\n%i" :prepend t :ill-buffer t))
-  ;; +doom-dashboard-banner-file (expand-file-name "logo.png" doom-private-dir)
-  +org-capture-todo-file "tasks.org")
-
-;; config org-super-agenda
-(setq org-super-agenda-mode t)
-(setq org-super-agenda-header-map nil)
-(setq org-deadline-warning-days 7)
-(setq org-agenda-skip-scheduled-if-done t)
-(setq org-agenda-block-separator 9472)
-(setq org-agenda-start-on-weekday nil)
-(setq org-super-agenda-groups '((:name "Today"
-                                   :time-grid t
-                                   :scheduled today)
-                                (:name "Due today"
-                                    :deadline today)
-                                (:name "Important"
-                                    :priority "A")
-                                (:name "Overdue"
-                                    :deadline past)
-                                (:name "Due soon"
-                                    :deadline future)))
- #+END_SRC
-
-헤더 스타일을 커스텀으로 변경한다.
-#+BEGIN_SRC elisp :tangle config.el
 (after! org
+  (add-hook 'org-mode-hook 'my-org-config/after-org-mode-load)
+  ;;basic org mode config
+  (setq
+    org-fontify-quote-and-verse-blocks nil
+    org-fontify-whole-heading-line nil
+    org-hide-leading-starts nil
+    org-startup-indented nil
+    org-hide-emphasis-markers t
+    org-directory "~/org/"
+    org-agenda-skip-scheduled-if-done t
+    org-ellipsis " ▾ "
+    org-tags-column -80
+    org-agenda-span 30
+    org-agenda-files '("~/org")
+    org-log-done 'time
+    org-refile-targets (quote ((nil :maxlevel . 1)))
+    ;; org-capture-templates '(("x" "JW.ORG" entry
+    ;;                         (file+olp+datetree "jw.org")
+    ;;                         "**** [ ] %U %?" :prepend t :kill-buffer t)
+    ;;                         ("t" "JJSOFT" entry
+    ;;                         (file+headline "jjsoft.org")
+    ;;                         "* [ ] %?\n%i" :prepend t :ill-buffer t))
+    ;; +doom-dashboard-banner-file (expand-file-name "logo.png" doom-private-dir)
+    +org-capture-todo-file "tasks.org"
+
+    org-edit-src-content-indentation 0
+    org-src-tab-acts-natively t
+    org-src-preserve-indentation t
+    ;; config org-super-agenda
+    org-super-agenda-mode t
+    org-super-agenda-header-map nil
+    org-deadline-warning-days 7
+    org-agenda-skip-scheduled-if-done t
+    org-agenda-block-separator 9472
+    org-agenda-start-on-weekday nil
+    org-super-agenda-groups '((:name "Today"
+                                    :time-grid t
+                                    :scheduled today)
+                                    (:name "Due today"
+                                        :deadline today)
+                                    (:name "Important"
+                                        :priority "A")
+                                    (:name "Overdue"
+                                        :deadline past)
+                                    (:name "Due soon"
+                                        :deadline future))
+    org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
   (set-face-attribute 'org-link nil :weight 'normal :background nil)
   (set-face-attribute 'org-code nil :foreground "#a9a1e1" :background nil)
   (set-face-attribute 'org-date nil :foreground "#5B6268" :background nil)
@@ -680,85 +551,34 @@ ORG모드를 위한 함수들
   (set-face-attribute 'org-level-5 nil :weight 'normal)
   (set-face-attribute 'org-level-6 nil :weight 'normal)
   (set-face-attribute 'org-document-title nil :foreground "SlateGray1" :background nil :height 1.75 :weight 'bold)
-  (setq org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
   (set-face-attribute 'org-document-title nil
                       :foreground "White"
                       :height 1.2
-                      :weight 'bold))
+                      :weight 'bold)
 
-;; 기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
-(use-package org-bullets
-  :init
-  (setq org-bullets-bullet-list '("✸" "✸" "✸" "✸" "✸"))
-  :config
-  (add-hook 'org-mode-hook
-            (lambda () (org-bullets-mode 1)))
+    ;; 기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
+  (use-package org-bullets
+    :init
+    (setq org-bullets-bullet-list '("✸" "✸" "✸" "✸" "✸"))
+    :config
+    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+  ;;기타 ORG모드 설정
+  (use-package! org-mac-link
+    :after org
+    :config
+    (setq
+      org-mac-grab-Acrobat-app-p nil
+      org-mac-grab-devonthink-app-p nil
+      org-html-htmlize-output-type 'css
+      org-download-method 'attach
+      global-org-pretty-table-mode t)
+    (map! :leader
+            :map org-mode-map
+            :desc "link from mac apps"
+            "mlm"  #'org-mac-grab-link))
 )
 #+END_SRC
 
-바벨을 사용할때 언어, lsp를 지원하기 위한 추가적인 세팅
-#+BEGIN_SRC elisp :tangle config.el
-(setq org-edit-src-content-indentation 0)
-(setq org-src-tab-acts-natively t)
-(setq org-src-preserve-indentation t)
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((ts . t)
-   (js . t)
-   (emacs-lisp . t)
-   (python . t)
-   (shell . t)
-   ))
-
-(cl-defmacro lsp-org-babel-enable (lang)
-  "Support LANG in org source code block."
-  (setq centaur-lsp 'lsp-mode)
-  (cl-check-type lang stringp)
-  (let* ((edit-pre (intern (format "org-babel-edit-prep:%s" lang)))
-         (intern-pre (intern (format "lsp--%s" (symbol-name edit-pre)))))
-    `(progn
-       (defun ,intern-pre (info)
-         (let ((file-name (->> info caddr (alist-get :file))))
-           (unless file-name
-             (setq file-name (make-temp-file "babel-lsp-")))
-           (setq buffer-file-name file-name)
-           (lsp-deferred)))
-       (put ',intern-pre 'function-documentation
-            (format "Enable lsp-mode in the buffer of org source block (%s)."
-                    (upcase ,lang)))
-       (if (fboundp ',edit-pre)
-           (advice-add ',edit-pre :after ',intern-pre)
-         (progn
-           (defun ,edit-pre (info)
-             (,intern-pre info))
-           (put ',edit-pre 'function-documentation
-                (format "Prepare local buffer environment for org source block (%s)."
-                        (upcase ,lang))))))))
-(defvar org-babel-lang-list
-  '("emacs-lisp" "python" "javascript" "bash" "sh" "vue"))
-(dolist (lang org-babel-lang-list)
-  (eval `(lsp-org-babel-enable ,lang)))
-#+END_SRC
-
-기타 ORG모드 설정
-#+BEGIN_SRC elisp :tangle config.el
-(use-package! org-mac-link
-  :after org
-  :config
-  (setq org-mac-grab-Acrobat-app-p nil)
-  (setq org-mac-grab-devonthink-app-p nil)
-  (map! :leader
-        :map org-mode-map
-        :desc "link from mac apps"
-        "mlm"  #'org-mac-grab-link))
-(setq org-html-htmlize-output-type 'css)
-(setq org-download-method 'attach)
-(setq global-org-pretty-table-mode t)
-;; (use-package org-weather)
-;; (setq org-weather-location "Daejoen,KR")
-;; (org-weather-refresh)
-#+END_SRC
 ** RSS Feed
 *** Custom Elfeed Search Column
 기본 피드 목록 화면은 한글 제목의 문자열 길이 계산에 버그가 있는지
@@ -801,33 +621,18 @@ ORG모드를 위한 함수들
 이맥스에서 RSS피드를 받아 보기에 편하다.
 #+BEGIN_SRC elisp :tangle config.el
 (setq elfeed-feeds '(
-"http://www.bloter.net/feed"
-"https://d2.naver.com/d2.atom"
-"https://engineering.linecorp.com/ko/feed/"
-"https://tech.lezhin.com/rss/"
-"https://emacsredux.com/atom.xml"
-"http://sachachua.com/blog/category/emacs/feed"
-"https://planet.emacslife.com/atom.xml"
-"https://www.emacswiki.org/emacs?action=rss;match=%5E%5Cd%5Cd%5Cd%5Cd-%5Cd%5Cd-%5Cd%5Cd"
-"https://feeds.feedburner.com/zdkorea"
-"https://www.reddit.com/r/linux.rss"
+    "http://www.bloter.net/feed"
+    "https://d2.naver.com/d2.atom"
+    "https://engineering.linecorp.com/ko/feed/"
+    "https://tech.lezhin.com/rss/"
+    "https://emacsredux.com/atom.xml"
+    "http://sachachua.com/blog/category/emacs/feed"
+    "https://planet.emacslife.com/atom.xml"
+    "https://www.emacswiki.org/emacs?action=rss;match=%5E%5Cd%5Cd%5Cd%5Cd-%5Cd%5Cd-%5Cd%5Cd"
+    "https://feeds.feedburner.com/zdkorea"
+    "https://www.reddit.com/r/linux.rss"
 ))
 #+END_SRC
-
-#+begin_src elisp
-;; elfeed 관련 목록 커스텀 컬럼 설정
-(defun my-elfeed-update()
-  (interactive)
-  (message "update elfeed")
-  (elfeed-update-feed)
-  (run-with-timer 0 3600 #'elfeed-update-feed)
-  )
-
-(add-hook 'after-init-hook 'my-elfeed-update)
-
-(after! elfeed
-   (setq elfeed-search-print-entry-function #'feed-reader/search-print))
-#+end_src
 
 ** Utils
 *** Ripgrep
@@ -835,16 +640,15 @@ rg.el 관련 설정.
 #+BEGIN_SRC elisp :tangle config.el
 (use-package rg
   :config
-  (setq rg-group-result t)
-  (setq rg-hide-command t)
-  (setq rg-show-columns nil)
-  (setq rg-show-header t)
-  (setq rg-custom-type-aliases nil)
-  (setq rg-default-alias-fallback "all"))
-
-;; 버퍼가 열리면 포커스를 그쪽으로 이동시킨다.
-;; 이거 없으면 생각보다 귀찮아진다.
-(add-hook 'rg-mode-hook (lambda () (switch-to-buffer-other-window "*rg*")))
+  (setq rg-group-result t
+        rg-hide-command t
+        rg-show-columns nil
+        rg-show-header t
+        rg-custom-type-aliases nil
+        rg-default-alias-fallback "all")
+  ;; 버퍼가 열리면 포커스를 그쪽으로 이동시킨다.
+  ;; 이거 없으면 생각보다 귀찮아진다.
+  (add-hook 'rg-mode-hook (lambda () (switch-to-buffer-other-window "*rg*"))))
 #+END_SRC
 
 *** Google, StackOverFlow Search
@@ -856,7 +660,7 @@ rg.el 관련 설정.
     (interactive)
     (require 'w3m)
     (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
-      (xwidget-webkit-browse-url (concat "http://www.google.com/search?hl=en&q=" keyword "+site:stackoverflow.com")))
+      (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword "+site:stackoverflow.com")))
 )
 
 (defun google-search ()
@@ -864,34 +668,9 @@ rg.el 관련 설정.
     (interactive)
     (require 'w3m)
     (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
-      (xwidget-webkit-browse-url (concat "http://www.google.com/search?hl=en&q=" keyword )))
+      (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword )))
 )
 
-#+END_SRC
-
-*** Custom Emacs Multi-InputMethod Cycle
-기존의 이맥스에서는 여러 외국어를 입력할때 변환이 매우 번거로웠지만
-간단한 함수를 만들어서 순환형식으로 빠르게 입력기 변환을 수행한다。
-가장 좋은 방법은 OS의 입력기에 맞춰서 이맥스의 입력기도 함께 변환되도록 연동하는 것이겠지만
-어떻게 하는건지는 모르겠음.
-#+BEGIN_SRC elisp :tangle +custom_funcs.el
-(defun custom-input-method-hook ()
-  (when (equal nil (string-equal nil evil-input-method))
-      (setq evil-input-method nil)
-      )
-  )
-
-(defvar my-input-list '("korean-hangul"
-                        "japanese"
-                        "pyim"))
-
-(defun choose-input-from-rotated-list ()
-  "change input method"
-  (interactive)
-  (setq my-input-list (append (cdr my-input-list) (cons (car my-input-list) ())))
-  (message (car my-input-list))
-  (set-input-method (car my-input-list))
-  )
 #+END_SRC
 
 *** Forge Custom Open Link
@@ -936,146 +715,17 @@ Forge에서 브라우저로 바로 열수 있는 함수를 사용한다.
           (if this-win-2nd (other-window 1))))))
 #+END_SRC
 
-** Mail
-*** Basic Coonfiguration
-Mail관련 설정을 추가 한다.
-mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많이 자료가 존재한다. 고마워요 구글.
-#+BEGIN_SRC elisp :tangle config.el
-(add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
-(use-package! mu4e)
-(after! mu4e
-  (message "init mu4e variables")
-  (setq mu4e-attachment-dir "~/Downloads"
-        mu4e-compose-signature-auto-include t
-        mu4e-get-mail-command "true"
-        mu4e-maildir "~/Mailbox"
-        mu4e-update-interval nil
-        mu4e-use-fancy-chars t
-        mu4e-view-show-addresses t
-        mu4e-view-show-images t
-        mu4e-index-update-in-background nil
-        mu4e-index-update-error-warning nil
-        mu4e-compose-signature-auto-include t
-        mu4e-confirm-quit nil
-        mu4e-compose-format-flowed t
-        ;; +mu4e-min-header-frame-width 142
-        mu4e-headers-date-format "%y/%m/%d"
-        mu4e-headers-time-format "%H:%M:%S"
-        mu4e-index-cleanup t)
-
-  ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
-  (setq mu4e-headers-fields '((:human-date . 10)
-                              (:flags      . 6)
-                              ;; (:folder . 12)
-                              (:from       . 20)
-                              (:to         . 20)
-                              (:subject       . nil)))
-  ;;메일 폴더를 빠르게 선택할 수 있는 단축키도 지정한다.
-  (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@outlook.com/inbox"   :key ?i)
-                                 (:maildir "/jjpark78@outlook.com/sent"    :key ?s)
-                                 ))
-  ;;리플라이나 포워딩을 할때 원본 메세지의 받은 주소를 자동으로 보내는 사람 필드에 설정한다.
-  (add-hook 'mu4e-compose-pre-hook
-  (defun my-set-from-address ()
-      "Set the From address based on the To address of the original."
-      (let ((msg mu4e-compose-parent-message)) ;; msg is shorter...
-      (when msg
-      (setq user-mail-address
-      (cond
-          ((mu4e-message-contact-field-matches msg :to "jjpark@jjsoft.kr") "jjpark@jjsoft.kr")
-          ((mu4e-message-contact-field-matches msg :to "jjpark78@gmail.com") "jjpark78@gmail.com")
-          ((mu4e-message-contact-field-matches msg :to "pjj78@naver.com") "pjj78@naver.com")
-          ((mu4e-message-contact-field-matches msg :to "admin@jjsoft.kr") "admin@jjsoft.kr")
-          (t "jjpark78@outlook.com")))))))
-)
-#+END_SRC
-
-*** SMTP
-smtp 서버를 설정한다.
-#+BEGIN_SRC elisp :tangle config.el
-(set-email-account! "Outlook"
-                    '((user-full-name         . "Jaejin Park")
-                      (smtpmail-smtp-server   . "smtp.office365.com")
-                      (smtpmail-smtp-service  . 587)
-                      (smtpmail-stream-type   . starttls)
-                      (smtpmail-debug-info    . t)
-                      (mu4e-drafts-folder     . "/Drafts")
-                      (mu4e-refile-folder     . "/Archive")
-                      (mu4e-sent-folder       . "/Sent Items")
-                      (mu4e-trash-folder      . "/Deleted Items")
-                      ;(mu4e-sent-messages-behavior . 'delete)
-                      )
-                    nil)
-#+END_SRC
-
-*** Render HTML email
-요즘의 대부분의 이메일은 raw text보다는 html + image 조합이 더 일반적인다.
-그래서 기능이 부족한 shr 보다는 그냥 webkit으로 렌더링 하도록 한다. mu4e-views는 이를 위한 패키지이다
-이맥스에는 내가 하고 싶은 거의 모든것이 이미 구현되어 있다.
-#+BEGIN_SRC elisp :tangle config.el
-(use-package! mu4e-views
-  :after mu4e
-  :defer nil
-  :bind (:map mu4e-headers-mode-map
-	    ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
-	    ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
-	    ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
-	    )
-  :config
-  (setq mu4e-views-mu4e-html-email-header-style
-          "<style type=\"text/css\">
-  .mu4e-mu4e-views-mail-headers { font-family: sans-serif; font-size: 10pt; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid #ccc; color: #000;}
-  .mu4e-mu4e-views-header-row { display:block; padding: 1px 0 1px 0; }
-  .mu4e-mu4e-views-mail-header { display: inline-block; text-transform: capitalize; font-weight: bold; }
-  .mu4e-mu4e-views-header-content { display: inline-block; padding-right: 8px; }
-  .mu4e-mu4e-views-email { display: inline-block; padding-right: 8px; }
-  .mu4e-mu4e-views-attachment { display: inline-block; padding-right: 8px; }
-  </style>")
-  (setq mu4e-views-completion-method 'ivy) ;; use ivy for completion
-  (setq mu4e-views-default-view-method "html") ;; make xwidgets default
-  (mu4e-views-mu4e-use-view-msg-method "html") ;; select the default
-  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window)
-  (map! :map mu4e-headers-mode-map
-        :n "M-b" #'mu4e-views-cursor-msg-view-window-up
-        :n "M-f" #'mu4e-views-cursor-msg-view-window-down
-        :localleader
-        :desc "Message action"        "a"   #'mu4e-views-mu4e-view-action
-        :desc "Scoll message down"    "b"   #'mu4e-views-cursor-msg-view-window-up
-        :desc "Scoll message up"      "f"   #'mu4e-views-cursor-msg-view-window-down
-        :desc "Open attachment"       "o"   #'mu4e-views-mu4e-view-open-attachment
-        :desc "Save attachment"       "s"   #'mu4e-views-mu4e-view-save-attachment
-        :desc "Save all attachments"  "S"   #'mu4e-views-mu4e-view-save-all-attachments
-        :desc "Set view method"       "v"   #'mu4e-views-mu4e-select-view-msg-method)) ;; select viewing method)
-  #+END_SRC
-
-*** Alert
-새로운 메일이 도착할때 마다 데스크탑과 Emacs 상태바에 알람을 표시한다.
- #+BEGIN_SRC elisp :tangle config.el
-(use-package mu4e-alert
-  :config
-  (message "loaded mu4e-alert")
-  (mu4e-alert-set-default-style 'notifier)
-  (mu4e-alert-enable-notifications)
-  (mu4e-alert-enable-mode-line-display)
-)
-
-(defun refresh-mu4e-alert-mode-line ()
-  (interactive)
-  ;; (call-process-shell-command "okular&" nil 0)
-  (message "start update email")
-  (call-process-shell-command "~/.doom.d/update_mail.sh" nil 0)
-  ;; (mu4e-update-index)
-  (mu4e-alert-enable-mode-line-display))
-
-(run-with-timer 0 180 'refresh-mu4e-alert-mode-line)
- #+END_SRC
-
 ** ETC
 *** Shell Utils
 쉘 설정 파일을 바로 불어 올 수 있는 함수.
 단축기와 연동하여 사용한다.
 zsh관련 설정 파일을 만질 일이 있을때 요긴하게 잘 사용한다.
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
+(defun er-find-alacritty-init-file ()
+  "Edit the shell init file in another window."
+  (interactive)
+    (find-file-other-window (expand-file-name ".config/alacritty/alacritty.yml" (getenv "HOME"))))
+
 (defun er-find-shell-init-file ()
   "Edit the shell init file in another window."
   (interactive)
