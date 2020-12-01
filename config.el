@@ -178,12 +178,12 @@
 
 (setq flycheck-global-modes '(not gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
 ;; all-the-icons에 아이콘 색깔을 바꾸기 위해서 수동으로 설정한다.
-(add-hook 'company-mode-hook 'company-box-mode)
-(setq company-box-icons-alist 'company-box-icons-idea)
+;; (add-hook 'company-mode-hook 'company-box-mode)
+;; (setq company-box-icons-alist 'company-box-icons-idea)
 
-(setq company-tooltip-minimum-width 60)
-(setq company-tooltip-maximum-width 60)
-(setq company-box-doc-enable nil)
+;; (setq company-tooltip-minimum-width 60)
+;; (setq company-tooltip-maximum-width 60)
+;; (setq company-box-doc-enable nil)
 
 ;; 린트 에러 버퍼를 오픈하면 포커스가 자동으로 이동하지 않는다.
 ;; 이거 없으면 생각보다 귀찮아진다.
@@ -358,8 +358,8 @@
                                     (:name "Overdue"
                                         :deadline past)
                                     (:name "Due soon"
-                                        :deadline future))
-    org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
+                                        :deadline future)))
+    ;; org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
   (set-face-attribute 'org-link nil :weight 'normal :background nil)
   (set-face-attribute 'org-code nil :foreground "#a9a1e1" :background nil)
   (set-face-attribute 'org-date nil :foreground "#5B6268" :background nil)

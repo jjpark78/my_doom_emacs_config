@@ -16,8 +16,8 @@
 
 
 (doom! :input
-       chinese
-       japanese
+       ;; chinese
+       ;; japanese
 
        :completion
        (company +auto)             ; the ultimate code completion backend
@@ -42,7 +42,7 @@
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
        ;; pretty-code       ; ligatures or substitute text with pretty symbols
        ;; tabs                ; an tab bar for Emacs
-       treemacs            ; a rroject drawer, like neotree but cooler"doom-color"
+       ;; treemacs            ; a rroject drawer, like neotree but cooler"doom-color"
 
        unicode             ; extended unicode support for various languages
        vc-gutter           ; vcs diff in the fringe
@@ -53,7 +53,7 @@
 
        :editor
        (evil +everywhere)  ; come to the dark side, we have cookies
-       file-templates      ; auto-snippets for empty files
+       ;; file-templates      ; auto-snippets for empty files
        fold                ; (nigh) universal code folding
        ;; (format +onsave)  ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
@@ -66,9 +66,9 @@
        ;;word-wrap         ; soft wrapping with language-aware indent
 
        :emacs
-       (dired +icons)      ; making dired pretty [functional]
+       (dired +ranger)      ; making dired pretty [functional]
        ;;electric          ; smarter, keyword-based electric-indent
-       ;; (ibuffer +icons)    ; interactive buffer management
+       (ibuffer)    ; interactive buffer management
        undo                ; persistent, smarter undo for your inevitable mistakes
        vc                  ; version-control and Emacs, sitting in a tree
 
@@ -104,7 +104,7 @@
        ;; pdf               ; pdf enhancements
        ;; prodigy           ; FIXME managing external services & code builders
        rgb               ; creating color strings
-       taskrunner        ; taskrunner for all your projects
+       ;; taskrunner        ; taskrunner for all your projects
        ;;terraform         ; infrastructure as code
        ;; tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
@@ -152,9 +152,8 @@
          +capture
          +export
          +present
-         +dragndrop
          +noter
-         +roam)
+         )
        ;php               ; perl's insecure younger brother
        ;; plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
@@ -162,7 +161,7 @@
        ;; qt                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
-       rest              ; Emacs as a REST client
+       ;; rest              ; Emacs as a REST client
        ;;rst               ; ReST in peace
        ;; (ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
        ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
@@ -177,7 +176,7 @@
        yaml              ; JSON, but readable
 
        :email
-       (mu4e +org +gmail)
+       ;; (mu4e +org +gmail)
        ;;notmuch
        ;; (wanderlust +gmail)
 
