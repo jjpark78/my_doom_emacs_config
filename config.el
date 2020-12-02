@@ -77,7 +77,7 @@
     doom-modeline-major-mode-icon t
     doom-modeline-buffer-encoding nil
     doom-modeline-mu4e t
-    doom-modeline-buffer-file-name-style 'file-name))
+    doom-modeline-buffer-file-name-style 'truncate-with-project))
 
 ;; 라인 넘버표시 하지 않는게 더 빠르다
 ;; 이유는 모름.
@@ -86,7 +86,7 @@
 (setq display-line-numbers-type nil)
 
 ;; 필요없는 부분은 동작하지 않는 특수 모드 활성화
-(global-so-long-mode)
+(global-so-long-mode 1)
 
 ;; 더블버퍼링이 동작하도록 설정한다.
 (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
