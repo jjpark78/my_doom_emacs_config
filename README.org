@@ -19,6 +19,11 @@
     - [[#google-stackoverflow-search][Google, StackOverFlow Search]]
     - [[#forge-custom-open-link][Forge Custom Open Link]]
     - [[#toggle-window-layout][Toggle Window Layout]]
+  - [[#mail][Mail]]
+    - [[#basic-coonfiguration][Basic Coonfiguration]]
+    - [[#smtp][SMTP]]
+    - [[#render-html-email][Render HTML email]]
+    - [[#alert][Alert]]
   - [[#etc][ETC]]
     - [[#shell-utils][Shell Utils]]
     - [[#custom-variables][Custom Variables]]
@@ -56,6 +61,12 @@
 (package! git-link)
 (package! magit-todos)
 (package! tmux-pane)
+(package! nyan-mode)
+(package! mu4e-alert)
+(package! mu4e-views
+  :recipe
+  (:host github
+   :repo "lordpretzel/mu4e-views"))
 #+END_SRC
 *** Custom Setup
 **** Startup Setup
@@ -84,7 +95,7 @@
    ))
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-(setq initial-frame-alist '((top . 23) (left . 1147) (width . 284) (height . 80)))
+(setq initial-frame-alist '((top . 23) (left . 1175) (width . 124) (height . 80)))
 
 (global-evil-matchit-mode)
 
@@ -119,22 +130,38 @@
 (setq doom-theme 'doom-one)
 
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
-(setq doom-font (font-spec :family "monaco" :size 14))
+(setq doom-font (font-spec :family "monaco" :size 15))
 
-;; 한글 관련 폰트미치 스케일링 설정
-(set-face-attribute 'default nil :height 130)
+(defun my-fringe-mode-hook ()
+   (fringe-mode '(15 . 15)))
+
+(add-hook 'prog-mode-hook 'my-fringe-mode-hook)
+(add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
+(add-hook 'org-mode-hook  'my-fringe-mode-hook)
+
+;; 한글 관련 폰트 스케일링 설정
+;; (set-face-attribute 'default nil :height 130)
 (set-fontset-font t 'hangul (font-spec :name "AppleGothic"))
 (setq face-font-rescale-alist
       '(("NanumGothicCoding" . 1.2307692307692308)
         ("AppleGothic" . 1.2307692307692308)
         ))
+
+(nyan-mode)
+(after! nyan-mode
+  (nyan-start-animation)
+)
 #+END_SRC
 
 **** Doom Modeline
 Doom modeline 관련 수정
 #+BEGIN_SRC elisp :tangle config.el
-;; (after! doom-modeline
-;;   (setq doom-modeline-buffer-state-icon nil))
+(after! doom-modeline
+  (setq
+    doom-modeline-major-mode-icon t
+    doom-modeline-buffer-encoding nil
+    doom-modeline-mu4e t
+    doom-modeline-buffer-file-name-style 'file-name))
 #+END_SRC
 
 **** Fine-tune
@@ -147,8 +174,12 @@ Doom modeline 관련 수정
 ;; 라인 넘버표시 하지 않는게 더 빠르다
 ;; 이유는 모름.
 ;; (setq display-line-numbers-type 'relative)
-(setq display-line-numbers-type t)
-;; (global-so-long-mode)
+;; (setq display-line-numbers-type t)
+(setq display-line-numbers-type nil)
+
+;; 필요없는 부분은 동작하지 않는 특수 모드 활성화
+(global-so-long-mode)
+
 ;; 더블버퍼링이 동작하도록 설정한다.
 (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
 (setq scroll-conservatively 101)
@@ -713,6 +744,134 @@ Forge에서 브라우저로 바로 열수 있는 함수를 사용한다.
           (if this-win-2nd (other-window 1))))))
 #+END_SRC
 
+** Mail
+*** Basic Coonfiguration
+Mail관련 설정을 추가 한다.
+mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많이 자료가 존재한다. 고마워요 구글.
+#+BEGIN_SRC elisp :tangle config.el
+(add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
+(use-package! mu4e)
+(after! mu4e
+  (message "init mu4e variables")
+  (setq mu4e-attachment-dir "~/Downloads"
+        mu4e-compose-signature-auto-include t
+        mu4e-get-mail-command "true"
+        mu4e-maildir "~/Mailbox"
+        mu4e-update-interval nil
+        mu4e-use-fancy-chars t
+        mu4e-view-show-addresses t
+        mu4e-view-show-images t
+        mu4e-index-update-in-background t
+        mu4e-index-update-error-warning nil
+        mu4e-confirm-quit nil
+        mu4e-compose-format-flowed t
+        ;; +mu4e-min-header-frame-width 142
+        mu4e-headers-date-format "%y/%m/%d"
+        mu4e-headers-time-format "%H:%M:%S"
+        mu4e-index-cleanup t)
+
+  ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
+  (setq mu4e-headers-fields '((:human-date . 10)
+                              (:flags      . 6)
+                              ;; (:folder . 12)
+                              (:from       . 20)
+                              (:to         . 20)
+                              (:subject       . nil)))
+  ;;메일 폴더를 빠르게 선택할 수 있는 단축키도 지정한다.
+  (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@outlook.com/inbox"   :key ?i)
+                                 (:maildir "/jjpark78@outlook.com/sent"    :key ?s)
+                                 ))
+  ;;리플라이나 포워딩을 할때 원본 메세지의 받은 주소를 자동으로 보내는 사람 필드에 설정한다.
+  (add-hook 'mu4e-compose-pre-hook
+  (defun my-set-from-address ()
+      "Set the From address based on the To address of the original."
+      (let ((msg mu4e-compose-parent-message)) ;; msg is shorter...
+      (when msg
+      (setq user-mail-address
+      (cond
+          ((mu4e-message-contact-field-matches msg :to "jjpark@jjsoft.kr") "jjpark@jjsoft.kr")
+          ((mu4e-message-contact-field-matches msg :to "jjpark78@gmail.com") "jjpark78@gmail.com")
+          ((mu4e-message-contact-field-matches msg :to "pjj78@naver.com") "pjj78@naver.com")
+          ((mu4e-message-contact-field-matches msg :to "admin@jjsoft.kr") "admin@jjsoft.kr")
+          (t "jjpark78@outlook.com")))))))
+)
+#+END_SRC
+
+*** SMTP
+smtp 서버를 설정한다.
+#+BEGIN_SRC elisp :tangle config.el
+(set-email-account! "Outlook"
+                    '((user-full-name         . "Jaejin Park")
+                      (smtpmail-smtp-server   . "smtp.office365.com")
+                      (smtpmail-smtp-service  . 587)
+                      (smtpmail-stream-type   . starttls)
+                      (smtpmail-debug-info    . t)
+                      (mu4e-drafts-folder     . "/Drafts")
+                      (mu4e-refile-folder     . "/Archive")
+                      (mu4e-sent-folder       . "/Sent Items")
+                      (mu4e-trash-folder      . "/Deleted Items")
+                      ;(mu4e-sent-messages-behavior . 'delete)
+                      )
+                    nil)
+#+END_SRC
+
+*** Render HTML email
+요즘의 대부분의 이메일은 raw text보다는 html + image 조합이 더 일반적인다.
+그래서 기능이 부족한 shr 보다는 그냥 webkit으로 렌더링 하도록 한다. mu4e-views는 이를 위한 패키지이다
+이맥스에는 내가 하고 싶은 거의 모든것이 이미 구현되어 있다.
+#+BEGIN_SRC elisp :tangle config.el
+(use-package! mu4e-views
+  :after mu4e
+  :defer nil
+  :bind (:map mu4e-headers-mode-map
+	    ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
+	    ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
+	    ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
+	    )
+  :config
+  (setq mu4e-views-mu4e-html-email-header-style
+          "<style type=\"text/css\">
+  .mu4e-mu4e-views-mail-headers { font-family: sans-serif; font-size: 10pt; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid #ccc; color: #000;}
+  .mu4e-mu4e-views-header-row { display:block; padding: 1px 0 1px 0; }
+  .mu4e-mu4e-views-mail-header { display: inline-block; text-transform: capitalize; font-weight: bold; }
+  .mu4e-mu4e-views-header-content { display: inline-block; padding-right: 8px; }
+  .mu4e-mu4e-views-email { display: inline-block; padding-right: 8px; }
+  .mu4e-mu4e-views-attachment { display: inline-block; padding-right: 8px; }
+  </style>")
+  (setq mu4e-views-completion-method 'ivy) ;; use ivy for completion
+  (setq mu4e-views-default-view-method "browser") ;; make xwidgets default
+  (mu4e-views-mu4e-use-view-msg-method "browser") ;; select the default
+  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window)
+  (map! :map mu4e-headers-mode-map
+        :n "M-b" #'mu4e-views-cursor-msg-view-window-up
+        :n "M-f" #'mu4e-views-cursor-msg-view-window-down
+        :localleader
+        :desc "Message action"        "a"   #'mu4e-views-mu4e-view-action
+        :desc "Scoll message down"    "b"   #'mu4e-views-cursor-msg-view-window-up
+        :desc "Scoll message up"      "f"   #'mu4e-views-cursor-msg-view-window-down
+        :desc "Open attachment"       "o"   #'mu4e-views-mu4e-view-open-attachment
+        :desc "Save attachment"       "s"   #'mu4e-views-mu4e-view-save-attachment
+        :desc "Save all attachments"  "S"   #'mu4e-views-mu4e-view-save-all-attachments
+        :desc "Set view method"       "v"   #'mu4e-views-mu4e-select-view-msg-method)) ;; select viewing method)
+  #+END_SRC
+
+*** Alert
+새로운 메일이 도착할때 마다 데스크탑과 Emacs 상태바에 알람을 표시한다.
+ #+BEGIN_SRC elisp :tangle config.el
+(use-package mu4e-alert
+  :config
+  (message "loaded mu4e-alert")
+  (mu4e-alert-set-default-style 'notifier)
+  (mu4e-alert-enable-notifications)
+)
+
+(defun refresh-mu4e-alert-mode-line ()
+  (interactive)
+  (call-process-shell-command "~/.doom.d/update_mail.sh" nil 0)
+  (mu4e-alert-enable-mode-line-display))
+
+(run-with-timer 0 180 'refresh-mu4e-alert-mode-line)
+ #+END_SRC
 ** ETC
 *** Shell Utils
 쉘 설정 파일을 바로 불어 올 수 있는 함수.
