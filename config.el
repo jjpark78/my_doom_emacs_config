@@ -11,7 +11,7 @@
 (setq avy-all-windows t)
 (setq ivy-read-action-function #'ivy-hydra-read-action)
 ;; dired를 두개 열어 놓고 왔다 갔다하며 복사 붙여넣기 할때 편하다
-(setq dired-dwim-target t)
+;; (setq dired-dwim-target t)
 
 (setq which-key-idle-delay 0.5)
 (setq which-key-allow-multiple-replacements t)
@@ -23,7 +23,7 @@
    ))
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-(setq initial-frame-alist '((top . 23) (left . 1175) (width . 124) (height . 80)))
+(setq initial-frame-alist '((top . 23) (left . 1175) (width . 125) (height . 80)))
 
 (global-evil-matchit-mode)
 
@@ -52,16 +52,14 @@
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
 (setq doom-font (font-spec :family "monaco" :size 15))
 
-(defun my-fringe-mode-hook ()
-   (fringe-mode '(15 . 15)))
-
-(add-hook 'prog-mode-hook 'my-fringe-mode-hook)
-(add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
-(add-hook 'org-mode-hook  'my-fringe-mode-hook)
+(set-fringe-style '(nil . 0))
 
 ;; 한글 관련 폰트 스케일링 설정
 ;; (set-face-attribute 'default nil :height 130)
 (set-fontset-font t 'hangul (font-spec :name "AppleGothic"))
+(set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
+(set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
+
 (setq face-font-rescale-alist
       '(("NanumGothicCoding" . 1.2307692307692308)
         ("AppleGothic" . 1.2307692307692308)
@@ -196,7 +194,7 @@
 (after! typescript-mode
   (set-company-backend! 'typescript-mode '(company-tabnine company-capf company-yasnippet)))
 
-(setq flycheck-global-modes '(not gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
+(setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
 ;; all-the-icons에 아이콘 색깔을 바꾸기 위해서 수동으로 설정한다.
 ;; (add-hook 'company-mode-hook 'company-box-mode)
 ;; (setq company-box-icons-alist 'company-box-icons-idea)
@@ -416,6 +414,8 @@
             :desc "link from mac apps"
             "mlm"  #'org-mac-grab-link))
 )
+
+
 
 (setq elfeed-feeds '(
     "http://www.bloter.net/feed"

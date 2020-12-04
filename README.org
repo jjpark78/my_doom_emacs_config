@@ -12,6 +12,7 @@
     - [[#vue--typescript-custom-setting][Vue & Typescript Custom Setting]]
   - [[#magit--forge][Magit / Forge]]
   - [[#org-mode][Org-Mode]]
+    - [[#org-caldav][ORG Caldav]]
   - [[#rss-feed][RSS Feed]]
     - [[#custom-elfeed-search-column][Custom Elfeed Search Column]]
   - [[#utils][Utils]]
@@ -39,6 +40,7 @@
 +private.el 파일에는 공개하기 곤란한 개인 토큰이나 패스워드등이 담겨 있다.
 *** Packages
 #+BEGIN_SRC elisp :tangle packages.el
+;; (package! oauth2)
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
@@ -46,6 +48,7 @@
 (package! company-tabnine)
 (package! org-super-agenda)
 (package! org-bullets)
+;; (package! org-caldav)
 (package! gitlab-ci-mode)
 (package! beacon)
 (package! carbon-now-sh)
@@ -83,7 +86,7 @@
 (setq avy-all-windows t)
 (setq ivy-read-action-function #'ivy-hydra-read-action)
 ;; dired를 두개 열어 놓고 왔다 갔다하며 복사 붙여넣기 할때 편하다
-(setq dired-dwim-target t)
+;; (setq dired-dwim-target t)
 
 (setq which-key-idle-delay 0.5)
 (setq which-key-allow-multiple-replacements t)
@@ -95,7 +98,7 @@
    ))
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-(setq initial-frame-alist '((top . 23) (left . 1175) (width . 124) (height . 80)))
+(setq initial-frame-alist '((top . 23) (left . 1175) (width . 125) (height . 80)))
 
 (global-evil-matchit-mode)
 
@@ -132,16 +135,14 @@
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
 (setq doom-font (font-spec :family "monaco" :size 15))
 
-(defun my-fringe-mode-hook ()
-   (fringe-mode '(15 . 15)))
-
-(add-hook 'prog-mode-hook 'my-fringe-mode-hook)
-(add-hook 'gfm-mode-hook  'my-fringe-mode-hook)
-(add-hook 'org-mode-hook  'my-fringe-mode-hook)
+(set-fringe-style '(nil . 0))
 
 ;; 한글 관련 폰트 스케일링 설정
 ;; (set-face-attribute 'default nil :height 130)
 (set-fontset-font t 'hangul (font-spec :name "AppleGothic"))
+(set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
+(set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
+
 (setq face-font-rescale-alist
       '(("NanumGothicCoding" . 1.2307692307692308)
         ("AppleGothic" . 1.2307692307692308)
@@ -354,7 +355,7 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 (after! typescript-mode
   (set-company-backend! 'typescript-mode '(company-tabnine company-capf company-yasnippet)))
 
-(setq flycheck-global-modes '(not gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
+(setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
 ;; all-the-icons에 아이콘 색깔을 바꾸기 위해서 수동으로 설정한다.
 ;; (add-hook 'company-mode-hook 'company-box-mode)
 ;; (setq company-box-icons-alist 'company-box-icons-idea)
@@ -512,7 +513,6 @@ ORG모드를 위한 함수들
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
 (defun my-org-config/after-org-mode-load ()
   ;; (visual-line-mode)
-
   (require 'org-indent)
   (org-indent-mode)
   )
@@ -607,6 +607,9 @@ ORG모드를 위한 함수들
             "mlm"  #'org-mac-grab-link))
 )
 #+END_SRC
+*** ORG Caldav
+#+begin_src elisp :tangle config.el
+#+end_src
 
 ** RSS Feed
 *** Custom Elfeed Search Column

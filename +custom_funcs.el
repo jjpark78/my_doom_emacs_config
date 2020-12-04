@@ -47,7 +47,6 @@
 
 (defun my-org-config/after-org-mode-load ()
   ;; (visual-line-mode)
-
   (require 'org-indent)
   (org-indent-mode)
   )

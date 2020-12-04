@@ -1,3 +1,4 @@
+;; (package! oauth2)
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
@@ -5,6 +6,7 @@
 (package! company-tabnine)
 (package! org-super-agenda)
 (package! org-bullets)
+;; (package! org-caldav)
 (package! gitlab-ci-mode)
 (package! beacon)
 (package! carbon-now-sh)
