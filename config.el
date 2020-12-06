@@ -415,7 +415,15 @@
             "mlm"  #'org-mac-grab-link))
 )
 
-
+(after! org-gcal
+ (setq
+   org-gcal-client-id "940337524807-n3rdlteg2pcdnpsqu1q4bjegtt3cie70.apps.googleusercontent.com"
+   org-gcal-client-secret "gebsX3uXOf_T26x9ncTea-SZ"
+   org-gcal-fetch-file-alist '(("jjpark78@gmail.com" . "~/org/personal.org")
+                               ("2q9jjv662ihb8rv61qf7bjo7h4%40group.calendar.google.com" . "~/org/jw.org")
+                               )
+ )
+)
 
 (setq elfeed-feeds '(
     "http://www.bloter.net/feed"

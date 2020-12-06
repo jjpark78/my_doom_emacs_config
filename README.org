@@ -40,7 +40,7 @@
 +private.el 파일에는 공개하기 곤란한 개인 토큰이나 패스워드등이 담겨 있다.
 *** Packages
 #+BEGIN_SRC elisp :tangle packages.el
-;; (package! oauth2)
+(package! oauth2)
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
@@ -48,7 +48,7 @@
 (package! company-tabnine)
 (package! org-super-agenda)
 (package! org-bullets)
-;; (package! org-caldav)
+(package! org-gcal)
 (package! gitlab-ci-mode)
 (package! beacon)
 (package! carbon-now-sh)
@@ -609,6 +609,15 @@ ORG모드를 위한 함수들
 #+END_SRC
 *** ORG Caldav
 #+begin_src elisp :tangle config.el
+(after! org-gcal
+ (setq
+   org-gcal-client-id "940337524807-n3rdlteg2pcdnpsqu1q4bjegtt3cie70.apps.googleusercontent.com"
+   org-gcal-client-secret "gebsX3uXOf_T26x9ncTea-SZ"
+   org-gcal-fetch-file-alist '(("jjpark78@gmail.com" . "~/org/personal.org")
+                               ("2q9jjv662ihb8rv61qf7bjo7h4%40group.calendar.google.com" . "~/org/jw.org")
+                               )
+ )
+)
 #+end_src
 
 ** RSS Feed
