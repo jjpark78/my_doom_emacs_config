@@ -64,12 +64,13 @@
 (package! git-link)
 (package! magit-todos)
 (package! tmux-pane)
-(package! nyan-mode)
 (package! mu4e-alert)
 (package! mu4e-views
   :recipe
   (:host github
    :repo "lordpretzel/mu4e-views"))
+(package! graphql-mode)
+(package! mmm-mode)
 #+END_SRC
 *** Custom Setup
 **** Startup Setup
@@ -98,7 +99,7 @@
    ))
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-(setq initial-frame-alist '((top . 23) (left . 1175) (width . 125) (height . 80)))
+;; (setq initial-frame-alist '((top . 23) (left . 1175) (width . 125) (height . 80)))
 
 (global-evil-matchit-mode)
 
@@ -148,10 +149,6 @@
         ("AppleGothic" . 1.2307692307692308)
         ))
 
-(nyan-mode)
-(after! nyan-mode
-  (nyan-start-animation)
-)
 #+END_SRC
 
 **** Doom Modeline
@@ -290,6 +287,7 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
 (defun setup-custom-prog-mode ()
   ;; 기본 인덴테이션을 설정한다.
+  (lsp!)
   (setq typescript-indent-level 2)
   (setq emmet-indentation 2)
   (setq js-indent-level 2)
@@ -302,28 +300,38 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (setq lsp-ui-peek-fontify 'always)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (add-hook 'before-save-hook #'prettier-js nil 'local))
+  (add-hook 'before-save-hook prettier-js nil 'local))
 
 (defun custom-ts-mode ()
-  "Custom hooks for ts-mode"
   (if (not (equal buffer-file-name 'nil))
       (let ((extname (file-name-extension buffer-file-name)))
         (when (or (string-equal "tsx" extname)
                   (string-equal "ts" extname))
           (setup-custom-prog-mode)
           ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
+          (mmm-add-classes
+           '((js-graphql
+              :submode graphql-mode
+              :face mmm-declaration-submode-face
+              :front "[^a-zA-Z]gql`" ;; regex to find the opening tag
+              :back "`"))) ;; regex to find the closing tag
+          (mmm-add-mode-ext-class 'typescript-mode nil 'js-graphql)
+          (setq mmm-global-mode 'maybe)
+          (setq mmm-submode-decoration-level 0)
+          ;; Optional configuration that hides the background color for a highlighted block
+          ;; I find it useful for debugging emacs, but when actually coding I dont want so much emphasis on submodes
           (flycheck-select-checker 'javascript-eslint)))))
 
 (defun my/use-eslint-from-node-modules ()
   "Use local eslint from node_modules before global."
   (let* ((root (locate-dominating-file
-                 (or (buffer-file-name) default-directory)
-                     "node_modules"))
+                (or (buffer-file-name) default-directory)
+                "node_modules"))
          (eslint (and root
-                    (expand-file-name "node_modules/eslint/bin/eslint.js"
-                                      root))))
-        (when (and eslint (file-executable-p eslint))
-              (setq-local flycheck-javascript-eslint-executable eslint))))
+                      (expand-file-name "node_modules/eslint/bin/eslint.js"
+                                        root))))
+    (when (and eslint (file-executable-p eslint))
+      (setq-local flycheck-javascript-eslint-executable eslint))))
 
 (defun custom-vue-mode ()
   "Custom hooks for vue-mode"
@@ -334,7 +342,6 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
           ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
           (flycheck-select-checker 'javascript-eslint)
           ))))
-
 #+END_SRC
 
 주로 사용하는 언어들 관련 설정. lsp관련 설정들을 모아 놓았다.
@@ -437,7 +444,7 @@ magit이나 dired등과 같이 유틸리티 관련 설정들을 모아 놓았다
 (setq magit-set-upstream-on-push 'askifnotset)
 (setq magit-diff-refine-hunk 'all)
 
-(magit-delta-mode)
+;; (magit-delta-mode)
 (magit-todos-mode)
 ;; (setq ghub-use-workaround-for-emacs-bug 'force)
 (setq forge-topic-list-limit '(200 . 10))

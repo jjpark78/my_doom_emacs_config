@@ -23,7 +23,7 @@
        (company +auto)             ; the ultimate code completion backend
        ;; helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       (ivy +icons)               ; a search engine for love and life
+       (ivy)               ; a search engine for love and life
 
        :ui
        deft              ; notational velocity for Emacs
@@ -39,10 +39,10 @@
        nav-flash           ; blink cursor line after big motions
        ;; neotree          ; a project drawer, like NERDTree for vim
        ophints             ; highlight the region an operation acts on
-       (popup +defaults)   ; tame sudden yet inevitable temporary windows
+       ;; (popup +defaults)   ; tame sudden yet inevitable temporary windows
        ;; pretty-code       ; ligatures or substitute text with pretty symbols
        ;; tabs                ; an tab bar for Emacs
-       treemacs            ; a rroject drawer, like neotree but cooler"doom-color"
+       ;; treemacs            ; a rroject drawer, like neotree but cooler"doom-color"
 
        unicode             ; extended unicode support for various languages
        vc-gutter           ; vcs diff in the fringe
@@ -54,8 +54,8 @@
        :editor
        (evil +everywhere)  ; come to the dark side, we have cookies
        file-templates      ; auto-snippets for empty files
-       fold                ; (nigh) universal code folding
-       ;; (format +onsave)  ; automated prettiness
+       ;; fold                ; (nigh) universal code folding
+       (format +onsave)  ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
        multiple-cursors    ; editing in many places at once
@@ -85,7 +85,7 @@
 
        :os
        macos               ; recent new feature
-       ;; tty                    ;
+       tty                    ;
 
        :tools
        ;;ansible
@@ -106,7 +106,7 @@
        rgb               ; creating color strings
        ;; taskrunner        ; taskrunner for all your projects
        ;;terraform         ; infrastructure as code
-       ;; tmux              ; an API for interacting with tmux
+       tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
 
        :lang
@@ -151,9 +151,7 @@
          +babel
          +capture
          +export
-         +present
-         +noter
-         +roam)
+       )
        ;php               ; perl's insecure younger brother
        ;; plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional

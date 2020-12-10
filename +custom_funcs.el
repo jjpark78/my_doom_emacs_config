@@ -1,5 +1,6 @@
 (defun setup-custom-prog-mode ()
   ;; 기본 인덴테이션을 설정한다.
+  (lsp!)
   (setq typescript-indent-level 2)
   (setq emmet-indentation 2)
   (setq js-indent-level 2)
@@ -12,28 +13,38 @@
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (setq lsp-ui-peek-fontify 'always)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (add-hook 'before-save-hook #'prettier-js nil 'local))
+  (add-hook 'before-save-hook prettier-js nil 'local))
 
 (defun custom-ts-mode ()
-  "Custom hooks for ts-mode"
   (if (not (equal buffer-file-name 'nil))
       (let ((extname (file-name-extension buffer-file-name)))
         (when (or (string-equal "tsx" extname)
                   (string-equal "ts" extname))
           (setup-custom-prog-mode)
           ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
+          (mmm-add-classes
+           '((js-graphql
+              :submode graphql-mode
+              :face mmm-declaration-submode-face
+              :front "[^a-zA-Z]gql`" ;; regex to find the opening tag
+              :back "`"))) ;; regex to find the closing tag
+          (mmm-add-mode-ext-class 'typescript-mode nil 'js-graphql)
+          (setq mmm-global-mode 'maybe)
+          (setq mmm-submode-decoration-level 0)
+          ;; Optional configuration that hides the background color for a highlighted block
+          ;; I find it useful for debugging emacs, but when actually coding I dont want so much emphasis on submodes
           (flycheck-select-checker 'javascript-eslint)))))
 
 (defun my/use-eslint-from-node-modules ()
   "Use local eslint from node_modules before global."
   (let* ((root (locate-dominating-file
-                 (or (buffer-file-name) default-directory)
-                     "node_modules"))
+                (or (buffer-file-name) default-directory)
+                "node_modules"))
          (eslint (and root
-                    (expand-file-name "node_modules/eslint/bin/eslint.js"
-                                      root))))
-        (when (and eslint (file-executable-p eslint))
-              (setq-local flycheck-javascript-eslint-executable eslint))))
+                      (expand-file-name "node_modules/eslint/bin/eslint.js"
+                                        root))))
+    (when (and eslint (file-executable-p eslint))
+      (setq-local flycheck-javascript-eslint-executable eslint))))
 
 (defun custom-vue-mode ()
   "Custom hooks for vue-mode"

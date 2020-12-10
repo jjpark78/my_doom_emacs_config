@@ -23,7 +23,7 @@
    ))
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-(setq initial-frame-alist '((top . 23) (left . 1175) (width . 125) (height . 80)))
+;; (setq initial-frame-alist '((top . 23) (left . 1175) (width . 125) (height . 80)))
 
 (global-evil-matchit-mode)
 
@@ -64,11 +64,6 @@
       '(("NanumGothicCoding" . 1.2307692307692308)
         ("AppleGothic" . 1.2307692307692308)
         ))
-
-(nyan-mode)
-(after! nyan-mode
-  (nyan-start-animation)
-)
 
 (after! doom-modeline
   (setq
@@ -264,7 +259,7 @@
 (setq magit-set-upstream-on-push 'askifnotset)
 (setq magit-diff-refine-hunk 'all)
 
-(magit-delta-mode)
+;; (magit-delta-mode)
 (magit-todos-mode)
 ;; (setq ghub-use-workaround-for-emacs-bug 'force)
 (setq forge-topic-list-limit '(200 . 10))
