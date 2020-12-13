@@ -91,11 +91,10 @@
 (setq gc-cons-threshold 1000000000)
 (setq read-process-output-max (* 1024 1024))
 
-;; 스플릿된 화면들을 넘어 다닐때 Tmux랑 연동되어 편하다.
-(map! "C-h" #'tmux-pane-omni-window-left)
-(map! "C-j" #'tmux-pane-omni-window-down)
-(map! "C-k" #'tmux-pane-omni-window-up)
-(map! "C-l" #'tmux-pane-omni-window-right)
+(map! "C-h" #'evil-window-left)
+(map! "C-j" #'evil-window-down)
+(map! "C-k" #'evil-window-up)
+(map! "C-l" #'evil-window-right)
 
 (map! :leader :prefix "g" :desc "ediff style diff from working-tree" "d" #'magit-ediff-show-working-tree)
 ;; go back, go references
@@ -147,6 +146,9 @@
 ;; ORG 모드에서 헤더 레벨 설정할때 쓰기 편한 단축키
 (map! :after org-mode :map org-mode-map ">" 'org-cyclt-level)
 
+;; Jump to mail-directory
+(map! :leader :prefix "o" :desc "Jump to MailBox" "j" 'mu4e~headers-jump-to-maildir )
+
 ;; 둠 이맥스 디스코드 채널에서 고수가 제안한 새로운 바인딩
 ;; https://discord.com/channels/406534637242810369/695450585758957609/759868990909841438
 (after! evil
@@ -182,6 +184,7 @@
 
 (add-hook 'web-mode-hook 'custom-vue-mode)
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
+(add-hook 'cc-mode-hook 'custom-cc-mode)
 
 (after! web-mode
   (set-company-backend! 'web-mode '(company-capf company-yasnippet)))
@@ -280,7 +283,7 @@
 
 (after! forge
   (setq auth-sources '("~/.authinfo"))
-  (add-to-list 'forge-alist '("gitlab.jjsoft.kr" "gitlab.jjsoft.kr/api/v4" "gitlab.jjsoft.kr" forge-gitlab-repository))
+  (add-to-list 'forge-alist '("gitlab.com" "gitlab.com/api/v4" "gitlab.com" forge-gitlab-repository))
   ;; O-T (Open This)바인딩으로 브라우저에서 링크를 열 수 있도록 지원한다.
   (define-key forge-topic-title-section-map (kbd "ot") 'forge-custom-open-url)
   (define-key forge-topic-marks-section-map (kbd "ot") 'forge-custom-open-url)

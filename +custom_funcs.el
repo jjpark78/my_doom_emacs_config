@@ -1,4 +1,4 @@
-(defun setup-custom-prog-mode ()
+(defun setup-custom-jsts-mode ()
   ;; 기본 인덴테이션을 설정한다.
   (lsp!)
   (setq typescript-indent-level 2)
@@ -20,7 +20,7 @@
       (let ((extname (file-name-extension buffer-file-name)))
         (when (or (string-equal "tsx" extname)
                   (string-equal "ts" extname))
-          (setup-custom-prog-mode)
+          (setup-custom-jsts-mode)
           ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
           (mmm-add-classes
            '((js-graphql
@@ -51,10 +51,22 @@
   (if (not (equal buffer-file-name 'nil))
       (let ((extname (file-name-extension buffer-file-name)))
         (when (string-equal "vue" extname)
-          (setup-custom-prog-mode)
+          (setup-custom-jsts-mode)
           ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
           (flycheck-select-checker 'javascript-eslint)
           ))))
+
+(defun custom-cc-mode ()
+  "Custom cc-mode make support qml, qmake etc."
+  (interactive)
+  (setq lsp-prefer-flymake nil
+        ccls-executable "/usr/local/bin/ccls"
+        ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t))
+        lsp-modeline-diagnostics-mode nil
+        lsp-ui-peek-fontify 'always
+        lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
+        lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
+  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
 
 (defun my-org-config/after-org-mode-load ()
   ;; (visual-line-mode)

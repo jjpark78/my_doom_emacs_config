@@ -21,7 +21,6 @@
 (package! lsp-treemacs)
 (package! git-link)
 (package! magit-todos)
-(package! tmux-pane)
 (package! mu4e-alert)
 (package! mu4e-views
   :recipe
