@@ -95,7 +95,6 @@
 (map! "C-j" #'evil-window-down)
 (map! "C-k" #'evil-window-up)
 (map! "C-l" #'evil-window-right)
-
 (map! :leader :prefix "g" :desc "ediff style diff from working-tree" "d" #'magit-ediff-show-working-tree)
 ;; go back, go references
 (map! :n "gb" #'evil-jump-backward)
@@ -117,14 +116,11 @@
 (map! :leader :prefix "f" :desc "Open alacritty init file on other windows" "a" #'er-find-alacritty-init-file)
 ;; 코드를 입력받아서 이쁜 화면으로 만들어주는 패키지에 단축기를 할당했다.
 (map! :leader :prefix "t" :desc "Capture Code with Carbon now" "t" #'carbon-now-sh)
-
 ;; change window split mode
 ;; 이맥스를 넓게 쓰다가 길게 쓰다가 할때마다 자주 쓰이는 레이아웃 번경 맛집 함수
 (map! :leader :prefix "t" :desc "Toggle Window Split Style" "s" #'toggle-window-split)
-
 ;; ace-window
 (map! :leader :prefix "w" :desc "open ace window to select window" "a" #'ace-window)
-
 ;; evil 에서 라인 처음과 마지막으로 더 빨리 점프할 수 있도록 한다.
 (define-key evil-visual-state-map (kbd "H") 'beginning-of-line-text)
 (define-key evil-visual-state-map (kbd "L") 'evil-end-of-line)
@@ -142,12 +138,10 @@
 (define-key evil-insert-state-map (kbd "M-s-j") #'er/contract-region)
 ;;ivy 미니 버퍼에서 컨트롤 키로 아이템을 선택하는건 새끼손가락에 죄를 짓는 일이다.
 (map! :after ivy :map ivy-minibuffer-map "TAB" 'next-line)
-
 ;; ORG 모드에서 헤더 레벨 설정할때 쓰기 편한 단축키
 (map! :after org-mode :map org-mode-map ">" 'org-cyclt-level)
-
-;; Jump to mail-directory
-(map! :leader :prefix "o" :desc "Jump to MailBox" "j" 'mu4e~headers-jump-to-maildir )
+;; <SPC> w C-o 는 너무 누르기 힘들지만 이게 의외로 많이 쓰인다. 쓰이지 않는 키 바인딩에 할당해서 더 간단히 만든다.
+(map! :leader :prefix "w" :desc "Close Other Windows Fast Binding" "O" 'delete-other-windows)
 
 ;; 둠 이맥스 디스코드 채널에서 고수가 제안한 새로운 바인딩
 ;; https://discord.com/channels/406534637242810369/695450585758957609/759868990909841438
@@ -186,24 +180,28 @@
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
 (add-hook 'cc-mode-hook 'custom-cc-mode)
 
-(after! web-mode
-  (set-company-backend! 'web-mode '(company-capf company-yasnippet)))
+;; (after! web-mode
+;;   (set-company-backend! 'web-mode '(company-capf company-yasnippet)))
 
-(after! typescript-mode
-  (set-company-backend! 'typescript-mode '(company-tabnine company-capf company-yasnippet)))
-
+;; (after! typescript-mode
+;;   (set-company-backend! 'typescript-mode '(company-tabnine company-capf company-yasnippet)))
+(setq lsp-modeline-diagnostics-enable nil)
 (setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
-;; all-the-icons에 아이콘 색깔을 바꾸기 위해서 수동으로 설정한다.
-;; (add-hook 'company-mode-hook 'company-box-mode)
-;; (setq company-box-icons-alist 'company-box-icons-idea)
 
-;; (setq company-tooltip-minimum-width 60)
-;; (setq company-tooltip-maximum-width 60)
-;; (setq company-box-doc-enable nil)
+;; all-the-icons에 아이콘 색깔을 바꾸기 위해서 수동으로 설정한다.
+(add-hook 'company-mode-hook 'company-box-mode)
+(setq company-box-icons-alist 'company-box-icons-idea)
+(setq company-tooltip-minimum-width 60)
+(setq company-tooltip-maximum-width 60)
+(setq company-box-doc-enable nil)
 
 ;; 린트 에러 버퍼를 오픈하면 포커스가 자동으로 이동하지 않는다.
 ;; 이거 없으면 생각보다 귀찮아진다.
 (add-hook 'flycheck-error-list-mode-hook (lambda () (switch-to-buffer-other-window "*Flycheck errors*")))
+
+(after! ccls
+  (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
+  (set-lsp-priority! 'ccls 2)) ; optional as ccls is the default in Doom
 
 (use-package company-tabnine
   :defer 1
@@ -214,7 +212,7 @@
   ;;  ("C-z t" . company-tabnine))
   :hook
   (lsp-after-open . (lambda ()
-                      (setq company-tabnine-max-num-results 3)
+                      (setq company-tabnine-max-num-results 5)
                       (add-to-list 'company-transformers 'company//sort-by-tabnine t)
                       (add-to-list 'company-backends '(company-capf :with company-tabnine :separate))))
   (kill-emacs . company-tabnine-kill-process)
@@ -239,13 +237,18 @@
             (puthash candidate t candidates-table)))
         (setq candidates-lsp (nreverse candidates-lsp))
         (setq candidates-tabnine (nreverse candidates-tabnine))
-        (nconc (seq-take candidates-tabnine 3)
+        (nconc (seq-take candidates-tabnine 5)
                (seq-take candidates-lsp 6))))))
 
 ;; 1초라도 빨리 팝업 띄우고 싶어서
 ;; 그러나 실제 체감속도 향상은 없음
 (setq company-idle-delay 0.0)
 
+;; Dash Documents랑 연동이 되도록 각각 메이저에 관련 정보들을 추가한다.
+(set-docsets! 'c++-mode "Qt" "C++" "C")
+(set-docsets! 'cc-mode "Qt" "C++" "C")
+(set-docsets! 'web-mode   "TypeScript" "NodeJS" "HTML" "CSS" "Pug" "Stylus" "VueJS")
+(set-docsets! 'typescript "TypeScript" "NodeJS" "HTML" "CSS" "Pug" "Stylus" "VueJS")
 ;; lsp 설정 이후에 불필요한 옵션들은 전부다 끈다.
 (after! lsp
   ;; These take up a lot of space on my big font size
@@ -447,112 +450,3 @@
   ;; 버퍼가 열리면 포커스를 그쪽으로 이동시킨다.
   ;; 이거 없으면 생각보다 귀찮아진다.
   (add-hook 'rg-mode-hook (lambda () (switch-to-buffer-other-window "*rg*"))))
-
-(add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
-(use-package! mu4e)
-(after! mu4e
-  (message "init mu4e variables")
-  (setq mu4e-attachment-dir "~/Downloads"
-        mu4e-compose-signature-auto-include t
-        mu4e-get-mail-command "true"
-        mu4e-maildir "~/Mailbox"
-        mu4e-update-interval nil
-        mu4e-use-fancy-chars t
-        mu4e-view-show-addresses t
-        mu4e-view-show-images t
-        mu4e-index-update-in-background t
-        mu4e-index-update-error-warning nil
-        mu4e-confirm-quit nil
-        mu4e-compose-format-flowed t
-        ;; +mu4e-min-header-frame-width 142
-        mu4e-headers-date-format "%y/%m/%d"
-        mu4e-headers-time-format "%H:%M:%S"
-        mu4e-index-cleanup t)
-
-  ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
-  (setq mu4e-headers-fields '((:human-date . 10)
-                              (:flags      . 6)
-                              ;; (:folder . 12)
-                              (:from       . 20)
-                              (:to         . 20)
-                              (:subject       . nil)))
-  ;;메일 폴더를 빠르게 선택할 수 있는 단축키도 지정한다.
-  (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@outlook.com/inbox"   :key ?i)
-                                 (:maildir "/jjpark78@outlook.com/sent"    :key ?s)
-                                 ))
-  ;;리플라이나 포워딩을 할때 원본 메세지의 받은 주소를 자동으로 보내는 사람 필드에 설정한다.
-  (add-hook 'mu4e-compose-pre-hook
-  (defun my-set-from-address ()
-      "Set the From address based on the To address of the original."
-      (let ((msg mu4e-compose-parent-message)) ;; msg is shorter...
-      (when msg
-      (setq user-mail-address
-      (cond
-          ((mu4e-message-contact-field-matches msg :to "jjpark@jjsoft.kr") "jjpark@jjsoft.kr")
-          ((mu4e-message-contact-field-matches msg :to "jjpark78@gmail.com") "jjpark78@gmail.com")
-          ((mu4e-message-contact-field-matches msg :to "pjj78@naver.com") "pjj78@naver.com")
-          ((mu4e-message-contact-field-matches msg :to "admin@jjsoft.kr") "admin@jjsoft.kr")
-          (t "jjpark78@outlook.com")))))))
-)
-
-(set-email-account! "Outlook"
-                    '((user-full-name         . "Jaejin Park")
-                      (smtpmail-smtp-server   . "smtp.office365.com")
-                      (smtpmail-smtp-service  . 587)
-                      (smtpmail-stream-type   . starttls)
-                      (smtpmail-debug-info    . t)
-                      (mu4e-drafts-folder     . "/Drafts")
-                      (mu4e-refile-folder     . "/Archive")
-                      (mu4e-sent-folder       . "/Sent Items")
-                      (mu4e-trash-folder      . "/Deleted Items")
-                      ;(mu4e-sent-messages-behavior . 'delete)
-                      )
-                    nil)
-
-(use-package! mu4e-views
-  :after mu4e
-  :defer nil
-  :bind (:map mu4e-headers-mode-map
-	    ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
-	    ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
-	    ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
-	    )
-  :config
-  (setq mu4e-views-mu4e-html-email-header-style
-          "<style type=\"text/css\">
-  .mu4e-mu4e-views-mail-headers { font-family: sans-serif; font-size: 10pt; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid #ccc; color: #000;}
-  .mu4e-mu4e-views-header-row { display:block; padding: 1px 0 1px 0; }
-  .mu4e-mu4e-views-mail-header { display: inline-block; text-transform: capitalize; font-weight: bold; }
-  .mu4e-mu4e-views-header-content { display: inline-block; padding-right: 8px; }
-  .mu4e-mu4e-views-email { display: inline-block; padding-right: 8px; }
-  .mu4e-mu4e-views-attachment { display: inline-block; padding-right: 8px; }
-  </style>")
-  (setq mu4e-views-completion-method 'ivy) ;; use ivy for completion
-  (setq mu4e-views-default-view-method "browser") ;; make xwidgets default
-  (mu4e-views-mu4e-use-view-msg-method "browser") ;; select the default
-  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window)
-  (map! :map mu4e-headers-mode-map
-        :n "M-b" #'mu4e-views-cursor-msg-view-window-up
-        :n "M-f" #'mu4e-views-cursor-msg-view-window-down
-        :localleader
-        :desc "Message action"        "a"   #'mu4e-views-mu4e-view-action
-        :desc "Scoll message down"    "b"   #'mu4e-views-cursor-msg-view-window-up
-        :desc "Scoll message up"      "f"   #'mu4e-views-cursor-msg-view-window-down
-        :desc "Open attachment"       "o"   #'mu4e-views-mu4e-view-open-attachment
-        :desc "Save attachment"       "s"   #'mu4e-views-mu4e-view-save-attachment
-        :desc "Save all attachments"  "S"   #'mu4e-views-mu4e-view-save-all-attachments
-        :desc "Set view method"       "v"   #'mu4e-views-mu4e-select-view-msg-method)) ;; select viewing method)
-
-(use-package mu4e-alert
-  :config
-  (message "loaded mu4e-alert")
-  (mu4e-alert-set-default-style 'notifier)
-  (mu4e-alert-enable-notifications)
-)
-
-(defun refresh-mu4e-alert-mode-line ()
-  (interactive)
-  (call-process-shell-command "~/.doom.d/update_mail.sh" nil 0)
-  (mu4e-alert-enable-mode-line-display))
-
-(run-with-timer 0 180 'refresh-mu4e-alert-mode-line)

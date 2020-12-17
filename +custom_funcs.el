@@ -61,7 +61,6 @@
   (interactive)
   (setq lsp-prefer-flymake nil
         ccls-executable "/usr/local/bin/ccls"
-        ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t))
         lsp-modeline-diagnostics-mode nil
         lsp-ui-peek-fontify 'always
         lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram

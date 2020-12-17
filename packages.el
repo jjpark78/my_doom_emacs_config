@@ -1,12 +1,11 @@
-(package! oauth2)
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
 (package! wakatime-mode)
 (package! company-tabnine)
+(package! company-box)
 (package! org-super-agenda)
 (package! org-bullets)
-(package! org-gcal)
 (package! gitlab-ci-mode)
 (package! beacon)
 (package! carbon-now-sh)
@@ -21,10 +20,5 @@
 (package! lsp-treemacs)
 (package! git-link)
 (package! magit-todos)
-(package! mu4e-alert)
-(package! mu4e-views
-  :recipe
-  (:host github
-   :repo "lordpretzel/mu4e-views"))
 (package! graphql-mode)
 (package! mmm-mode)
