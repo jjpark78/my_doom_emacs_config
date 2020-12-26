@@ -13,6 +13,7 @@
 ;; dired를 두개 열어 놓고 왔다 갔다하며 복사 붙여넣기 할때 편하다
 ;; (setq dired-dwim-target t)
 
+(setq confirm-kill-emacs nil)
 (setq which-key-idle-delay 0.5)
 (setq which-key-allow-multiple-replacements t)
 (after! which-key
@@ -44,7 +45,9 @@
 (set-keyboard-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
+;; (set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
+(require 'ucs-normalize)
+(set-file-name-coding-system 'utf-8-hfs)
 
 ;; 이것 저것 많이 바꿔봤지만 역시 기본 테마가 젤 이쁘다
 (setq doom-theme 'doom-one)
@@ -180,12 +183,8 @@
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
 (add-hook 'cc-mode-hook 'custom-cc-mode)
 
-;; (after! web-mode
-;;   (set-company-backend! 'web-mode '(company-capf company-yasnippet)))
-
 ;; (after! typescript-mode
 ;;   (set-company-backend! 'typescript-mode '(company-tabnine company-capf company-yasnippet)))
-(setq lsp-modeline-diagnostics-enable nil)
 (setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
 
 ;; all-the-icons에 아이콘 색깔을 바꾸기 위해서 수동으로 설정한다.
@@ -207,9 +206,6 @@
   :defer 1
   :custom
   (company-tabnine-max-num-results 9)
-  ;; :bind
-  ;; (("M-q" . company-other-backend)
-  ;;  ("C-z t" . company-tabnine))
   :hook
   (lsp-after-open . (lambda ()
                       (setq company-tabnine-max-num-results 5)
@@ -249,11 +245,14 @@
 (set-docsets! 'cc-mode "Qt" "C++" "C")
 (set-docsets! 'web-mode   "TypeScript" "NodeJS" "HTML" "CSS" "Pug" "Stylus" "VueJS")
 (set-docsets! 'typescript "TypeScript" "NodeJS" "HTML" "CSS" "Pug" "Stylus" "VueJS")
+
 ;; lsp 설정 이후에 불필요한 옵션들은 전부다 끈다.
 (after! lsp
   ;; These take up a lot of space on my big font size
   (setq lsp-ui-sideline-show-code-actions nil
         lsp-ui-sideline-show-diagnostics nil
+        lsp-modeline-diagnostics-mode nil
+        lsp-modeline-diagnostics-enable nil
         lsp-signature-render-all nil))
 
 ;; vc & magit 관련 설정
@@ -335,50 +334,42 @@
   (add-hook 'org-mode-hook 'my-org-config/after-org-mode-load)
   ;;basic org mode config
   (setq
-    org-fontify-quote-and-verse-blocks nil
-    org-fontify-whole-heading-line nil
-    org-hide-leading-starts nil
-    org-startup-indented nil
-    org-hide-emphasis-markers t
-    org-directory "~/org/"
-    org-agenda-skip-scheduled-if-done t
-    org-ellipsis " ▾ "
-    org-tags-column -80
-    org-agenda-span 30
-    org-agenda-files '("~/org")
-    org-log-done 'time
-    org-refile-targets (quote ((nil :maxlevel . 1)))
-    ;; org-capture-templates '(("x" "JW.ORG" entry
-    ;;                         (file+olp+datetree "jw.org")
-    ;;                         "**** [ ] %U %?" :prepend t :kill-buffer t)
-    ;;                         ("t" "JJSOFT" entry
-    ;;                         (file+headline "jjsoft.org")
-    ;;                         "* [ ] %?\n%i" :prepend t :ill-buffer t))
-    ;; +doom-dashboard-banner-file (expand-file-name "logo.png" doom-private-dir)
-    +org-capture-todo-file "tasks.org"
-
-    org-edit-src-content-indentation 0
-    org-src-tab-acts-natively t
-    org-src-preserve-indentation t
-    ;; config org-super-agenda
-    org-super-agenda-mode t
-    org-super-agenda-header-map nil
-    org-deadline-warning-days 7
-    org-agenda-skip-scheduled-if-done t
-    org-agenda-block-separator 9472
-    org-agenda-start-on-weekday nil
-    org-super-agenda-groups '((:name "Today"
-                                    :time-grid t
-                                    :scheduled today)
-                                    (:name "Due today"
-                                        :deadline today)
-                                    (:name "Important"
-                                        :priority "A")
-                                    (:name "Overdue"
-                                        :deadline past)
-                                    (:name "Due soon"
-                                        :deadline future)))
-    ;; org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
+   org-fontify-quote-and-verse-blocks nil
+   org-fontify-whole-heading-line nil
+   org-hide-leading-starts nil
+   org-startup-indented nil
+   org-hide-emphasis-markers t
+   org-directory "~/org/"
+   org-agenda-skip-scheduled-if-done t
+   org-ellipsis " ▾ "
+   org-tags-column -80
+   org-agenda-span 30
+   org-agenda-files '("~/org")
+   org-log-done 'time
+   org-refile-targets (quote ((nil :maxlevel . 1)))
+   +org-capture-todo-file "tasks.org"
+   org-edit-src-content-indentation 0
+   org-src-tab-acts-natively t
+   org-src-preserve-indentation t
+   ;; config org-super-agenda
+   org-super-agenda-mode t
+   org-super-agenda-header-map nil
+   org-deadline-warning-days 7
+   org-agenda-skip-scheduled-if-done t
+   org-agenda-block-separator 9472
+   org-agenda-start-on-weekday nil
+   org-super-agenda-groups '((:name "Today"
+                              :time-grid t
+                              :scheduled today)
+                             (:name "Due today"
+                              :deadline today)
+                             (:name "Important"
+                              :priority "A")
+                             (:name "Overdue"
+                              :deadline past)
+                             (:name "Due soon"
+                              :deadline future)))
+  ;; org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
   (set-face-attribute 'org-link nil :weight 'normal :background nil)
   (set-face-attribute 'org-code nil :foreground "#a9a1e1" :background nil)
   (set-face-attribute 'org-date nil :foreground "#5B6268" :background nil)
@@ -394,7 +385,7 @@
                       :height 1.2
                       :weight 'bold)
 
-    ;; 기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
+  ;; 기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
   (use-package org-bullets
     :init
     (setq org-bullets-bullet-list '("✸" "✸" "✸" "✸" "✸"))
@@ -405,26 +396,16 @@
     :after org
     :config
     (setq
-      org-mac-grab-Acrobat-app-p nil
-      org-mac-grab-devonthink-app-p nil
-      org-html-htmlize-output-type 'css
-      org-download-method 'attach
-      global-org-pretty-table-mode t)
+     org-mac-grab-Acrobat-app-p nil
+     org-mac-grab-devonthink-app-p nil
+     org-html-htmlize-output-type 'css
+     org-download-method 'attach
+     global-org-pretty-table-mode t)
     (map! :leader
-            :map org-mode-map
-            :desc "link from mac apps"
-            "mlm"  #'org-mac-grab-link))
-)
-
-(after! org-gcal
- (setq
-   org-gcal-client-id "940337524807-n3rdlteg2pcdnpsqu1q4bjegtt3cie70.apps.googleusercontent.com"
-   org-gcal-client-secret "gebsX3uXOf_T26x9ncTea-SZ"
-   org-gcal-fetch-file-alist '(("jjpark78@gmail.com" . "~/org/personal.org")
-                               ("2q9jjv662ihb8rv61qf7bjo7h4%40group.calendar.google.com" . "~/org/jw.org")
-                               )
- )
-)
+          :map org-mode-map
+          :desc "link from mac apps"
+          "mlm"  #'org-mac-grab-link))
+  )
 
 (setq elfeed-feeds '(
     "http://www.bloter.net/feed"

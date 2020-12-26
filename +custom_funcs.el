@@ -1,6 +1,6 @@
 (defun setup-custom-jsts-mode ()
   ;; 기본 인덴테이션을 설정한다.
-  (lsp!)
+  (lsp)
   (setq typescript-indent-level 2)
   (setq emmet-indentation 2)
   (setq js-indent-level 2)
@@ -22,15 +22,6 @@
                   (string-equal "ts" extname))
           (setup-custom-jsts-mode)
           ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
-          (mmm-add-classes
-           '((js-graphql
-              :submode graphql-mode
-              :face mmm-declaration-submode-face
-              :front "[^a-zA-Z]gql`" ;; regex to find the opening tag
-              :back "`"))) ;; regex to find the closing tag
-          (mmm-add-mode-ext-class 'typescript-mode nil 'js-graphql)
-          (setq mmm-global-mode 'maybe)
-          (setq mmm-submode-decoration-level 0)
           ;; Optional configuration that hides the background color for a highlighted block
           ;; I find it useful for debugging emacs, but when actually coding I dont want so much emphasis on submodes
           (flycheck-select-checker 'javascript-eslint)))))
@@ -61,7 +52,6 @@
   (interactive)
   (setq lsp-prefer-flymake nil
         ccls-executable "/usr/local/bin/ccls"
-        lsp-modeline-diagnostics-mode nil
         lsp-ui-peek-fontify 'always
         lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
         lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info

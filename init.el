@@ -23,7 +23,7 @@
        (company +auto)             ; the ultimate code completion backend
        ;; helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       (ivy)               ; a search engine for love and life
+       (ivy +icons)               ; a search engine for love and life
 
        :ui
        deft              ; notational velocity for Emacs
@@ -35,7 +35,7 @@
        ;; hydra
        ;; indent-guides    ; highlighted indent columns
        ;; minimap             ; show a map of the code on the side
-       (modeline +icons)   ; snazzy, Atom-inspired modeline, plus API
+       (modeline)   ; snazzy, Atom-inspired modeline, plus API
        nav-flash           ; blink cursor line after big motions
        ;; neotree          ; a project drawer, like NERDTree for vim
        ophints             ; highlight the region an operation acts on
@@ -85,7 +85,7 @@
 
        :os
        macos               ; recent new feature
-       tty                    ;
+       ;; tty                    ;
 
        :tools
        ;;ansible

@@ -21,4 +21,3 @@
 (package! git-link)
 (package! magit-todos)
 (package! graphql-mode)
-(package! mmm-mode)
