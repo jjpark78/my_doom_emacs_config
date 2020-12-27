@@ -13,7 +13,8 @@
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (setq lsp-ui-peek-fontify 'always)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  (add-hook 'before-save-hook prettier-js nil 'local))
+  ;; (add-hook 'before-save-hook prettier-js nil 'local)
+  )
 
 (defun custom-ts-mode ()
   (if (not (equal buffer-file-name 'nil))

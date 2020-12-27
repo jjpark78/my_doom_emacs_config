@@ -145,6 +145,7 @@
 (map! :after org-mode :map org-mode-map ">" 'org-cyclt-level)
 ;; <SPC> w C-o 는 너무 누르기 힘들지만 이게 의외로 많이 쓰인다. 쓰이지 않는 키 바인딩에 할당해서 더 간단히 만든다.
 (map! :leader :prefix "w" :desc "Close Other Windows Fast Binding" "O" 'delete-other-windows)
+(map! :leader :n "," 'switch-to-buffer)
 
 ;; 둠 이맥스 디스코드 채널에서 고수가 제안한 새로운 바인딩
 ;; https://discord.com/channels/406534637242810369/695450585758957609/759868990909841438
