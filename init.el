@@ -156,7 +156,7 @@
        ;; plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
        ;; python            ; beautiful is better than ugly
-       ;; qt                ; the 'cutest' gui framework ever
+       (qt +lsp)                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
        ;; rest              ; Emacs as a REST client
@@ -174,7 +174,7 @@
        yaml              ; JSON, but readable
 
        :email
-       (mu4e +org +gmail)
+       ;; (mu4e +org +gmail)
        ;;notmuch
        ;; (wanderlust +gmail)
 

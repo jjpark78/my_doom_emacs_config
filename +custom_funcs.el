@@ -14,6 +14,7 @@
   (setq lsp-ui-peek-fontify 'always)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
   ;; (add-hook 'before-save-hook prettier-js nil 'local)
+  ;; (prettier-js-mode)
   )
 
 (defun custom-ts-mode ()

@@ -77,9 +77,9 @@
 
 ;; 라인 넘버표시 하지 않는게 더 빠르다
 ;; 이유는 모름.
-;; (setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 'relative)
 ;; (setq display-line-numbers-type t)
-(setq display-line-numbers-type nil)
+;; (setq display-line-numbers-type nil)
 
 ;; 필요없는 부분은 동작하지 않는 특수 모드 활성화
 (global-so-long-mode 1)
@@ -94,10 +94,14 @@
 (setq gc-cons-threshold 1000000000)
 (setq read-process-output-max (* 1024 1024))
 
-(map! "C-h" #'evil-window-left)
-(map! "C-j" #'evil-window-down)
-(map! "C-k" #'evil-window-up)
-(map! "C-l" #'evil-window-right)
+(map! "C-h" #'tmux-pane-omni-window-left)
+(map! "C-j" #'tmux-pane-omni-window-down)
+(map! "C-k" #'tmux-pane-omni-window-up)
+(map! "C-l" #'tmux-pane-omni-window-right)
+;; (map! "C-h" #'evil-window-left)
+;; (map! "C-j" #'evil-window-down)
+;; (map! "C-k" #'evil-window-up)
+;; (map! "C-l" #'evil-window-right)
 (map! :leader :prefix "g" :desc "ediff style diff from working-tree" "d" #'magit-ediff-show-working-tree)
 ;; go back, go references
 (map! :n "gb" #'evil-jump-backward)
@@ -179,6 +183,9 @@
 
 ;; disable CamelCase syntax
 (global-subword-mode nil)
+
+;; disable lsp-formating
+(setq +format-with-lsp nil)
 
 (add-hook 'web-mode-hook 'custom-vue-mode)
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
