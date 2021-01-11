@@ -3,7 +3,6 @@
 (package! dotenv-mode)
 (package! wakatime-mode)
 (package! company-tabnine)
-(package! company-box)
 (package! org-super-agenda)
 (package! org-bullets)
 (package! gitlab-ci-mode)
@@ -11,7 +10,6 @@
 (package! carbon-now-sh)
 (package! google-this)
 (package! rg)
-;; (package! prettier-js)
 (package! swiper)
 (package! magit-delta)
 (package! exec-path-from-shell)
@@ -21,6 +19,9 @@
 (package! git-link)
 (package! magit-todos)
 (package! tmux-pane)
-;; (package! graphql-mode)
 (package! npm-mode)
-;; (package! calfw)
+(package! mu4e-alert)
+(package! mu4e-views
+  :recipe
+  (:host github
+   :repo "lordpretzel/mu4e-views"))
