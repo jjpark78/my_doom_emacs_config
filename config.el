@@ -443,6 +443,8 @@
 
 (run-with-timer 0 60 'refresh-mu4e-alert-mode-line)
 
+(map! :leader :prefix "o" :desc "update email index manually" "M" #'refresh-mu4e-alert-mode-line)
+
 ;; start my org settings
 ;; config some hooks
 (after! org
