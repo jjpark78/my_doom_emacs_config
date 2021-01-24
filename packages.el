@@ -21,6 +21,7 @@
 (package! tmux-pane)
 (package! npm-mode)
 (package! mu4e-alert)
+(package! nyan-mode)
 (package! mu4e-views
   :recipe
   (:host github

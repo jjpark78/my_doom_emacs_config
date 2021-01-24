@@ -3,9 +3,9 @@
 
 ;; 사용자 이름 설정
 (setq user-full-name "Jaejin Park"
-      user-mail-address "jjpark78@outlook.com")
+      user-mail-address "jjpark78@gmail.com")
 (setq-default frame-title-format '("DOOM EMACS"))
-
+(setq auth-sources '("~/.authinfo"))
 ;; 바쁘게 버퍼전환 하는 와중에 화면이 울렁거리는게 멀미날것 같아서 프리뷰 옵션을 껐다
 (setq +ivy-buffer-preview nil)
 (setq avy-all-windows t)
@@ -36,6 +36,12 @@
 ;; 하루 일과를 잘 보여준다.
 ;; 개인으로만 쓰면 공짜인것도 매력임.
 (global-wakatime-mode)
+
+;; just for fun
+(after! nyan-mode
+  (nyan-mode)
+  (nyan-start-animation)
+  )
 
 ;; 한글 입력기 on
 (setq default-input-method "korean-hangul")
@@ -193,6 +199,7 @@
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
 (add-hook 'cc-mode-hook 'custom-cc-mode)
 
+(setq lsp-auto-guess-root t)
 ;; (after! typescript-mode
 ;;   (set-company-backend! 'typescript-mode '(company-tabnine company-capf company-yasnippet)))
 (setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
@@ -294,7 +301,7 @@
 )
 
 (after! forge
-  (setq auth-sources '("~/.authinfo"))
+  ;; (setq auth-sources '("~/.authinfo"))
   (add-to-list 'forge-alist '("gitlab.com" "gitlab.com/api/v4" "gitlab.com" forge-gitlab-repository))
   ;; O-T (Open This)바인딩으로 브라우저에서 링크를 열 수 있도록 지원한다.
   (define-key forge-topic-title-section-map (kbd "ot") 'forge-custom-open-url)
@@ -346,7 +353,8 @@
         mu4e-compose-signature-auto-include t
         mu4e-get-mail-command "true"
         mu4e-maildir "~/Mailbox"
-        mu4e-update-interval nil
+        mu4e-update-interval (* 2 60)
+        mu4e-get-mail-command "mbsync -a"
         mu4e-use-fancy-chars t
         mu4e-view-show-addresses t
         mu4e-view-show-images t
@@ -383,7 +391,7 @@
 
 (set-email-account! "Gmail"
                     '((user-full-name         . "Jaejin Park")
-                      (smtpmail-smtp-server   . "smtp.office365.com")
+                      (smtpmail-smtp-server   . "smtp.gmail.com")
                       (smtpmail-smtp-service  . 587)
                       (smtpmail-stream-type   . starttls)
                       (smtpmail-debug-info    . t)
@@ -391,7 +399,6 @@
                       (mu4e-refile-folder     . "/Archive")
                       (mu4e-sent-folder       . "/Sent Items")
                       (mu4e-trash-folder      . "/Deleted Items")
-                                        ;(mu4e-sent-messages-behavior . 'delete)
                       )
                     nil)
 
@@ -436,14 +443,14 @@
   (mu4e-alert-enable-notifications)
   )
 
-(defun refresh-mu4e-alert-mode-line ()
-  (interactive)
-  (call-process-shell-command "~/.doom.d/update_mail.sh" nil 0)
-  (mu4e-alert-enable-mode-line-display))
+;; (defun refresh-mu4e-alert-mode-line ()
+;;   (interactive)
+;;   (call-process-shell-command "~/.doom.d/update_mail.sh" nil 0)
+;;   (mu4e-alert-enable-mode-line-display))
 
-(run-with-timer 0 60 'refresh-mu4e-alert-mode-line)
+;; (run-with-timer 0 180 'refresh-mu4e-alert-mode-line)
 
-(map! :leader :prefix "o" :desc "update email index manually" "M" #'refresh-mu4e-alert-mode-line)
+;; (map! :leader :prefix "o" :desc "update email index manually" "M" #'refresh-mu4e-alert-mode-line)
 
 ;; start my org settings
 ;; config some hooks
@@ -525,17 +532,15 @@
   )
 
 (setq elfeed-feeds '(
-    "http://www.bloter.net/feed"
-    "https://d2.naver.com/d2.atom"
-    "https://engineering.linecorp.com/ko/feed/"
-    "https://tech.lezhin.com/rss/"
-    "https://emacsredux.com/atom.xml"
-    "http://sachachua.com/blog/category/emacs/feed"
-    "https://planet.emacslife.com/atom.xml"
-    "https://www.emacswiki.org/emacs?action=rss;match=%5E%5Cd%5Cd%5Cd%5Cd-%5Cd%5Cd-%5Cd%5Cd"
-    "https://feeds.feedburner.com/zdkorea"
-    "https://www.reddit.com/r/linux.rss"
-))
+                     "http://www.bloter.net/feed"
+                     "https://d2.naver.com/d2.atom"
+                     "https://engineering.linecorp.com/ko/feed/"
+                     "https://emacsredux.com/atom.xml"
+                     "http://sachachua.com/blog/category/emacs/feed"
+                     "https://planet.emacslife.com/atom.xml"
+                     "https://www.emacswiki.org/emacs?action=rss;match=%5E%5Cd%5Cd%5Cd%5Cd-%5Cd%5Cd-%5Cd%5Cd"
+                     "https://feeds.feedburner.com/zdkorea"
+                     ))
 
 (use-package rg
   :config
