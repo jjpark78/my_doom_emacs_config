@@ -38,10 +38,8 @@
 (global-wakatime-mode)
 
 ;; just for fun
-(after! nyan-mode
-  (nyan-mode)
-  (nyan-start-animation)
-  )
+(nyan-mode)
+(nyan-start-animation)
 
 ;; 한글 입력기 on
 (setq default-input-method "korean-hangul")
@@ -194,9 +192,20 @@
 
 ;; disable lsp-formating
 (setq +format-with-lsp nil)
+(setq +format-on-save-enabled-modes
+      '(not emacs-lisp-mode
+            sql-mode
+            tex-mode
+            latex-mode))
+
+(add-hook 'web-mode-hook #'format-all-mode)
+(add-hook 'cc-mode-hook #'format-all-mode)
+(add-hook 'typescript-mode-hook #'format-all-mode)
+(add-hook 'typescript-tsx-mode-hook #'format-all-mode)
 
 (add-hook 'web-mode-hook 'custom-vue-mode)
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
+(add-hook 'typescript-tsx-mode-hook 'custom-ts-mode)
 (add-hook 'cc-mode-hook 'custom-cc-mode)
 
 (setq lsp-auto-guess-root t)
@@ -264,13 +273,12 @@
 (set-docsets! 'typescript "TypeScript" "NodeJS" "HTML" "CSS" "Pug" "Stylus" "VueJS")
 
 ;; lsp 설정 이후에 불필요한 옵션들은 전부다 끈다.
-(after! lsp
-  ;; These take up a lot of space on my big font size
-  (setq lsp-ui-sideline-show-code-actions nil
-        lsp-ui-sideline-show-diagnostics nil
-        lsp-modeline-diagnostics-mode nil
-        lsp-modeline-diagnostics-enable nil
-        lsp-signature-render-all nil))
+;; These take up a lot of space on my big font size
+(setq lsp-ui-sideline-show-code-actions nil
+      lsp-ui-sideline-show-diagnostics nil
+      lsp-modeline-diagnostics-mode nil
+      lsp-modeline-diagnostics-enable nil
+      lsp-signature-render-all nil)
 
 ;; vc & magit 관련 설정
 (setq vc-follow-symlinks t)
@@ -344,113 +352,6 @@
           (issues . show)
           (pullreqs . show)))
   )
-
-(add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
-(use-package! mu4e)
-(after! mu4e
-  (message "init mu4e variables")
-  (setq mu4e-attachment-dir "~/Downloads"
-        mu4e-compose-signature-auto-include t
-        mu4e-get-mail-command "true"
-        mu4e-maildir "~/Mailbox"
-        mu4e-update-interval (* 2 60)
-        mu4e-get-mail-command "mbsync -a"
-        mu4e-use-fancy-chars t
-        mu4e-view-show-addresses t
-        mu4e-view-show-images t
-        mu4e-index-update-in-background t
-        mu4e-index-update-error-warning nil
-        mu4e-confirm-quit nil
-        mu4e-compose-format-flowed t
-        ;; +mu4e-min-header-frame-width 142
-        mu4e-headers-date-format "%y/%m/%d"
-        mu4e-headers-time-format "%H:%M:%S"
-        mu4e-index-cleanup t)
-
-  ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
-  (setq mu4e-headers-fields '((:human-date . 10)
-                              (:subject    . nil)))
-  ;;메일 폴더를 빠르게 선택할 수 있는 단축키도 지정한다.
-  (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@gmail.com/inbox"   :key ?i)
-                                 (:maildir "/jjpark78@gmail.com/sent"    :key ?s)
-                                 ))
-  ;;리플라이나 포워딩을 할때 원본 메세지의 받은 주소를 자동으로 보내는 사람 필드에 설정한다.
-  (add-hook 'mu4e-compose-pre-hook
-            (defun my-set-from-address ()
-              "Set the From address based on the To address of the original."
-              (let ((msg mu4e-compose-parent-message)) ;; msg is shorter...
-                (when msg
-                  (setq user-mail-address
-                        (cond
-                         ((mu4e-message-contact-field-matches msg :to "jjpark@jjsoft.kr") "jjpark@jjsoft.kr")
-                         ((mu4e-message-contact-field-matches msg :to "jjpark78@outlook.com") "jjpark78@outlook.com")
-                         ((mu4e-message-contact-field-matches msg :to "pjj78@naver.com") "pjj78@naver.com")
-                         ((mu4e-message-contact-field-matches msg :to "admin@jjsoft.kr") "admin@jjsoft.kr")
-                         (t "jjpark78@gmail.com")))))))
-  )
-
-(set-email-account! "Gmail"
-                    '((user-full-name         . "Jaejin Park")
-                      (smtpmail-smtp-server   . "smtp.gmail.com")
-                      (smtpmail-smtp-service  . 587)
-                      (smtpmail-stream-type   . starttls)
-                      (smtpmail-debug-info    . t)
-                      (mu4e-drafts-folder     . "/Drafts")
-                      (mu4e-refile-folder     . "/Archive")
-                      (mu4e-sent-folder       . "/Sent Items")
-                      (mu4e-trash-folder      . "/Deleted Items")
-                      )
-                    nil)
-
-(use-package! mu4e-views
-  :after mu4e
-  :defer nil
-  :bind (:map mu4e-headers-mode-map
-	    ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
-	    ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
-	    ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
-	    )
-  :config
-  (setq mu4e-views-mu4e-html-email-header-style
-          "<style type=\"text/css\">
-  .mu4e-mu4e-views-mail-headers { font-family: sans-serif; font-size: 10pt; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid #ccc; color: #000;}
-  .mu4e-mu4e-views-header-row { display:block; padding: 1px 0 1px 0; }
-  .mu4e-mu4e-views-mail-header { display: inline-block; text-transform: capitalize; font-weight: bold; }
-  .mu4e-mu4e-views-header-content { display: inline-block; padding-right: 8px; }
-  .mu4e-mu4e-views-email { display: inline-block; padding-right: 8px; }
-  .mu4e-mu4e-views-attachment { display: inline-block; padding-right: 8px; }
-  </style>")
-  (setq mu4e-views-completion-method 'ivy) ;; use ivy for completion
-  (setq mu4e-views-default-view-method "browser") ;; make xwidgets default
-  (mu4e-views-mu4e-use-view-msg-method "browser") ;; select the default
-  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window)
-  (map! :map mu4e-headers-mode-map
-        :n "M-b" #'mu4e-views-cursor-msg-view-window-up
-        :n "M-f" #'mu4e-views-cursor-msg-view-window-down
-        :localleader
-        :desc "Message action"        "a"   #'mu4e-views-mu4e-view-action
-        :desc "Scoll message down"    "b"   #'mu4e-views-cursor-msg-view-window-up
-        :desc "Scoll message up"      "f"   #'mu4e-views-cursor-msg-view-window-down
-        :desc "Open attachment"       "o"   #'mu4e-views-mu4e-view-open-attachment
-        :desc "Save attachment"       "s"   #'mu4e-views-mu4e-view-save-attachment
-        :desc "Save all attachments"  "S"   #'mu4e-views-mu4e-view-save-all-attachments
-        :desc "Set view method"       "v"   #'mu4e-views-mu4e-select-view-msg-method)) ;; select viewing method)
-
-(use-package mu4e-alert
-  :config
-  (message "loaded mu4e-alert")
-  (mu4e-alert-set-default-style 'notifier)
-  (mu4e-alert-enable-notifications)
-  )
-
-;; (defun refresh-mu4e-alert-mode-line ()
-;;   (interactive)
-;;   (call-process-shell-command "~/.doom.d/update_mail.sh" nil 0)
-;;   (mu4e-alert-enable-mode-line-display))
-
-;; (run-with-timer 0 180 'refresh-mu4e-alert-mode-line)
-
-;; (map! :leader :prefix "o" :desc "update email index manually" "M" #'refresh-mu4e-alert-mode-line)
 
 ;; start my org settings
 ;; config some hooks

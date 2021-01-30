@@ -20,7 +20,7 @@
 (package! magit-todos)
 (package! tmux-pane)
 (package! npm-mode)
-(package! mu4e-alert)
+;; (package! mu4e-alert)
 (package! nyan-mode)
 (package! mu4e-views
   :recipe

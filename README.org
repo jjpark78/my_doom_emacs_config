@@ -12,11 +12,6 @@
     - [[#ccls-custom-setting][CCLS Custom Setting]]
     - [[#vue--typescript-custom-setting][Vue & Typescript Custom Setting]]
   - [[#magit--forge][Magit / Forge]]
-  - [[#mail][Mail]]
-    - [[#basic-coonfiguration][Basic Coonfiguration]]
-    - [[#smtp][SMTP]]
-    - [[#render-html-email][Render HTML email]]
-    - [[#alert][Alert]]
   - [[#org-mode][Org-Mode]]
   - [[#rss-feed][RSS Feed]]
     - [[#custom-elfeed-search-column][Custom Elfeed Search Column]]
@@ -62,7 +57,7 @@
 (package! magit-todos)
 (package! tmux-pane)
 (package! npm-mode)
-(package! mu4e-alert)
+;; (package! mu4e-alert)
 (package! nyan-mode)
 (package! mu4e-views
   :recipe
@@ -368,9 +363,20 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 
 ;; disable lsp-formating
 (setq +format-with-lsp nil)
+(setq +format-on-save-enabled-modes
+      '(not emacs-lisp-mode
+            sql-mode
+            tex-mode
+            latex-mode))
+
+(add-hook 'web-mode-hook #'format-all-mode)
+(add-hook 'cc-mode-hook #'format-all-mode)
+(add-hook 'typescript-mode-hook #'format-all-mode)
+(add-hook 'typescript-tsx-mode-hook #'format-all-mode)
 
 (add-hook 'web-mode-hook 'custom-vue-mode)
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
+(add-hook 'typescript-tsx-mode-hook 'custom-ts-mode)
 (add-hook 'cc-mode-hook 'custom-cc-mode)
 
 (setq lsp-auto-guess-root t)
@@ -447,13 +453,12 @@ Tabnine관련 설정들
 (set-docsets! 'typescript "TypeScript" "NodeJS" "HTML" "CSS" "Pug" "Stylus" "VueJS")
 
 ;; lsp 설정 이후에 불필요한 옵션들은 전부다 끈다.
-(after! lsp
-  ;; These take up a lot of space on my big font size
-  (setq lsp-ui-sideline-show-code-actions nil
-        lsp-ui-sideline-show-diagnostics nil
-        lsp-modeline-diagnostics-mode nil
-        lsp-modeline-diagnostics-enable nil
-        lsp-signature-render-all nil))
+;; These take up a lot of space on my big font size
+(setq lsp-ui-sideline-show-code-actions nil
+      lsp-ui-sideline-show-diagnostics nil
+      lsp-modeline-diagnostics-mode nil
+      lsp-modeline-diagnostics-enable nil
+      lsp-signature-render-all nil)
 #+END_SRC
 ** Magit / Forge
 magit이나 dired등과 같이 유틸리티 관련 설정들을 모아 놓았다.
@@ -537,130 +542,130 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
   )
 #+END_SRC
 
-** Mail
-*** Basic Coonfiguration
-Mail관련 설정을 추가 한다.
-mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많이 자료가 존재한다. 고마워요 구글.
-#+BEGIN_SRC elisp :tangle config.el
-(add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
-(use-package! mu4e)
-(after! mu4e
-  (setq mu4e-attachment-dir "~/Downloads"
-        mu4e-compose-signature-auto-include t
-        mu4e-get-mail-command "true"
-        mu4e-maildir "~/Mailbox"
-        mu4e-update-interval (* 2 60)
-        mu4e-get-mail-command "mbsync -a"
-        mu4e-use-fancy-chars t
-        mu4e-view-show-addresses t
-        mu4e-view-show-images t
-        mu4e-index-update-in-background t
-        mu4e-index-update-error-warning nil
-        mu4e-confirm-quit nil
-        mu4e-compose-format-flowed t
-        ;; +mu4e-min-header-frame-width 142
-        mu4e-headers-date-format "%y/%m/%d"
-        mu4e-headers-time-format "%H:%M:%S"
-        mu4e-index-cleanup t)
+# ** Mail
+# *** Basic Coonfiguration
+# Mail관련 설정을 추가 한다.
+# mbsync와 mu4e 패키지를 사용한다. mbsync관련 설정은 구글에 많이 자료가 존재한다. 고마워요 구글.
+# #+BEGIN_SRC elisp :tangle config.el
+# (add-to-list 'load-path "/usr/local/Cellar/mu/1.4.13/share/emacs/site-lisp/mu/mu4e")
+# (use-package! mu4e)
+# (after! mu4e
+#   (setq mu4e-attachment-dir "~/Downloads"
+#         mu4e-compose-signature-auto-include t
+#         mu4e-get-mail-command "true"
+#         mu4e-maildir "~/Mailbox"
+#         mu4e-update-interval (* 2 60)
+#         mu4e-get-mail-command "mbsync -a"
+#         mu4e-use-fancy-chars t
+#         mu4e-view-show-addresses t
+#         mu4e-view-show-images t
+#         mu4e-index-update-in-background t
+#         mu4e-index-update-error-warning nil
+#         mu4e-confirm-quit nil
+#         mu4e-compose-format-flowed t
+#         ;; +mu4e-min-header-frame-width 142
+#         mu4e-headers-date-format "%y/%m/%d"
+#         mu4e-headers-time-format "%H:%M:%S"
+#         mu4e-index-cleanup t)
 
-  ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
-  (setq mu4e-headers-fields '((:human-date . 10)
-                              (:subject    . nil)))
-  ;;메일 폴더를 빠르게 선택할 수 있는 단축키도 지정한다.
-  (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@gmail.com/inbox"   :key ?i)
-                                 (:maildir "/jjpark78@gmail.com/sent"    :key ?s)
-                                 ))
-  ;;리플라이나 포워딩을 할때 원본 메세지의 받은 주소를 자동으로 보내는 사람 필드에 설정한다.
-  (add-hook 'mu4e-compose-pre-hook
-            (defun my-set-from-address ()
-              "Set the From address based on the To address of the original."
-              (let ((msg mu4e-compose-parent-message)) ;; msg is shorter...
-                (when msg
-                  (setq user-mail-address
-                        (cond
-                         ((mu4e-message-contact-field-matches msg :to "jjpark@jjsoft.kr") "jjpark@jjsoft.kr")
-                         ((mu4e-message-contact-field-matches msg :to "jjpark78@outlook.com") "jjpark78@outlook.com")
-                         ((mu4e-message-contact-field-matches msg :to "pjj78@naver.com") "pjj78@naver.com")
-                         ((mu4e-message-contact-field-matches msg :to "admin@jjsoft.kr") "admin@jjsoft.kr")
-                         (t "jjpark78@gmail.com")))))))
-  )
-#+END_SRC
+#   ;; 메일 목록 화면에서 컬럼 사이즈를 재조정한다.
+#   (setq mu4e-headers-fields '((:human-date . 10)
+#                               (:subject    . nil)))
+#   ;;메일 폴더를 빠르게 선택할 수 있는 단축키도 지정한다.
+#   (setq mu4e-maildir-shortcuts '((:maildir "/jjpark78@gmail.com/inbox"   :key ?i)
+#                                  (:maildir "/jjpark78@gmail.com/sent"    :key ?s)
+#                                  ))
+#   ;;리플라이나 포워딩을 할때 원본 메세지의 받은 주소를 자동으로 보내는 사람 필드에 설정한다.
+#   (add-hook 'mu4e-compose-pre-hook
+#             (defun my-set-from-address ()
+#               "Set the From address based on the To address of the original."
+#               (let ((msg mu4e-compose-parent-message)) ;; msg is shorter...
+#                 (when msg
+#                   (setq user-mail-address
+#                         (cond
+#                          ((mu4e-message-contact-field-matches msg :to "jjpark@jjsoft.kr") "jjpark@jjsoft.kr")
+#                          ((mu4e-message-contact-field-matches msg :to "jjpark78@outlook.com") "jjpark78@outlook.com")
+#                          ((mu4e-message-contact-field-matches msg :to "pjj78@naver.com") "pjj78@naver.com")
+#                          ((mu4e-message-contact-field-matches msg :to "admin@jjsoft.kr") "admin@jjsoft.kr")
+#                          (t "jjpark78@gmail.com")))))))
+#   )
+# #+END_SRC
 
-*** SMTP
-smtp 서버를 설정한다.
-#+BEGIN_SRC elisp :tangle config.el
-(set-email-account! "Gmail"
-                    '((user-full-name         . "Jaejin Park")
-                      (smtpmail-smtp-server   . "smtp.gmail.com")
-                      (smtpmail-smtp-service  . 587)
-                      (smtpmail-stream-type   . starttls)
-                      (smtpmail-debug-info    . t)
-                      (mu4e-drafts-folder     . "/Drafts")
-                      (mu4e-refile-folder     . "/Archive")
-                      (mu4e-sent-folder       . "/Sent Items")
-                      (mu4e-trash-folder      . "/Deleted Items")
-                      )
-                    nil)
-#+END_SRC
+# *** SMTP
+# smtp 서버를 설정한다.
+# #+BEGIN_SRC elisp :tangle config.el
+# (set-email-account! "Gmail"
+#                     '((user-full-name         . "Jaejin Park")
+#                       (smtpmail-smtp-server   . "smtp.gmail.com")
+#                       (smtpmail-smtp-service  . 587)
+#                       (smtpmail-stream-type   . starttls)
+#                       (smtpmail-debug-info    . t)
+#                       (mu4e-drafts-folder     . "/Drafts")
+#                       (mu4e-refile-folder     . "/Archive")
+#                       (mu4e-sent-folder       . "/Sent Items")
+#                       (mu4e-trash-folder      . "/Deleted Items")
+#                       )
+#                     nil)
+# #+END_SRC
 
-*** Render HTML email
-요즘의 대부분의 이메일은 raw text보다는 html + image 조합이 더 일반적인다.
-그래서 기능이 부족한 shr 보다는 그냥 webkit으로 렌더링 하도록 한다. mu4e-views는 이를 위한 패키지이다
-이맥스에는 내가 하고 싶은 거의 모든것이 이미 구현되어 있다.
-#+BEGIN_SRC elisp :tangle config.el
-(use-package! mu4e-views
-  :after mu4e
-  :defer nil
-  :bind (:map mu4e-headers-mode-map
-	    ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
-	    ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
-	    ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
-	    )
-  :config
-  (setq mu4e-views-mu4e-html-email-header-style
-          "<style type=\"text/css\">
-  .mu4e-mu4e-views-mail-headers { font-family: sans-serif; font-size: 10pt; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid #ccc; color: #000;}
-  .mu4e-mu4e-views-header-row { display:block; padding: 1px 0 1px 0; }
-  .mu4e-mu4e-views-mail-header { display: inline-block; text-transform: capitalize; font-weight: bold; }
-  .mu4e-mu4e-views-header-content { display: inline-block; padding-right: 8px; }
-  .mu4e-mu4e-views-email { display: inline-block; padding-right: 8px; }
-  .mu4e-mu4e-views-attachment { display: inline-block; padding-right: 8px; }
-  </style>")
-  (setq mu4e-views-completion-method 'ivy) ;; use ivy for completion
-  (setq mu4e-views-default-view-method "browser") ;; make xwidgets default
-  (mu4e-views-mu4e-use-view-msg-method "browser") ;; select the default
-  (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window)
-  (map! :map mu4e-headers-mode-map
-        :n "M-b" #'mu4e-views-cursor-msg-view-window-up
-        :n "M-f" #'mu4e-views-cursor-msg-view-window-down
-        :localleader
-        :desc "Message action"        "a"   #'mu4e-views-mu4e-view-action
-        :desc "Scoll message down"    "b"   #'mu4e-views-cursor-msg-view-window-up
-        :desc "Scoll message up"      "f"   #'mu4e-views-cursor-msg-view-window-down
-        :desc "Open attachment"       "o"   #'mu4e-views-mu4e-view-open-attachment
-        :desc "Save attachment"       "s"   #'mu4e-views-mu4e-view-save-attachment
-        :desc "Save all attachments"  "S"   #'mu4e-views-mu4e-view-save-all-attachments
-        :desc "Set view method"       "v"   #'mu4e-views-mu4e-select-view-msg-method)) ;; select viewing method)
-  #+END_SRC
+# *** Render HTML email
+# 요즘의 대부분의 이메일은 raw text보다는 html + image 조합이 더 일반적인다.
+# 그래서 기능이 부족한 shr 보다는 그냥 webkit으로 렌더링 하도록 한다. mu4e-views는 이를 위한 패키지이다
+# 이맥스에는 내가 하고 싶은 거의 모든것이 이미 구현되어 있다.
+# #+BEGIN_SRC elisp :tangle config.el
+# (use-package! mu4e-views
+#   :after mu4e
+#   :defer nil
+#   :bind (:map mu4e-headers-mode-map
+# 	    ("v" . mu4e-views-mu4e-select-view-msg-method) ;; select viewing method
+# 	    ("M-n" . mu4e-views-cursor-msg-view-window-down) ;; from headers window scroll the email view
+# 	    ("M-p" . mu4e-views-cursor-msg-view-window-up) ;; from headers window scroll the email view
+# 	    )
+#   :config
+#   (setq mu4e-views-mu4e-html-email-header-style
+#           "<style type=\"text/css\">
+#   .mu4e-mu4e-views-mail-headers { font-family: sans-serif; font-size: 10pt; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid #ccc; color: #000;}
+#   .mu4e-mu4e-views-header-row { display:block; padding: 1px 0 1px 0; }
+#   .mu4e-mu4e-views-mail-header { display: inline-block; text-transform: capitalize; font-weight: bold; }
+#   .mu4e-mu4e-views-header-content { display: inline-block; padding-right: 8px; }
+#   .mu4e-mu4e-views-email { display: inline-block; padding-right: 8px; }
+#   .mu4e-mu4e-views-attachment { display: inline-block; padding-right: 8px; }
+#   </style>")
+#   (setq mu4e-views-completion-method 'ivy) ;; use ivy for completion
+#   (setq mu4e-views-default-view-method "browser") ;; make xwidgets default
+#   (mu4e-views-mu4e-use-view-msg-method "browser") ;; select the default
+#   (setq mu4e-views-next-previous-message-behaviour 'stick-to-current-window)
+#   (map! :map mu4e-headers-mode-map
+#         :n "M-b" #'mu4e-views-cursor-msg-view-window-up
+#         :n "M-f" #'mu4e-views-cursor-msg-view-window-down
+#         :localleader
+#         :desc "Message action"        "a"   #'mu4e-views-mu4e-view-action
+#         :desc "Scoll message down"    "b"   #'mu4e-views-cursor-msg-view-window-up
+#         :desc "Scoll message up"      "f"   #'mu4e-views-cursor-msg-view-window-down
+#         :desc "Open attachment"       "o"   #'mu4e-views-mu4e-view-open-attachment
+#         :desc "Save attachment"       "s"   #'mu4e-views-mu4e-view-save-attachment
+#         :desc "Save all attachments"  "S"   #'mu4e-views-mu4e-view-save-all-attachments
+#         :desc "Set view method"       "v"   #'mu4e-views-mu4e-select-view-msg-method)) ;; select viewing method)
+#   #+END_SRC
 
-*** Alert
-새로운 메일이 도착할때 마다 데스크탑과 Emacs 상태바에 알람을 표시한다.
- #+BEGIN_SRC elisp :tangle config.el
-(use-package mu4e-alert
-  :config
-  (mu4e-alert-set-default-style 'notifier)
-  (mu4e-alert-enable-notifications)
-  )
+# *** Alert
+# 새로운 메일이 도착할때 마다 데스크탑과 Emacs 상태바에 알람을 표시한다.
+#  #+BEGIN_SRC elisp :tangle config.el
+# (use-package mu4e-alert
+#   :config
+#   (mu4e-alert-set-default-style 'notifier)
+#   (mu4e-alert-enable-notifications)
+#   )
 
-;; (defun refresh-mu4e-alert-mode-line ()
-;;   (interactive)
-;;   (call-process-shell-command "~/.doom.d/update_mail.sh" nil 0)
-;;   (mu4e-alert-enable-mode-line-display))
+# ;; (defun refresh-mu4e-alert-mode-line ()
+# ;;   (interactive)
+# ;;   (call-process-shell-command "~/.doom.d/update_mail.sh" nil 0)
+# ;;   (mu4e-alert-enable-mode-line-display))
 
-;; (run-with-timer 0 180 'refresh-mu4e-alert-mode-line)
+# ;; (run-with-timer 0 180 'refresh-mu4e-alert-mode-line)
 
-;; (map! :leader :prefix "o" :desc "update email index manually" "M" #'refresh-mu4e-alert-mode-line)
- #+END_SRC
+# ;; (map! :leader :prefix "o" :desc "update email index manually" "M" #'refresh-mu4e-alert-mode-line)
+#  #+END_SRC
 ** Org-Mode
 
 ORG모드를 위한 함수들
