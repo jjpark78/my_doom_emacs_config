@@ -57,15 +57,15 @@
 (setq doom-theme 'doom-nord)
 
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
-(setq doom-font (font-spec :family "monaco" :size 14))
+(setq doom-font (font-spec :family "FiraMono NF" :size 14))
 
 (set-fringe-style '(nil . 0))
 
 ;; 한글 관련 폰트 스케일링 설정
 ;; (set-face-attribute 'default nil :height 130)
-(set-fontset-font t 'hangul (font-spec :name "AppleGothic"))
-(set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
-(set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
+;; (set-fontset-font t 'hangul (font-spec :name "AppleGothic"))
+;; (set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
+;; (set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
 
 (setq face-font-rescale-alist
       '(("NanumGothicCoding" . 1.2307692307692308)
@@ -81,9 +81,9 @@
 
 ;; 라인 넘버표시 하지 않는게 더 빠르다
 ;; 이유는 모름.
-;; (setq display-line-numbers-type 'relative)
+(setq display-line-numbers-type 'relative)
 ;; (setq display-line-numbers-type t)
-(setq display-line-numbers-type nil)
+;; (setq display-line-numbers-type nil)
 
 ;; 필요없는 부분은 동작하지 않는 특수 모드 활성화
 (global-so-long-mode 1)
@@ -98,14 +98,14 @@
 (setq gc-cons-threshold 1000000000)
 (setq read-process-output-max (* 1024 1024))
 
-(map! "C-h" #'tmux-pane-omni-window-left)
-(map! "C-j" #'tmux-pane-omni-window-down)
-(map! "C-k" #'tmux-pane-omni-window-up)
-(map! "C-l" #'tmux-pane-omni-window-right)
-;; (map! "C-h" #'evil-window-left)
-;; (map! "C-j" #'evil-window-down)
-;; (map! "C-k" #'evil-window-up)
-;; (map! "C-l" #'evil-window-right)
+;; (map! "C-h" #'tmux-pane-omni-window-left)
+;; (map! "C-j" #'tmux-pane-omni-window-down)
+;; (map! "C-k" #'tmux-pane-omni-window-up)
+;; (map! "C-l" #'tmux-pane-omni-window-right)
+(map! "C-h" #'evil-window-left)
+(map! "C-j" #'evil-window-down)
+(map! "C-k" #'evil-window-up)
+(map! "C-l" #'evil-window-right)
 (map! :leader :prefix "g" :desc "ediff style diff from working-tree" "d" #'magit-ediff-show-working-tree)
 ;; go back, go references
 (map! :n "gb" #'evil-jump-backward)
@@ -207,6 +207,7 @@
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
 (add-hook 'typescript-tsx-mode-hook 'custom-ts-mode)
 (add-hook 'cc-mode-hook 'custom-cc-mode)
+(add-hook 'c++-mode-hook 'custom-cc-mode)
 
 (setq lsp-auto-guess-root t)
 ;; (after! typescript-mode

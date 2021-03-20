@@ -20,9 +20,6 @@
 (package! magit-todos)
 (package! tmux-pane)
 (package! npm-mode)
-;; (package! mu4e-alert)
+(package! org-jira)
 (package! nyan-mode)
-(package! mu4e-views
-  :recipe
-  (:host github
-   :repo "lordpretzel/mu4e-views"))
+(package! platformio-mode)
