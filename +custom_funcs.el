@@ -1,14 +1,3 @@
-(defun custom-cc-mode ()
-  "Custom cc-mode make support qml, qmake etc."
-  (interactive)
-  (platformio-conditionally-enable)
-  (setq lsp-prefer-flymake nil
-        ccls-executable "/usr/local/bin/ccls"
-        lsp-ui-peek-fontify 'always
-        lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
-        lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
-  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
-
 (defun setup-custom-jsts-mode ()
   ;; 기본 인덴테이션을 설정한다.
   (lsp)
@@ -59,6 +48,17 @@
           ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
           (flycheck-select-checker 'javascript-eslint)
           ))))
+
+(defun custom-cc-mode ()
+  "Custom cc-mode make support qml, qmake etc."
+  (interactive)
+  (platformio-conditionally-enable)
+  (setq lsp-prefer-flymake nil
+        ccls-executable "/usr/local/bin/ccls"
+        lsp-ui-peek-fontify 'always
+        lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
+        lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
+  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
 
 (defun my-org-config/after-org-mode-load ()
   ;; (visual-line-mode)

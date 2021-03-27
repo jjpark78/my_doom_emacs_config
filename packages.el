@@ -23,3 +23,4 @@
 (package! org-jira)
 (package! nyan-mode)
 (package! platformio-mode)
+(package! drag-stuff)

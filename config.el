@@ -13,6 +13,7 @@
 ;; dired를 두개 열어 놓고 왔다 갔다하며 복사 붙여넣기 할때 편하다
 ;; (setq dired-dwim-target t)
 
+(drag-stuff-mode t)
 (setq confirm-kill-emacs nil)
 (setq which-key-idle-delay 0.5)
 (setq which-key-allow-multiple-replacements t)
@@ -98,6 +99,32 @@
 (setq gc-cons-threshold 1000000000)
 (setq read-process-output-max (* 1024 1024))
 
+;; 둠 이맥스 디스코드 채널에서 고수가 제안한 새로운 바인딩
+;; https://discord.com/channels/406534637242810369/695450585758957609/759868990909841438
+(after! evil
+  (require 'evil-textobj-anyblock)
+  (evil-define-text-object my-evil-textobj-anyblock-inner-quote
+    (count &optional beg end type)
+    "Select the closest outer quote."
+    (let ((evil-textobj-anyblock-blocks
+           '(("'" . "'")
+             ("\"" . "\"")
+             ("`" . "`")
+             ("“" . "”"))))
+      (evil-textobj-anyblock--make-textobj beg end type count nil)))
+  (evil-define-text-object my-evil-textobj-anyblock-a-quote
+    (count &optional beg end type)
+    "Select the closest outer quote."
+    (let ((evil-textobj-anyblock-blocks
+           '(("'" . "'")
+             ("\"" . "\"")
+             ("`" . "`")
+             ("“" . "”"))))
+      (evil-textobj-anyblock--make-textobj beg end type count t)))
+  (define-key evil-inner-text-objects-map "q" 'my-evil-textobj-anyblock-inner-quote)
+  (define-key evil-outer-text-objects-map "q" 'my-evil-textobj-anyblock-a-quote)
+  )
+
 ;; (map! "C-h" #'tmux-pane-omni-window-left)
 ;; (map! "C-j" #'tmux-pane-omni-window-down)
 ;; (map! "C-k" #'tmux-pane-omni-window-up)
@@ -156,32 +183,7 @@
 ;; <SPC> w C-o 는 너무 누르기 힘들지만 이게 의외로 많이 쓰인다. 쓰이지 않는 키 바인딩에 할당해서 더 간단히 만든다.
 (map! :leader :prefix "w" :desc "Close Other Windows Fast Binding" "O" 'delete-other-windows)
 (map! :leader :n "," 'switch-to-buffer)
-
-;; 둠 이맥스 디스코드 채널에서 고수가 제안한 새로운 바인딩
-;; https://discord.com/channels/406534637242810369/695450585758957609/759868990909841438
-(after! evil
-  (require 'evil-textobj-anyblock)
-  (evil-define-text-object my-evil-textobj-anyblock-inner-quote
-    (count &optional beg end type)
-    "Select the closest outer quote."
-    (let ((evil-textobj-anyblock-blocks
-           '(("'" . "'")
-             ("\"" . "\"")
-             ("`" . "`")
-             ("“" . "”"))))
-      (evil-textobj-anyblock--make-textobj beg end type count nil)))
-  (evil-define-text-object my-evil-textobj-anyblock-a-quote
-    (count &optional beg end type)
-    "Select the closest outer quote."
-    (let ((evil-textobj-anyblock-blocks
-           '(("'" . "'")
-             ("\"" . "\"")
-             ("`" . "`")
-             ("“" . "”"))))
-      (evil-textobj-anyblock--make-textobj beg end type count t)))
-  (define-key evil-inner-text-objects-map "q" 'my-evil-textobj-anyblock-inner-quote)
-  (define-key evil-outer-text-objects-map "q" 'my-evil-textobj-anyblock-a-quote)
-  )
+(drag-stuff-define-keys)
 
 ;; 뷰모드가 느리게 동작하고 아직 버그가 많아서 웹 모드로 바꾼다.
 (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
@@ -191,17 +193,16 @@
 (global-subword-mode nil)
 
 ;; disable lsp-formating
-(setq +format-with-lsp nil)
-(setq +format-on-save-enabled-modes
-      '(not emacs-lisp-mode
-            sql-mode
-            tex-mode
-            latex-mode))
+;; (setq +format-with-lsp nil)
+;;       '(not emacs-lisp-mode
+;;             sql-mode
+;;             tex-mode
+;;             latex-mode))
 
-(add-hook 'web-mode-hook #'format-all-mode)
-(add-hook 'cc-mode-hook #'format-all-mode)
-(add-hook 'typescript-mode-hook #'format-all-mode)
-(add-hook 'typescript-tsx-mode-hook #'format-all-mode)
+;; (add-hook 'web-mode-hook #'format-all-mode)
+;; (add-hook 'cc-mode-hook #'format-all-mode)
+;; (add-hook 'typescript-mode-hook #'format-all-mode)
+;; (add-hook 'typescript-tsx-mode-hook #'format-all-mode)
 
 (add-hook 'web-mode-hook 'custom-vue-mode)
 (add-hook 'typescript-mode-hook 'custom-ts-mode)

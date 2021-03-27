@@ -9,8 +9,8 @@
     - [[#custom-setup][Custom Setup]]
     - [[#useful-bindings][Useful Bindings]]
   - [[#programming][Programming]]
-    - [[#ccls-custom-setting][CCLS Custom Setting]]
     - [[#vue--typescript-custom-setting][Vue & Typescript Custom Setting]]
+    - [[#ccls-custom-setting][CCLS Custom Setting]]
   - [[#magit--forge][Magit / Forge]]
   - [[#org-mode][Org-Mode]]
   - [[#rss-feed][RSS Feed]]
@@ -60,6 +60,7 @@
 (package! org-jira)
 (package! nyan-mode)
 (package! platformio-mode)
+(package! drag-stuff)
 #+END_SRC
 *** Custom Setup
 **** Startup Setup
@@ -78,6 +79,7 @@
 ;; dired를 두개 열어 놓고 왔다 갔다하며 복사 붙여넣기 할때 편하다
 ;; (setq dired-dwim-target t)
 
+(drag-stuff-mode t)
 (setq confirm-kill-emacs nil)
 (setq which-key-idle-delay 0.5)
 (setq which-key-allow-multiple-replacements t)
@@ -185,6 +187,37 @@ Doom modeline 관련 수정
 #+END_SRC
 
 *** Useful Bindings
+**** Bindings 2
+조금 복잡해지는 바인딩들. 그래도 이것들이 있어서 편하다.
+#+BEGIN_SRC elisp :tangle config.el
+;; 둠 이맥스 디스코드 채널에서 고수가 제안한 새로운 바인딩
+;; https://discord.com/channels/406534637242810369/695450585758957609/759868990909841438
+(after! evil
+  (require 'evil-textobj-anyblock)
+  (evil-define-text-object my-evil-textobj-anyblock-inner-quote
+    (count &optional beg end type)
+    "Select the closest outer quote."
+    (let ((evil-textobj-anyblock-blocks
+           '(("'" . "'")
+             ("\"" . "\"")
+             ("`" . "`")
+             ("“" . "”"))))
+      (evil-textobj-anyblock--make-textobj beg end type count nil)))
+  (evil-define-text-object my-evil-textobj-anyblock-a-quote
+    (count &optional beg end type)
+    "Select the closest outer quote."
+    (let ((evil-textobj-anyblock-blocks
+           '(("'" . "'")
+             ("\"" . "\"")
+             ("`" . "`")
+             ("“" . "”"))))
+      (evil-textobj-anyblock--make-textobj beg end type count t)))
+  (define-key evil-inner-text-objects-map "q" 'my-evil-textobj-anyblock-inner-quote)
+  (define-key evil-outer-text-objects-map "q" 'my-evil-textobj-anyblock-a-quote)
+  )
+
+ #+END_SRC
+
 **** Bindings 1
 단축키 설정
 #+BEGIN_SRC elisp :tangle config.el
@@ -246,53 +279,9 @@ Doom modeline 관련 수정
 ;; <SPC> w C-o 는 너무 누르기 힘들지만 이게 의외로 많이 쓰인다. 쓰이지 않는 키 바인딩에 할당해서 더 간단히 만든다.
 (map! :leader :prefix "w" :desc "Close Other Windows Fast Binding" "O" 'delete-other-windows)
 (map! :leader :n "," 'switch-to-buffer)
+(drag-stuff-define-keys)
 #+END_SRC
-**** Bindings 2
-조금 복잡해지는 바인딩들. 그래도 이것들이 있어서 편하다.
-#+BEGIN_SRC elisp :tangle config.el
-;; 둠 이맥스 디스코드 채널에서 고수가 제안한 새로운 바인딩
-;; https://discord.com/channels/406534637242810369/695450585758957609/759868990909841438
-(after! evil
-  (require 'evil-textobj-anyblock)
-  (evil-define-text-object my-evil-textobj-anyblock-inner-quote
-    (count &optional beg end type)
-    "Select the closest outer quote."
-    (let ((evil-textobj-anyblock-blocks
-           '(("'" . "'")
-             ("\"" . "\"")
-             ("`" . "`")
-             ("“" . "”"))))
-      (evil-textobj-anyblock--make-textobj beg end type count nil)))
-  (evil-define-text-object my-evil-textobj-anyblock-a-quote
-    (count &optional beg end type)
-    "Select the closest outer quote."
-    (let ((evil-textobj-anyblock-blocks
-           '(("'" . "'")
-             ("\"" . "\"")
-             ("`" . "`")
-             ("“" . "”"))))
-      (evil-textobj-anyblock--make-textobj beg end type count t)))
-  (define-key evil-inner-text-objects-map "q" 'my-evil-textobj-anyblock-inner-quote)
-  (define-key evil-outer-text-objects-map "q" 'my-evil-textobj-anyblock-a-quote)
-  )
-
- #+END_SRC
-
 ** Programming
-*** CCLS Custom Setting
-#+begin_src elisp :tangle +custom_funcs.el
-(defun custom-cc-mode ()
-  "Custom cc-mode make support qml, qmake etc."
-  (interactive)
-  (platformio-conditionally-enable)
-  (setq lsp-prefer-flymake nil
-        ccls-executable "/usr/local/bin/ccls"
-        lsp-ui-peek-fontify 'always
-        lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
-        lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
-  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
-#+end_src
-
 *** Vue & Typescript Custom Setting
 Vue와 타입스크립트를 위한 커스텀 설정 모드.
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
@@ -359,17 +348,16 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 (global-subword-mode nil)
 
 ;; disable lsp-formating
-(setq +format-with-lsp nil)
-(setq +format-on-save-enabled-modes
-      '(not emacs-lisp-mode
-            sql-mode
-            tex-mode
-            latex-mode))
+;; (setq +format-with-lsp nil)
+;;       '(not emacs-lisp-mode
+;;             sql-mode
+;;             tex-mode
+;;             latex-mode))
 
-(add-hook 'web-mode-hook #'format-all-mode)
-(add-hook 'cc-mode-hook #'format-all-mode)
-(add-hook 'typescript-mode-hook #'format-all-mode)
-(add-hook 'typescript-tsx-mode-hook #'format-all-mode)
+;; (add-hook 'web-mode-hook #'format-all-mode)
+;; (add-hook 'cc-mode-hook #'format-all-mode)
+;; (add-hook 'typescript-mode-hook #'format-all-mode)
+;; (add-hook 'typescript-tsx-mode-hook #'format-all-mode)
 
 (add-hook 'web-mode-hook 'custom-vue-mode)
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
@@ -458,6 +446,20 @@ Tabnine관련 설정들
       lsp-modeline-diagnostics-enable nil
       lsp-signature-render-all nil)
 #+END_SRC
+*** CCLS Custom Setting
+#+begin_src elisp :tangle +custom_funcs.el
+(defun custom-cc-mode ()
+  "Custom cc-mode make support qml, qmake etc."
+  (interactive)
+  (platformio-conditionally-enable)
+  (setq lsp-prefer-flymake nil
+        ccls-executable "/usr/local/bin/ccls"
+        lsp-ui-peek-fontify 'always
+        lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
+        lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
+  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
+#+end_src
+
 ** Magit / Forge
 magit이나 dired등과 같이 유틸리티 관련 설정들을 모아 놓았다.
 #+BEGIN_SRC elisp :tangle config.el
