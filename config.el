@@ -58,7 +58,7 @@
 (setq doom-theme 'doom-nord)
 
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
-(setq doom-font (font-spec :family "FiraMono NF" :size 14))
+(setq doom-font (font-spec :family "FiraMono NF" :size 16))
 
 (set-fringe-style '(nil . 0))
 
@@ -210,7 +210,7 @@
 (add-hook 'cc-mode-hook 'custom-cc-mode)
 (add-hook 'c++-mode-hook 'custom-cc-mode)
 
-(setq lsp-auto-guess-root t)
+(setq lsp-auto-guess-root nil)
 ;; (after! typescript-mode
 ;;   (set-company-backend! 'typescript-mode '(company-tabnine company-capf company-yasnippet)))
 (setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
@@ -276,7 +276,7 @@
 
 ;; lsp 설정 이후에 불필요한 옵션들은 전부다 끈다.
 ;; These take up a lot of space on my big font size
-(setq lsp-ui-sideline-show-code-actions nil
+(setq lsp-ui-sideline-show-code-actions t
       lsp-ui-sideline-show-diagnostics nil
       lsp-modeline-diagnostics-mode nil
       lsp-modeline-diagnostics-enable nil

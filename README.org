@@ -132,7 +132,7 @@
 (setq doom-theme 'doom-nord)
 
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
-(setq doom-font (font-spec :family "FiraMono NF" :size 14))
+(setq doom-font (font-spec :family "FiraMono NF" :size 16))
 
 (set-fringe-style '(nil . 0))
 
@@ -365,7 +365,7 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 (add-hook 'cc-mode-hook 'custom-cc-mode)
 (add-hook 'c++-mode-hook 'custom-cc-mode)
 
-(setq lsp-auto-guess-root t)
+(setq lsp-auto-guess-root nil)
 ;; (after! typescript-mode
 ;;   (set-company-backend! 'typescript-mode '(company-tabnine company-capf company-yasnippet)))
 (setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))

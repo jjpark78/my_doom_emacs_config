@@ -40,7 +40,7 @@
        ;; neotree          ; a project drawer, like NERDTree for vim
        ophints             ; highlight the region an operation acts on
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
-       ;; pretty-code       ; ligatures or substitute text with pretty symbols
+       pretty-code       ; ligatures or substitute text with pretty symbols
        ;; tabs                ; an tab bar for Emacs
        ;; treemacs            ; a rroject drawer, like neotree but cooler"doom-color"
 
@@ -55,7 +55,7 @@
        (evil +everywhere)  ; come to the dark side, we have cookies
        file-templates      ; auto-snippets for empty files
        ;; fold                ; (nigh) universal code folding
-       ;; (format +onsave)  ; automated prettiness
+       (format +onsave)  ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
        multiple-cursors    ; editing in many places at once
@@ -84,7 +84,7 @@
        ;;grammar           ; tasing grammar mistake every you make
 
        :os
-       macos               ; recent new feature
+       ;; macos               ; recent new feature
        tty                    ;
 
        :tools
@@ -106,7 +106,7 @@
        rgb               ; creating color strings
        ;; taskrunner        ; taskrunner for all your projects
        ;;terraform         ; infrastructure as code
-       tmux              ; an API for interacting with tmux
+       ;; tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
 
        :lang
@@ -174,14 +174,14 @@
        yaml              ; JSON, but readable
 
        :email
-       (mu4e +org +gmail)
+       ;; (mu4e +org +gmail)
        ;;notmuch
        ;; (wanderlust +gmail)
 
        :app
-       calendar
+       ;; calendar
        ;;irc               ; how neckbeards socialize
-       rss       ; emacs as an RSS reader
+       ;; rss       ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
 
        :config
