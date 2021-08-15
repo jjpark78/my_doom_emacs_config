@@ -11,10 +11,9 @@
   (flycheck-mode +1)
   (my/use-eslint-from-node-modules)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (flycheck-add-mode 'javascript-eslint 'typescript-mode)
   (setq lsp-ui-peek-fontify 'always)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  ;; (add-hook 'before-save-hook prettier-js nil 'local)
-  ;; (prettier-js-mode)
   )
 
 (defun custom-ts-mode ()
@@ -23,13 +22,9 @@
         (when (or (string-equal "tsx" extname)
                   (string-equal "ts" extname))
           (setup-custom-jsts-mode)
-          ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
-          ;; Optional configuration that hides the background color for a highlighted block
-          ;; I find it useful for debugging emacs, but when actually coding I dont want so much emphasis on submodes
           (flycheck-select-checker 'javascript-eslint)))))
 
 (defun my/use-eslint-from-node-modules ()
-  "Use local eslint from node_modules before global."
   (let* ((root (locate-dominating-file
                 (or (buffer-file-name) default-directory)
                 "node_modules"))
@@ -39,26 +34,14 @@
     (when (and eslint (file-executable-p eslint))
       (setq-local flycheck-javascript-eslint-executable eslint))))
 
-(defun custom-vue-mode ()
+(defun custom-web-mode ()
   "Custom hooks for vue-mode"
   (if (not (equal buffer-file-name 'nil))
       (let ((extname (file-name-extension buffer-file-name)))
         (when (string-equal "vue" extname)
           (setup-custom-jsts-mode)
-          ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
           (flycheck-select-checker 'javascript-eslint)
           ))))
-
-(defun custom-cc-mode ()
-  "Custom cc-mode make support qml, qmake etc."
-  (interactive)
-  (platformio-conditionally-enable)
-  (setq lsp-prefer-flymake nil
-        ccls-executable "/usr/local/bin/ccls"
-        lsp-ui-peek-fontify 'always
-        lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
-        lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
-  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
 
 (defun my-org-config/after-org-mode-load ()
   ;; (visual-line-mode)
@@ -111,6 +94,14 @@
     (require 'w3m)
     (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
       (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword )))
+)
+
+(defun github-search ()
+"search word under cursor in google code search and google.com"
+    (interactive)
+    (require 'w3m)
+    (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
+      (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword "+site:github.com")))
 )
 
 (defun forge-custom-open-url ()
