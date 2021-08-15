@@ -85,7 +85,7 @@
 
        :os
        ;; macos               ; recent new feature
-       tty                    ;
+       ;; tty                    ;
 
        :tools
        ;;ansible

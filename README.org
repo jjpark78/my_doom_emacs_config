@@ -274,15 +274,15 @@ Doom modeline 관련 수정
 (define-key evil-normal-state-map (kbd "H") 'beginning-of-line-text)
 (define-key evil-normal-state-map (kbd "L") 'evil-end-of-line)
 ;; evil multi edit recommanded setting
-(define-key evil-visual-state-map (kbd "M-s-m") 'evil-multiedit-match-all)
-(define-key evil-normal-state-map (kbd "M-s-m") 'evil-multiedit-match-all)
-(define-key evil-insert-state-map (kbd "M-s-m") 'evil-multiedit-match-all)
+(define-key evil-visual-state-map (kbd "C-M-m") 'evil-multiedit-match-all)
+(define-key evil-normal-state-map (kbd "C-M-m") 'evil-multiedit-match-all)
+(define-key evil-insert-state-map (kbd "C-M-m") 'evil-multiedit-match-all)
 ;; 블럭 단위로 한번에 선택하고 싶을때 사용하면 좋다.
 ;; 기본 단축키가 너무 불편해서 변경했다.
-(define-key evil-normal-state-map (kbd "M-s-k") #'er/expand-region)
-(define-key evil-normal-state-map (kbd "M-s-j") #'er/contract-region)
-(define-key evil-insert-state-map (kbd "M-s-k") #'er/expand-region)
-(define-key evil-insert-state-map (kbd "M-s-j") #'er/contract-region)
+(define-key evil-normal-state-map (kbd "C-M-k") #'er/expand-region)
+(define-key evil-normal-state-map (kbd "C-M-j") #'er/contract-region)
+(define-key evil-insert-state-map (kbd "C-M-k") #'er/expand-region)
+(define-key evil-insert-state-map (kbd "C-M-j") #'er/contract-region)
 ;;ivy 미니 버퍼에서 컨트롤 키로 아이템을 선택하는건 새끼손가락에 죄를 짓는 일이다.
 (map! :after ivy :map ivy-minibuffer-map "TAB" 'next-line)
 ;; ORG 모드에서 헤더 레벨 설정할때 쓰기 편한 단축키
@@ -305,6 +305,17 @@ Doom modeline 관련 수정
 (define-key evil-visual-state-map (kbd "M-k") #'move-line-up)
 (define-key evil-normal-state-map (kbd "M-j") #'move-line-down)
 (define-key evil-visual-state-map (kbd "M-j") #'move-line-down)
+
+(defun execute-gitkraken ()
+  (interactive)
+  (call-process-shell-command "gitkraken&" nil 0))
+
+(defun execute-chrome ()
+  (interactive)
+  (call-process-shell-command "google-chrome&" nil 0))
+
+(map! :leader :prefix "r" :desc "Run Command - Gitkraken" "gk" 'execute-gitkraken)
+(map! :leader :prefix "r" :desc "Run Command - Google Chrome" "gh" 'execute-chrome)
 #+END_SRC
 ** Programming
 *** Vue & Typescript Custom Setting
