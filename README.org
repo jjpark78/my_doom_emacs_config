@@ -10,9 +10,10 @@
     - [[#useful-bindings][Useful Bindings]]
   - [[#programming][Programming]]
     - [[#vue--typescript-custom-setting][Vue & Typescript Custom Setting]]
-    - [[#ccls-custom-setting][CCLS Custom Setting]]
-  - [[#magit--forge][Magit / Forge]]
-  - [[#org-mode][Org-Mode]]
+    - [[#ccls--platformio-setting][CCLS / PlatformIO Setting]]
+    - [[#lsp--language-mode-hooks][LSP / Language Mode Hooks]]
+    - [[#programming-etc][Programming ETC]]
+  - [[#magit--forge][Magit & Forge]]
   - [[#rss-feed][RSS Feed]]
     - [[#custom-elfeed-search-column][Custom Elfeed Search Column]]
   - [[#utils][Utils]]
@@ -39,7 +40,7 @@
 (package! expand-region)
 (package! dotenv-mode)
 (package! wakatime-mode)
-(package! company-tabnine)
+(package! company-box)
 (package! org-super-agenda)
 (package! org-bullets)
 (package! gitlab-ci-mode)
@@ -58,9 +59,16 @@
 (package! tmux-pane)
 (package! npm-mode)
 (package! org-jira)
-(package! nyan-mode)
+(package! w3m)
 (package! platformio-mode)
-(package! drag-stuff)
+(package! ccls)
+(package! prettier-js)
+;; (package! ejira
+;;   :recipe
+;;   (:host github
+;;    :repo "nyyManni/ejira"
+;;    :files ("*.el")
+;;    ))
 #+END_SRC
 *** Custom Setup
 **** Startup Setup
@@ -91,7 +99,7 @@
    ))
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-;; (setq initial-frame-alist '((top . 23) (left . 1175) (width . 125) (height . 80)))
+(setq initial-frame-alist '((top . 32) (left . 1220) (width . 116) (height . 61)))
 
 (global-evil-matchit-mode)
 
@@ -105,9 +113,11 @@
 (global-wakatime-mode)
 
 ;; just for fun
-(nyan-mode)
-(nyan-start-animation)
+;; (nyan-mode)
+;; (nyan-start-animation)
 #+END_SRC
+
+#+RESULTS:
 
 **** UTF & Korean Input
 한글 관련 설정
@@ -134,13 +144,13 @@
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
 (setq doom-font (font-spec :family "FiraMono NF" :size 16))
 
-(set-fringe-style '(nil . 0))
+;; (set-fringe-style '(nil . 0))
 
 ;; 한글 관련 폰트 스케일링 설정
-;; (set-face-attribute 'default nil :height 130)
-;; (set-fontset-font t 'hangul (font-spec :name "AppleGothic"))
-;; (set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
-;; (set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
+(set-face-attribute 'default nil :height 130)
+(set-fontset-font t 'hangul (font-spec :name "AppleGothic"))
+(set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
+(set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
 
 (setq face-font-rescale-alist
       '(("NanumGothicCoding" . 1.2307692307692308)
@@ -153,9 +163,9 @@ Doom modeline 관련 수정
 #+BEGIN_SRC elisp :tangle config.el
 (after! doom-modeline
   (setq
-    doom-modeline-major-mode-icon t
+    doom-modeline-major-mode-icon nil
     doom-modeline-buffer-encoding nil
-    doom-modeline-mu4e t
+    doom-modeline-mu4e nil
     doom-modeline-buffer-file-name-style 'truncate-with-project))
 #+END_SRC
 
@@ -173,7 +183,7 @@ Doom modeline 관련 수정
 ;; (setq display-line-numbers-type nil)
 
 ;; 필요없는 부분은 동작하지 않는 특수 모드 활성화
-(global-so-long-mode 1)
+;; (global-so-long-mode 1)
 
 ;; 더블버퍼링이 동작하도록 설정한다.
 (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
@@ -182,8 +192,8 @@ Doom modeline 관련 수정
 ;; lsp 관련 설정 메뉴들
 ;; 이맥스를 느리게 만드는 범인중 십중팔구 LSP가 관련되어져 있다고 함.
 ;; 해당 튜닝도 구글링을 통해서 찾았다.
-(setq gc-cons-threshold 1000000000)
-(setq read-process-output-max (* 1024 1024))
+(setq lsp-file-watch-threshold (* 1024 1024))
+(setq read-process-output-max (* 100 1024 1024))
 #+END_SRC
 
 *** Useful Bindings
@@ -236,13 +246,14 @@ Doom modeline 관련 수정
 ;; 검색할때 브라우저를 찾는 수고를 줄여 준다.
 (map! :leader :prefix "s" :desc "Search Google.com" "g" #'google-search)
 (map! :leader :prefix "s" :desc "Search StackOverFlow" "v" #'stackoverflow-search)
+(map! :leader :prefix "s" :desc "Search Github" "h" #'github-search)
 (map! :leader :prefix "s" :desc "Search Buffers" "b" #'swiper-all)
 (map! :leader :prefix "s" :desc "new project search file" "p" #'rg-project)
 ;; 가끔씩 즐겨보는 블로그들의 rss를 피드로 받아와서 읽을때 사용한다.
 (map! :leader :prefix "o" :desc "Open news form RSS with ELfeed" "n" #'elfeed)
 (map! :leader :prefix "o" :desc "Open mu4e to current window" "m" #'mu4e)
 ;; 버퍼끼리 화면 전환할때 프로젝트를 벗어 나지 않도록 강제한다.
-(map! :leader :desc "workspace buffer list" "," #'+ivy/switch-workspace-buffer)
+(map! :leader :desc "workspace buffer list" "," 'counsel-projectile-switch-to-buffer)
 ;; ORG 모드에서 쓰는 단축키들
 (map! :leader :desc "Tangle Export" "ee" #'org-babel-tangle)
 ;; 커스텀 함수로 정의해둔 쉘 설정 파일불러오는 함수에게 단축기를 할당했음.
@@ -278,8 +289,22 @@ Doom modeline 관련 수정
 (map! :after org-mode :map org-mode-map ">" 'org-cyclt-level)
 ;; <SPC> w C-o 는 너무 누르기 힘들지만 이게 의외로 많이 쓰인다. 쓰이지 않는 키 바인딩에 할당해서 더 간단히 만든다.
 (map! :leader :prefix "w" :desc "Close Other Windows Fast Binding" "O" 'delete-other-windows)
-(map! :leader :n "," 'switch-to-buffer)
-(drag-stuff-define-keys)
+;; (map! :leader :n "," 'switch-to-buffer)
+(defun move-line-up ()
+  (interactive)
+  (transpose-lines 1)
+  (previous-line 2))
+
+(defun move-line-down ()
+  (interactive)
+  (next-line 1)
+  (transpose-lines 1)
+  (previous-line 1))
+
+(define-key evil-normal-state-map (kbd "M-k") #'move-line-up)
+(define-key evil-visual-state-map (kbd "M-k") #'move-line-up)
+(define-key evil-normal-state-map (kbd "M-j") #'move-line-down)
+(define-key evil-visual-state-map (kbd "M-j") #'move-line-down)
 #+END_SRC
 ** Programming
 *** Vue & Typescript Custom Setting
@@ -298,10 +323,9 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
   (flycheck-mode +1)
   (my/use-eslint-from-node-modules)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
+  (flycheck-add-mode 'javascript-eslint 'typescript-mode)
   (setq lsp-ui-peek-fontify 'always)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
-  ;; (add-hook 'before-save-hook prettier-js nil 'local)
-  ;; (prettier-js-mode)
   )
 
 (defun custom-ts-mode ()
@@ -310,13 +334,9 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
         (when (or (string-equal "tsx" extname)
                   (string-equal "ts" extname))
           (setup-custom-jsts-mode)
-          ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
-          ;; Optional configuration that hides the background color for a highlighted block
-          ;; I find it useful for debugging emacs, but when actually coding I dont want so much emphasis on submodes
           (flycheck-select-checker 'javascript-eslint)))))
 
 (defun my/use-eslint-from-node-modules ()
-  "Use local eslint from node_modules before global."
   (let* ((root (locate-dominating-file
                 (or (buffer-file-name) default-directory)
                 "node_modules"))
@@ -326,23 +346,41 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
     (when (and eslint (file-executable-p eslint))
       (setq-local flycheck-javascript-eslint-executable eslint))))
 
-(defun custom-vue-mode ()
+(defun custom-web-mode ()
   "Custom hooks for vue-mode"
   (if (not (equal buffer-file-name 'nil))
       (let ((extname (file-name-extension buffer-file-name)))
         (when (string-equal "vue" extname)
           (setup-custom-jsts-mode)
-          ;; (set-company-backend! 'prog-mode '(company-tabnine company-capf company-yasnippet))
           (flycheck-select-checker 'javascript-eslint)
           ))))
 
 #+END_SRC
+*** CCLS / PlatformIO Setting
+#+BEGIN_SRC elisp :tangle config.el
+(defun custom-cc-mode ()
+  "Custom cc-mode make support qml, qmake etc."
+  (interactive)
+  (lsp)
+  (platformio-conditionally-enable)
+  (setq lsp-prefer-flymake nil
+        lsp-ui-peek-fontify 'always
+        lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
+        lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
+  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
 
+(use-package ccls :ensure
+	:config '(ccls-initialization-options (quote (compilationDatabaseDirectory :build)))
+    :hook ((c-mode c++-mode objc-mode) . (lambda () (require 'ccls) (lsp))))
+#+END_SRC
+
+*** LSP / Language Mode Hooks
 주로 사용하는 언어들 관련 설정. lsp관련 설정들을 모아 놓았다.
 #+BEGIN_SRC elisp :tangle config.el
 ;; 뷰모드가 느리게 동작하고 아직 버그가 많아서 웹 모드로 바꾼다.
 (add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.env\\'" . dotenv-mode))
+(add-to-list 'auto-mode-alist '("\\.ino\\'" . cpp-mode))
 
 ;; disable CamelCase syntax
 (global-subword-mode nil)
@@ -358,18 +396,24 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 ;; (add-hook 'cc-mode-hook #'format-all-mode)
 ;; (add-hook 'typescript-mode-hook #'format-all-mode)
 ;; (add-hook 'typescript-tsx-mode-hook #'format-all-mode)
-
-(add-hook 'web-mode-hook 'custom-vue-mode)
+(add-hook 'web-mode-hook 'custom-web-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
+(add-hook 'typescript-mode-hook 'prettier-js-mode)
 (add-hook 'typescript-tsx-mode-hook 'custom-ts-mode)
+(add-hook 'typescript-tsx-mode-hook 'prettier-js-mode)
 (add-hook 'cc-mode-hook 'custom-cc-mode)
-(add-hook 'c++-mode-hook 'custom-cc-mode)
-
-(setq lsp-auto-guess-root nil)
+(add-hook 'cpp-mode-hook 'custom-cc-mode)
+(setq lsp-auto-guess-root t)
 ;; (after! typescript-mode
-;;   (set-company-backend! 'typescript-mode '(company-tabnine company-capf company-yasnippet)))
+(set-company-backend! 'typescript-mode '(company-capf))
 (setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
 
+(setq lsp-ui-sideline-show-code-actions nil
+      lsp-ui-sideline-show-diagnostics t
+      lsp-modeline-diagnostics-mode nil
+      lsp-modeline-diagnostics-enable nil
+      lsp-signature-render-all t)
 ;; all-the-icons에 아이콘 색깔을 바꾸기 위해서 수동으로 설정한다.
 ;; (add-hook 'company-mode-hook 'company-box-mode)
 ;; (setq company-box-icons-alist 'company-box-icons-idea)
@@ -382,55 +426,14 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 (add-hook 'flycheck-error-list-mode-hook (lambda () (switch-to-buffer-other-window "*Flycheck errors*")))
 #+END_SRC
 
-**** LSP & Tabnine
-Tabnine관련 설정들
-#+BEGIN_SRC elisp :tangle config.el
-(after! ccls
-  (setq ccls-initialization-options '(:index (:comments 2) :completion (:detailedLabel t)))
-  (set-lsp-priority! 'ccls 2)) ; optional as ccls is the default in Doom
-
-(use-package company-tabnine
-  :defer 1
-  :custom
-  (company-tabnine-max-num-results 9)
-  :hook
-  (lsp-after-open . (lambda ()
-                      (setq company-tabnine-max-num-results 5)
-                      (add-to-list 'company-transformers 'company//sort-by-tabnine t)
-                      (add-to-list 'company-backends '(company-capf :with company-tabnine :separate))))
-  (kill-emacs . company-tabnine-kill-process)
-  :config
-  ;; Enable TabNine on default
-  (add-to-list 'company-backends #'company-tabnine)
-
-  ;; Integrate company-tabnine with lsp-mode
-  (defun company//sort-by-tabnine (candidates)
-    (if (or (functionp company-backend)
-            (not (and (listp company-backend) (memq 'company-tabnine company-backends))))
-        candidates
-      (let ((candidates-table (make-hash-table :test #'equal))
-            candidates-lsp
-            candidates-tabnine)
-        (dolist (candidate candidates)
-          (if (eq (get-text-property 0 'company-backend candidate)
-                  'company-tabnine)
-              (unless (gethash candidate candidates-table)
-                (push candidate candidates-tabnine))
-            (push candidate candidates-lsp)
-            (puthash candidate t candidates-table)))
-        (setq candidates-lsp (nreverse candidates-lsp))
-        (setq candidates-tabnine (nreverse candidates-tabnine))
-        (nconc (seq-take candidates-tabnine 5)
-               (seq-take candidates-lsp 6))))))
-#+END_SRC
-
-**** Programming ETC
- 개발관련 기타 설정들
+*** Programming ETC
+개발관련 기타 설정들
 #+BEGIN_SRC elisp :tangle config.el
 
 ;; 1초라도 빨리 팝업 띄우고 싶어서
 ;; 그러나 실제 체감속도 향상은 없음
-(setq company-idle-delay 0.0)
+(setq company-idle-delay 0)
+;; (setq company-dabbrev-downcase 0)
 
 ;; Dash Documents랑 연동이 되도록 각각 메이저에 관련 정보들을 추가한다.
 (set-docsets! 'c++-mode "Qt" "C++" "C")
@@ -438,29 +441,9 @@ Tabnine관련 설정들
 (set-docsets! 'web-mode   "TypeScript" "NodeJS" "HTML" "CSS" "Pug" "Stylus" "VueJS")
 (set-docsets! 'typescript "TypeScript" "NodeJS" "HTML" "CSS" "Pug" "Stylus" "VueJS")
 
-;; lsp 설정 이후에 불필요한 옵션들은 전부다 끈다.
-;; These take up a lot of space on my big font size
-(setq lsp-ui-sideline-show-code-actions nil
-      lsp-ui-sideline-show-diagnostics nil
-      lsp-modeline-diagnostics-mode nil
-      lsp-modeline-diagnostics-enable nil
-      lsp-signature-render-all nil)
 #+END_SRC
-*** CCLS Custom Setting
-#+begin_src elisp :tangle +custom_funcs.el
-(defun custom-cc-mode ()
-  "Custom cc-mode make support qml, qmake etc."
-  (interactive)
-  (platformio-conditionally-enable)
-  (setq lsp-prefer-flymake nil
-        ccls-executable "/usr/local/bin/ccls"
-        lsp-ui-peek-fontify 'always
-        lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
-        lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
-  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
-#+end_src
 
-** Magit / Forge
+** Magit & Forge
 magit이나 dired등과 같이 유틸리티 관련 설정들을 모아 놓았다.
 #+BEGIN_SRC elisp :tangle config.el
 ;; vc & magit 관련 설정
@@ -666,7 +649,6 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
 
 # ;; (map! :leader :prefix "o" :desc "update email index manually" "M" #'refresh-mu4e-alert-mode-line)
 #  #+END_SRC
-** Org-Mode
 
 ORG모드를 위한 함수들
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
@@ -679,23 +661,47 @@ ORG모드를 위한 함수들
 
 요즘 열공중인 그렇게 대단하다 침이 마르지 않게 칭찬해대는 ORG모드에 대한 설정들을 따로 모아 놓았다.
 #+BEGIN_SRC elisp :tangle config.el
+;; 회사에서 지라를 사용해서 프로젝트의 큰 이슈들과 진행사항드을 관리하지 때문에
+;; org-mode와 지라를 연동시킨다.
+
 ;; start my org settings
 ;; config some hooks
 (after! org
-  (add-hook 'org-mode-hook 'my-org-config/after-org-mode-load)
+  ;; (use-package ejira
+  ;;   :init
+  ;;   (setq jiralib2-url             "jltechrnd.atlassian.net"
+  ;;         jiralib2-auth            'basic
+  ;;         jiralib2-user-login-name "jjpark@jltech.co.kr"
+  ;;         jiralib2-token           nil
+  ;;         ejira-org-directory      "~/org"
+  ;;         ejira-projects           '("SUSB")
+  ;;         ejira-priorities-alist   '(("Highest" . ?A)
+  ;;                                    ("High"    . ?B)
+  ;;                                    ("Medium"  . ?C)
+  ;;                                    ("Low"     . ?D)
+  ;;                                    ("Lowest"  . ?E))
+  ;;         ejira-todo-states-alist  '(("TO Do"       . 1)
+  ;;                                    ("In Progress" . 2)
+  ;;                                    ("Done"        . 3)))
+  ;;   :config
+  ;;   (add-hook 'jiralib2-post-login-hook #'ejira-guess-epic-sprint-fields)
+  ;;   ;; (add-hook 'jiralib2-post-login-hook #'ejira-epic-type-name)
+  ;;   (require 'ejira-agenda)
+  ;;   (add-to-list 'org-agenda-files ejira-org-directory)
+  ;;   (org-add-agenda-custom-command
+  ;;    '("j" "My Jira Issues"
+  ;;      ((ejira-jql "resolution = unresolved and assignee = currentUser()"
+  ;;                  ((org-agenda-overriding-header "Jira Assigned to me")))))))
+  ;; (add-hook 'org-mode-hook 'my-org-config/after-org-mode-load)
   ;;basic org mode config
   (setq
-   org-fontify-quote-and-verse-blocks nil
-   org-fontify-whole-heading-line nil
-   org-hide-leading-starts nil
-   org-startup-indented nil
+   jiralib-url "https://jltechrnd.atlassian.net"
    org-hide-emphasis-markers t
-   org-directory "~/org/"
+   org-directory "~/org"
    org-agenda-skip-scheduled-if-done t
    org-ellipsis " ▾ "
    org-tags-column -80
    org-agenda-span 30
-   org-agenda-files '("~/org")
    org-log-done 'time
    org-refile-targets (quote ((nil :maxlevel . 1)))
    +org-capture-todo-file "tasks.org"
@@ -704,11 +710,9 @@ ORG모드를 위한 함수들
    org-src-preserve-indentation t
    ;; config org-super-agenda
    org-super-agenda-mode t
-   org-super-agenda-header-map nil
    org-deadline-warning-days 7
    org-agenda-skip-scheduled-if-done t
    org-agenda-block-separator 9472
-   org-agenda-start-on-weekday nil
    org-super-agenda-groups '((:name "Today"
                               :time-grid t
                               :scheduled today)
@@ -743,19 +747,19 @@ ORG모드를 위한 함수들
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
   ;;기타 ORG모드 설정
-  (use-package! org-mac-link
-    :after org
-    :config
-    (setq
-     org-mac-grab-Acrobat-app-p nil
-     org-mac-grab-devonthink-app-p nil
-     org-html-htmlize-output-type 'css
-     org-download-method 'attach
-     global-org-pretty-table-mode t)
-    (map! :leader
-          :map org-mode-map
-          :desc "link from mac apps"
-          "mlm"  #'org-mac-grab-link))
+  ;; (use-package! org-mac-link
+  ;;   :after org
+  ;;   :config
+  ;;   (setq
+  ;;    org-mac-grab-Acrobat-app-p nil
+  ;;    org-mac-grab-devonthink-app-p nil
+  ;;    org-html-htmlize-output-type 'css
+  ;;    org-download-method 'attach
+  ;;    global-org-pretty-table-mode t)
+  ;;   (map! :leader
+  ;;         :map org-mode-map
+  ;;         :desc "link from mac apps"
+  ;;         "mlm"  #'org-mac-grab-link))
   )
 #+END_SRC
 
@@ -804,10 +808,7 @@ ORG모드를 위한 함수들
                      "http://www.bloter.net/feed"
                      "https://d2.naver.com/d2.atom"
                      "https://engineering.linecorp.com/ko/feed/"
-                     "https://emacsredux.com/atom.xml"
                      "http://sachachua.com/blog/category/emacs/feed"
-                     "https://planet.emacslife.com/atom.xml"
-                     "https://www.emacswiki.org/emacs?action=rss;match=%5E%5Cd%5Cd%5Cd%5Cd-%5Cd%5Cd-%5Cd%5Cd"
                      "https://feeds.feedburner.com/zdkorea"
                      ))
 #+END_SRC
@@ -849,6 +850,13 @@ rg.el 관련 설정.
       (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword )))
 )
 
+(defun github-search ()
+"search word under cursor in google code search and google.com"
+    (interactive)
+    (require 'w3m)
+    (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
+      (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword "+site:github.com")))
+)
 #+END_SRC
 
 *** Forge Custom Open Link

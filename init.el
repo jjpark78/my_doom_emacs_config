@@ -23,7 +23,7 @@
        (company +auto)             ; the ultimate code completion backend
        ;; helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       (ivy +icons +childframe)               ; a search engine for love and life
+       (ivy +icons)               ; a search engine for love and life
 
        :ui
        deft              ; notational velocity for Emacs
@@ -40,14 +40,14 @@
        ;; neotree          ; a project drawer, like NERDTree for vim
        ophints             ; highlight the region an operation acts on
        (popup +defaults)   ; tame sudden yet inevitable temporary windows
-       pretty-code       ; ligatures or substitute text with pretty symbols
+       ;; pretty-code       ; ligatures or substitute text with pretty symbols
        ;; tabs                ; an tab bar for Emacs
        ;; treemacs            ; a rroject drawer, like neotree but cooler"doom-color"
 
        unicode             ; extended unicode support for various languages
        vc-gutter           ; vcs diff in the fringe
        ;; vi-tilde-fringe     ; fringe tildes to mark beyond EOB
-       (window-select)    ; visually switch windows
+       ;; (window-select)    ; visually switch windows
        workspaces          ; tab emulation, persistence & separate workspaces
        ;;zen               ; distraction-free coding or writing
 
@@ -55,7 +55,7 @@
        (evil +everywhere)  ; come to the dark side, we have cookies
        file-templates      ; auto-snippets for empty files
        ;; fold                ; (nigh) universal code folding
-       (format +onsave)  ; automated prettiness
+       ;; (format +onsave)  ; automated prettiness
        ;;god               ; run Emacs commands without modifier keys
        ;;lispy             ; vim for lisp, for people who don't like vim
        multiple-cursors    ; editing in many places at once
@@ -89,14 +89,14 @@
 
        :tools
        ;;ansible
-       ;; debugger         ; FIXME stepping through code, to help you add bugs
+       debugger         ; FIXME stepping through code, to help you add bugs
        ;; direnv
        docker
        ;;editorconfig      ; let someone else argue about tabs vs spaces
        ;;ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
        ;;gist              ; interacting with github gists
-       (lookup +docsets)   ; navigate your code and its documentation
+       ;; (lookup +docsets)   ; navigate your code and its documentation
        (lsp +peek)
        (magit +forge)             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
@@ -104,7 +104,7 @@
        ;; pdf               ; pdf enhancements
        ;; prodigy           ; FIXME managing external services & code builders
        rgb               ; creating color strings
-       ;; taskrunner        ; taskrunner for all your projects
+       taskrunner        ; taskrunner for all your projects
        ;;terraform         ; infrastructure as code
        ;; tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
@@ -155,14 +155,14 @@
                                         ;php               ; perl's insecure younger brother
        ;; plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
-       ;; python            ; beautiful is better than ugly
-       (qt +lsp)                ; the 'cutest' gui framework ever
+       python            ; beautiful is better than ugly
+       ;; (qt +lsp)                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
-       ;; rest              ; Emacs as a REST client
+       rest              ; Emacs as a REST client
        ;;rst               ; ReST in peace
        ;; (ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-       ;;rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       ;; rust              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        ;;scheme            ; a fully conniving family of lisps
        sh                ; she sells {ba,z,fi}sh shells on the C xor
@@ -181,7 +181,7 @@
        :app
        ;; calendar
        ;;irc               ; how neckbeards socialize
-       ;; rss       ; emacs as an RSS reader
+       rss       ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
 
        :config
