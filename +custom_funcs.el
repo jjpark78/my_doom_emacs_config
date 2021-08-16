@@ -143,6 +143,12 @@
   (interactive)
     (find-file-other-window (expand-file-name ".config/alacritty/alacritty.yml" (getenv "HOME"))))
 
+(defun er-find-tmuxinator-file ()
+  "Brows tmuxinator session definition"
+  (interactive)
+  (find-file-other-window "~/.config/tmuxinator")
+  )
+
 (defun er-find-shell-init-file ()
   "Edit the shell init file in another window."
   (interactive)

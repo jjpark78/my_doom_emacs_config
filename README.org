@@ -63,6 +63,7 @@
 (package! platformio-mode)
 (package! ccls)
 (package! prettier-js)
+(package! nyan-mode)
 ;; (package! ejira
 ;;   :recipe
 ;;   (:host github
@@ -113,8 +114,8 @@
 (global-wakatime-mode)
 
 ;; just for fun
-;; (nyan-mode)
-;; (nyan-start-animation)
+(nyan-mode)
+(nyan-start-animation)
 #+END_SRC
 
 #+RESULTS:
@@ -130,7 +131,7 @@
 (set-keyboard-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
-;; (set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
+(set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
 (require 'ucs-normalize)
 (set-file-name-coding-system 'utf-8-hfs)
 #+END_SRC
@@ -256,10 +257,12 @@ Doom modeline 관련 수정
 (map! :leader :desc "workspace buffer list" "," 'counsel-projectile-switch-to-buffer)
 ;; ORG 모드에서 쓰는 단축키들
 (map! :leader :desc "Tangle Export" "ee" #'org-babel-tangle)
-;; 커스텀 함수로 정의해둔 쉘 설정 파일불러오는 함수에게 단축기를 할당했음.
+;; 커스텀 함수로 정의해둔 설정 파일불러오는 함수에게 단축기를 할당했음.
 ;; 자주 쓰지는 않는데 있어보이는 척 할때 아주 좋다.
-(map! :leader :prefix "f" :desc "Open Shell init file on other windows" "i" #'er-find-shell-init-file)
-(map! :leader :prefix "f" :desc "Open alacritty init file on other windows" "a" #'er-find-alacritty-init-file)
+(map! :leader :prefix "f" :desc "Open Shell init file on other windows" "gi" #'er-find-shell-init-file)
+(map! :leader :prefix "f" :desc "Open alacritty init file on other windows" "ga" #'er-find-alacritty-init-file)
+(map! :leader :prefix "f" :desc "Edit Tmuxinator Session File" "gi" 'er-find-tmuxinator-file)
+
 ;; 코드를 입력받아서 이쁜 화면으로 만들어주는 패키지에 단축기를 할당했다.
 (map! :leader :prefix "t" :desc "Capture Code with Carbon now" "t" #'carbon-now-sh)
 ;; change window split mode
@@ -314,6 +317,8 @@ Doom modeline 관련 수정
   (interactive)
   (call-process-shell-command "google-chrome&" nil 0))
 
+
+; 편리하게 외부 프로그램을 실행한다.
 (map! :leader :prefix "r" :desc "Run Command - Gitkraken" "gk" 'execute-gitkraken)
 (map! :leader :prefix "r" :desc "Run Command - Google Chrome" "gh" 'execute-chrome)
 #+END_SRC
@@ -754,7 +759,7 @@ ORG모드를 위한 함수들
   ;; 기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
   (use-package org-bullets
     :init
-    (setq org-bullets-bullet-list '("✸" "✸" "✸" "✸" "✸"))
+    (setq org-bullets-bullet-list '("⊙" "⊙" "⊙" "⊙"))
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
   ;;기타 ORG모드 설정
@@ -922,6 +927,12 @@ zsh관련 설정 파일을 만질 일이 있을때 요긴하게 잘 사용한다
   "Edit the shell init file in another window."
   (interactive)
     (find-file-other-window (expand-file-name ".config/alacritty/alacritty.yml" (getenv "HOME"))))
+
+(defun er-find-tmuxinator-file ()
+  "Brows tmuxinator session definition"
+  (interactive)
+  (find-file-other-window "~/.config/tmuxinator")
+  )
 
 (defun er-find-shell-init-file ()
   "Edit the shell init file in another window."
