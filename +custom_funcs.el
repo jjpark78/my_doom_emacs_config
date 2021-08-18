@@ -31,7 +31,7 @@
          (eslint (and root
                       (expand-file-name "node_modules/eslint/bin/eslint.js"
                                         root))))
-    (when (and eslint (file-executable-p eslint))
+    (when (and eslint (file-exists-p eslint))
       (setq-local flycheck-javascript-eslint-executable eslint))))
 
 (defun custom-web-mode ()
@@ -142,6 +142,11 @@
   "Edit the shell init file in another window."
   (interactive)
     (find-file-other-window (expand-file-name ".config/alacritty/alacritty.yml" (getenv "HOME"))))
+
+(defun er-find-tmuxconfig-file ()
+  "Edit the shell init file in another window."
+  (interactive)
+    (find-file-other-window (expand-file-name ".tmux.conf" (getenv "HOME"))))
 
 (defun er-find-tmuxinator-file ()
   "Brows tmuxinator session definition"
