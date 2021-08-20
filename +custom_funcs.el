@@ -49,6 +49,43 @@
   (org-indent-mode)
   )
 
+(defun my/search-org-project-files()
+  (interactive)
+  (async-start
+    ;;시간이 많이 걸리기 때문에 비동기 모드로 수행한다.
+      (lambda ()
+        (append (directory-files-recursively "~/develop/jltech/" "\\.org$")
+                (directory-files-recursively "/mnt/c/Users/jaejinpark/Development" "\\.org$")
+                (directory-files-recursively "~/org" "\\.org$")))
+      (lambda (result)
+        (setq org-agenda-files result))))
+
+  (defvar org-agenda-list-save-path
+    "~/.doom.d/org-agenda-list.el"
+  "Path to save the list of files belonging to the agenda.")
+
+  (defun org-agenda-save-file-list ()
+    "Save list of desktops from file in org-agenda-list-save-path"
+    (interactive)
+    (save-excursion
+      (let ((buf (find-file-noselect org-agenda-list-save-path)))
+        (set-buffer buf)
+        (erase-buffer)
+        (print (list 'quote org-agenda-files) buf)
+        (save-buffer)
+        (kill-buffer)
+        (message "org-agenda file list saved to: %s" org-agenda-list-save-path))))
+
+  (defun org-agenda-load-file-list ()
+    "Load list of desktops from file in org-agenda-list-save-path"
+    (interactive)
+    (save-excursion
+      (let ((buf (find-file-noselect org-agenda-list-save-path)))
+        (set-buffer buf)
+        (setq org-agenda-files (eval (read (buffer-string))))
+        (kill-buffer)
+        (message "org-agenda file list loaded from: %s" org-agenda-list-save-path))))
+
 (defun feed-reader/search-print (entry)
       "Print ENTRY to the buffer."
       (let* ((feed-width 16)
