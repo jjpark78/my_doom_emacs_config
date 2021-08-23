@@ -49,6 +49,8 @@
   (org-indent-mode)
   )
 
+; 어쩌다가 한번 수행하는 함수, 아래의 파일로 만들어 관리하도록 하는데 실수로 저장된 파일을 날려먹거나 하면
+; 이 함수를 수행해서 다시 값을 복구 한다.
 (defun my/search-org-project-files()
   (interactive)
   (async-start
@@ -59,6 +61,11 @@
                 (directory-files-recursively "~/org" "\\.org$")))
       (lambda (result)
         (setq org-agenda-files result))))
+
+; org-gcal-sync 함수는 미니버퍼에 메세지 로그를 좀 많이 생성한다. 랩핑 함수를 만들어 로그를 최소한으로 생성하도록 강제하고 종료되었을때만 간단하게 하나 출력하도록 수정한다.
+(defun my/org-gcal-sync ()
+  (interactive)
+  (org-gcal-sync :silent t))
 
   (defvar org-agenda-list-save-path
     "~/.doom.d/org-agenda-list.el"
