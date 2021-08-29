@@ -44,8 +44,6 @@
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
-(package! wakatime-mode)
-(package! company-box)
 (package! org-super-agenda)
 (package! org-bullets)
 (package! gitlab-ci-mode)
@@ -58,7 +56,6 @@
 (package! exec-path-from-shell)
 (package! evil-matchit)
 (package! evil-textobj-anyblock)
-(package! lsp-treemacs)
 (package! git-link)
 (package! magit-todos)
 (package! tmux-pane)
@@ -68,7 +65,6 @@
 (package! platformio-mode)
 (package! ccls)
 (package! prettier-js)
-(package! nyan-mode)
 (package! oauth2)
 (package! org-gcal
   :recipe
@@ -79,19 +75,7 @@
 (package! ob-typescript)
 (package! emacs-async)
 (package! ob-restclient)
-;; (package! org-caldav
-;;   :recipe
-;;   (:host github
-;;    ;; :repo "adrianparvino/org-caldav"
-;;    :repo "dengste/org-caldav"
-;;    :files ("*.el")))
-;; (package! org-gcal)
-;; (package! ejira
-;;   :recipe
-;;   (:host github
-;;    :repo "nyyManni/ejira"
-;;    :files ("*.el")
-;;    ))
+
 #+END_SRC
 *** Custom Setup
 **** Startup Setup
@@ -103,6 +87,7 @@
       user-mail-address "jjpark78@gmail.com")
 (setq-default frame-title-format '("DOOM EMACS"))
 (setq auth-sources '("~/.authinfo"))
+
 ;; 바쁘게 버퍼전환 하는 와중에 화면이 울렁거리는게 멀미날것 같아서 프리뷰 옵션을 껐다
 (setq +ivy-buffer-preview nil)
 (setq avy-all-windows t)
@@ -133,14 +118,20 @@
 ;; 와카타임이라고 본인이 얼마나 열심히 일했는지
 ;; 하루 일과를 잘 보여준다.
 ;; 개인으로만 쓰면 공짜인것도 매력임.
-(global-wakatime-mode)
+;; (global-wakatime-mode)
 
 ;; just for fun
-(nyan-mode)
-(nyan-start-animation)
-#+END_SRC
+;; (nyan-mode)
+;; (nyan-start-animation)
 
-#+RESULTS:
+;; for very long src-block fontify
+(setq jit-lock-stealth-time 0.5)
+;; (setq jit-lock-stealth-load 1000)
+;; (setq jit-lock-chunk-size 1000)
+;; melpa나 패키지 지원을 하지 않는 커스텀 lisp들을 추가로 로드한다
+;; gendoxy
+(add-to-list 'load-path (expand-file-name "~/.doom.d/elisps/gendoxy"))
+#+END_SRC
 
 **** UTF & Korean Input
 한글 관련 설정
@@ -192,7 +183,7 @@ Doom modeline 관련 수정
 #+BEGIN_SRC elisp :tangle config.el
 (after! doom-modeline
   (setq
-    doom-modeline-major-mode-icon nil
+    doom-modeline-major-mode-icon t
     doom-modeline-buffer-encoding nil
     doom-modeline-mu4e nil
     doom-modeline-buffer-file-name-style 'truncate-with-project))
@@ -257,14 +248,14 @@ Doom modeline 관련 수정
 **** Bindings 1
 단축키 설정
 #+BEGIN_SRC elisp :tangle config.el
-;; (map! "C-h" #'tmux-pane-omni-window-left)
-;; (map! "C-j" #'tmux-pane-omni-window-down)
-;; (map! "C-k" #'tmux-pane-omni-window-up)
-;; (map! "C-l" #'tmux-pane-omni-window-right)
-(map! "C-h" #'evil-window-left)
-(map! "C-j" #'evil-window-down)
-(map! "C-k" #'evil-window-up)
-(map! "C-l" #'evil-window-right)
+(map! "C-h" #'tmux-pane-omni-window-left)
+(map! "C-j" #'tmux-pane-omni-window-down)
+(map! "C-k" #'tmux-pane-omni-window-up)
+(map! "C-l" #'tmux-pane-omni-window-right)
+;; (map! "C-h" #'evil-window-left)
+;; (map! "C-j" #'evil-window-down)
+;; (map! "C-k" #'evil-window-up)
+;; (map! "C-l" #'evil-window-right)
 (map! :leader :prefix "g" :desc "ediff style diff from working-tree" "d" #'magit-ediff-show-working-tree)
 ;; go back, go references
 (map! :n "gb" #'evil-jump-backward)
@@ -395,12 +386,12 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
           (setup-custom-jsts-mode)
           (flycheck-select-checker 'javascript-eslint)
           ))))
-
 #+END_SRC
+
 *** CCLS / PlatformIO Setting
 #+BEGIN_SRC elisp :tangle config.el
 (defun custom-cc-mode ()
-  "Custom cc-mode make support qml, qmake etc."
+  "Custom cc-mode make support platfomio, qml, qmake etc."
   (interactive)
   (lsp)
   (platformio-conditionally-enable)
@@ -410,9 +401,12 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
         lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
   (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
 
-(use-package ccls :ensure
+(use-package ccls
 	:config '(ccls-initialization-options (quote (compilationDatabaseDirectory :build)))
     :hook ((c-mode c++-mode objc-mode) . (lambda () (require 'ccls) (lsp))))
+
+;;C, C++ 관련 문서화를 할때 코드의 주석 스타일을 통일한다.
+ ;; (use-package gendoxy)
 #+END_SRC
 
 *** LSP / Language Mode Hooks
@@ -445,8 +439,9 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 (add-hook 'typescript-tsx-mode-hook 'prettier-js-mode)
 (add-hook 'cc-mode-hook 'custom-cc-mode)
 (add-hook 'cpp-mode-hook 'custom-cc-mode)
+
 (setq lsp-auto-guess-root t)
-;; (after! typescript-mode
+
 (set-company-backend! 'typescript-mode '(company-capf))
 (setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
 
@@ -455,12 +450,6 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
       lsp-modeline-diagnostics-mode nil
       lsp-modeline-diagnostics-enable nil
       lsp-signature-render-all t)
-;; all-the-icons에 아이콘 색깔을 바꾸기 위해서 수동으로 설정한다.
-;; (add-hook 'company-mode-hook 'company-box-mode)
-;; (setq company-box-icons-alist 'company-box-icons-idea)
-;; (setq company-tooltip-minimum-width 60)
-;; (setq company-tooltip-maximum-width 60)
-;; (setq company-box-doc-enable nil)
 
 ;; 린트 에러 버퍼를 오픈하면 포커스가 자동으로 이동하지 않는다.
 ;; 이거 없으면 생각보다 귀찮아진다.
@@ -779,8 +768,7 @@ ORG모드를 위한 함수들
   (set-face-attribute 'org-level-5 nil :weight 'normal)
   (set-face-attribute 'org-level-6 nil :weight 'normal)
   (set-face-attribute 'org-document-title nil :foreground "White" :height 1.2 :weight 'bold)
-  ;;구글 달력과 연동한다.
-  (run-with-timer 0 200 'my/org-gcal-sync)
+  ;; (run-with-timer 0 200 'my/org-gcal-sync)
   ;;저장된 파일 리스트를 불러온다.
   (org-agenda-load-file-list)
   ;;이맥스가 종료될때 어젠다 파일 목록을 자동 저장하도록 한다.
