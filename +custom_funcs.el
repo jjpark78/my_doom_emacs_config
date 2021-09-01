@@ -62,11 +62,6 @@
       (lambda (result)
         (setq org-agenda-files result))))
 
-; org-gcal-sync 함수는 미니버퍼에 메세지 로그를 좀 많이 생성한다. 랩핑 함수를 만들어 로그를 최소한으로 생성하도록 강제하고 종료되었을때만 간단하게 하나 출력하도록 수정한다.
-(defun my/org-gcal-sync ()
-  (interactive)
-  (org-gcal-sync :silent t))
-
   (defvar org-agenda-list-save-path
     "~/.doom.d/org-agenda-list.el"
   "Path to save the list of files belonging to the agenda.")
@@ -129,7 +124,7 @@
     (interactive)
     (require 'w3m)
     (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
-      (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword "+site:stackoverflow.com")))
+      (execute-chrome-with-args (concat "https://www.google.com/search\\?q=" keyword "+site:stackoverflow.com")))
 )
 
 (defun google-search ()
@@ -137,7 +132,7 @@
     (interactive)
     (require 'w3m)
     (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
-      (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword )))
+      (execute-chrome-with-args (concat "https://www.google.com/search\\?q=" keyword "")))
 )
 
 (defun github-search ()
@@ -145,7 +140,7 @@
     (interactive)
     (require 'w3m)
     (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
-      (browse-url (concat "http://www.google.com/search?hl=en&q=" keyword "+site:github.com")))
+      (execute-chrome-with-args (concat "https://www.google.com/search\\?q=" keyword "+site:github.com")))
 )
 
 (defun forge-custom-open-url ()
@@ -154,7 +149,7 @@
                                    (forge-current-topic)))))
       (progn
         (message "Open Url: %S" url)
-        (browse-url-generic url)))
+        (execute-chrome-with-args url)))
   )
 
 (defun toggle-window-split ()

@@ -23,7 +23,8 @@
        (company +auto)             ; the ultimate code completion backend
        ;; helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       (ivy +icons)               ; a search engine for love and life
+       ;; (ivy +icons)               ; a search engine for love and life
+       (vertico +icons)
 
        :ui
        deft              ; notational velocity for Emacs
@@ -66,7 +67,7 @@
        ;;word-wrap         ; soft wrapping with language-aware indent
 
        :emacs
-       (dired +icons)    ; making dired pretty [functional]
+       (dired +icons +ranger)    ; making dired pretty [functional]
        ;;electric          ; smarter, keyword-based electric-indent
        ;; (ibuffer +icons)    ; interactive buffer management
        undo                ; persistent, smarter undo for your inevitable mistakes
@@ -85,7 +86,7 @@
 
        :os
        ;; macos               ; recent new feature
-       tty                    ;
+       ;; tty                    ;
 
        :tools
        ;;ansible
@@ -106,7 +107,7 @@
        rgb               ; creating color strings
        taskrunner        ; taskrunner for all your projects
        ;;terraform         ; infrastructure as code
-       tmux              ; an API for interacting with tmux
+       ;; tmux              ; an API for interacting with tmux
        ;;upload            ; map local to remote projects via ssh/ftp
 
        :lang
@@ -181,7 +182,7 @@
        ;; (wanderlust +gmail)
 
        :app
-       ;; calendar
+       calendar
        ;;irc               ; how neckbeards socialize
        rss       ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
@@ -190,3 +191,4 @@
        ;;literate
        (default +bindings +smartparens)
        )
+
