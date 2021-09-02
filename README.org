@@ -16,6 +16,7 @@
   - [[#magit--forge][Magit & Forge]]
   - [[#org][ORG]]
     - [[#basic-setup][Basic Setup]]
+    - [[#org-capture-설정][Org Capture 설정]]
     - [[#src-block--babel--lsp][SRC Block & Babel & LSP]]
     - [[#search-all-org-file][Search All Org file]]
     - [[#manage-org-agenda-files][Manage org-agenda-files]]
@@ -260,7 +261,7 @@ Doom modeline 관련 수정
 (map! :leader :prefix "o" :desc "Open news form RSS with ELfeed" "n" #'elfeed)
 (map! :leader :prefix "o" :desc "Open mu4e to current window" "m" #'mu4e)
 ;; 버퍼끼리 화면 전환할때 프로젝트를 벗어 나지 않도록 강제한다.
-(map! :leader :desc "workspace buffer list" "," 'counsel-projectile-switch-to-buffer)
+(map! :leader :desc "workspace buffer list" "," '+vertico/switch-workspace-buffer)
 ;; ORG 모드에서 쓰는 단축키들
 (map! :leader :desc "Tangle Export" "ee" #'org-babel-tangle)
 ;; 커스텀 함수로 정의해둔 설정 파일불러오는 함수에게 단축기를 할당했음.
@@ -719,39 +720,44 @@ ORG모드를 위한 함수들
 (after! org
   ;;basic org mode config
   (setq
-   org-hide-emphasis-markers t
-   org-directory "~/OneDrive/org"
-   org-agenda-skip-scheduled-if-done t
-   org-ellipsis " ▾ "
-   org-tags-column -80
-   org-agenda-span 21
-   org-adapt-indentation nil
-   org-log-done 'time
-   org-refile-targets (quote ((nil :maxlevel . 1)))
-   +org-capture-todo-file "tasks.org"
-   org-edit-src-content-indentation 0
-   org-src-tab-acts-natively t
-   org-src-preserve-indentation t
-   ;; config org-super-agenda
-   org-super-agenda-mode t
-   org-deadline-warning-days 7
-   org-agenda-skip-scheduled-if-done t
-   org-agenda-block-separator 9472
-   org-super-agenda-groups '((:name "Today"
-                              :time-grid t
-                              :date today
-                              :todo "TODAY"
-                              :order 1
-                              :scheduled today)
-                             (:name "Due today"
-                              :deadline today)
-                             (:name "Important"
-                              :priority "A")
-                             (:name "Overdue"
-                              :deadline past)
-                             (:name "Due soon"
-                              :deadline future))
-  org-fancy-priorities-list '("⚡" "⬆" "⬇" "☕"))
+    org-hide-emphasis-markers t
+    org-directory "~/OneDrive/org"
+    org-ellipsis " ▾ "
+    org-tags-column -80
+    org-agenda-span 21
+    org-adapt-indentation nil
+    org-log-done 'time
+    org-refile-targets (quote ((nil :maxlevel . 1)))
+    +org-capture-todo-file "tasks.org"
+    org-edit-src-content-indentation 0
+    org-src-tab-acts-natively t
+    org-src-preserve-indentation t
+    ;; config org-super-agenda
+    org-super-agenda-mode t
+    org-deadline-warning-days 7
+    org-agenda-skip-scheduled-if-done t
+    org-agenda-block-separator 9472
+    org-super-agenda-groups '((:auto-group t)))
+  (org-agenda-list)
+    ;; capture 설정들을 모아 놓았다.
+  (setq org-capture-templates
+                  '(("s" "Personal Schedule" entry
+                    (file "~/OneDrive/org/personal_schedule.org")
+                    "* %?\n SCHEDULE:%t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
+                    :prepend t :kill-buffer t)
+                    ("t" "Personal TODO" entry
+                    (file "~/OneDrive/org/tasks.org")
+                    "* %?\n TODO:%t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
+                    :prepend t :kill-buffer t)
+                    ("m" "프로임명" entry
+                    (file "~/OneDrive/org/jw.org")
+                    "* %?\n SCHEDULE:%t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
+                    :prepend t :kill-buffer t)
+                    ("b" "벧엘일과" entry
+                    (file "~/OneDrive/org/bethel.org")
+                    "* %?\n SCHEDULE:%t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
+                    :prepend t :kill-buffer t)
+                ))
   (org-super-agenda-mode)
   (set-face-attribute 'org-link nil :weight 'normal :background nil)
   (set-face-attribute 'org-code nil :foreground "#a9a1e1" :background nil)
@@ -765,11 +771,10 @@ ORG모드를 위한 함수들
   (set-face-attribute 'org-document-title nil :foreground "White" :height 1.2 :weight 'bold)
   ;; (run-with-timer 0 200 'my/org-gcal-sync)
   ;;저장된 파일 리스트를 불러온다.
-  (org-agenda-load-file-list)
   ;;이맥스가 종료될때 어젠다 파일 목록을 자동 저장하도록 한다.
-  (add-hook 'kill-emacs-hook 'org-agenda-save-file-list)
   ;; (run-with-timer 0 100 'my/search-org-project-files)
   ;; 기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
+  (org-agenda-load-file-list)
   (use-package org-bullets
     :init
     (setq org-bullets-bullet-list '("⊙" "⊙" "⊙" "⊙"))
@@ -792,7 +797,10 @@ ORG모드를 위한 함수들
 
   )
 #+END_SRC
-
+*** Org Capture 설정
+템플릿을 용도에 따라 많이 만들어 놓는다.
+#+begin_src elisp :tangle config.el
+#+end_src
 *** SRC Block & Babel & LSP
 #+begin_src  elisp :tangle config.el
 ;; 몇몇 언어들을 로딩해서 소스 블럭의 실행 결과를 볼 수 있도록 한다.
@@ -816,8 +824,8 @@ ORG모드를 위한 함수들
     ;;시간이 많이 걸리기 때문에 비동기 모드로 수행한다.
       (lambda ()
         (append (directory-files-recursively "~/develop/jltech/" "\\.org$")
-                (directory-files-recursively "/mnt/c/Users/jaejinpark/Development" "\\.org$")
-                (directory-files-recursively "~/org" "\\.org$")))
+                ;; (directory-files-recursively "/mnt/c/Users/jaejinpark/Development" "\\.org$")
+                (directory-files-recursively "~/OneDrive/org")))
       (lambda (result)
         (setq org-agenda-files result))))
 
@@ -854,6 +862,11 @@ org-agenda-files 변수를 파일에 저장하도록 만들어서 매번 스캔�
         (kill-buffer)
         (message "org-agenda file list loaded from: %s" org-agenda-list-save-path))))
 #+END_SRC
+
+그리고 설정 파일에서 저장된 파일을 다시 읽어 들이도록 한다.
+#+begin_src elisp :tangle config.el
+(add-hook 'kill-emacs-hook 'org-agenda-save-file-list)
+#+end_src
 
 ** RSS Feed
 *** Custom Elfeed Search Column
@@ -918,7 +931,6 @@ org-agenda-files 변수를 파일에 저장하도록 만들어서 매번 스캔�
 rg.el 관련 설정.
 #+BEGIN_SRC elisp :tangle config.el
 (use-package rg
-
   :config
   (setq rg-group-result t
         rg-hide-command t
@@ -961,7 +973,7 @@ rg.el 관련 설정.
 #+END_SRC
 
 *** Forge Custom Open Link
-Forge에서 브라우저로 바로 열수 있는 함수를 사용한다.
+Forge에서 브라우저로 바로 열수 있는 함수를 사용한다. 역시 사전에 만들어 놓은 'execute-chrome-with-args' 함수를 사용해서 외부 윈도우의 크롬브라우저를 열도록 수정한다.
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
 (defun forge-custom-open-url ()
   (interactive)

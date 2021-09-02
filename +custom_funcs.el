@@ -57,8 +57,8 @@
     ;;시간이 많이 걸리기 때문에 비동기 모드로 수행한다.
       (lambda ()
         (append (directory-files-recursively "~/develop/jltech/" "\\.org$")
-                (directory-files-recursively "/mnt/c/Users/jaejinpark/Development" "\\.org$")
-                (directory-files-recursively "~/org" "\\.org$")))
+                ;; (directory-files-recursively "/mnt/c/Users/jaejinpark/Development" "\\.org$")
+                (directory-files-recursively "~/OneDrive/org")))
       (lambda (result)
         (setq org-agenda-files result))))
 
