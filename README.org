@@ -83,7 +83,6 @@
 (setq auth-sources '("~/.authinfo"))
 
 ;; 바쁘게 버퍼전환 하는 와중에 화면이 울렁거리는게 멀미날것 같아서 프리뷰 옵션을 껐다
-;; (setq +ivy-buffer-preview nil)
 (setq avy-all-windows t)
 ;; (setq ivy-read-action-function #'ivy-hydra-read-action)
 ;; dired를 두개 열어 놓고 왔다 갔다하며 복사 붙여넣기 할때 편하다
@@ -113,17 +112,13 @@
 (setq evil-snipe-scope 'whole-visible)
 (setq evil-snipe-repeat-scope 'whole-visible)
 
-;; 와카타임이라고 본인이 얼마나 열심히 일했는지
-;; 하루 일과를 잘 보여준다.
-;; 개인으로만 쓰면 공짜인것도 매력임.
-;; (global-wakatime-mode)
-
 ;; just for fun
 (nyan-mode)
 (nyan-start-animation)
 
 ;; for very long src-block fontify
 (setq jit-lock-stealth-time 0.5)
+
 ;; melpa나 패키지 지원을 하지 않는 커스텀 lisp들을 추가로 로드한다
 ;; gendoxy
 (add-to-list 'load-path (expand-file-name "~/.doom.d/elisps/gendoxy"))
@@ -169,8 +164,7 @@
 (set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
 
 (setq face-font-rescale-alist
-      '(("NanumGothicCoding" . 1.2307692307692308)
-        ("AppleGothic" . 1.2307692307692308)
+      '(("AppleGothic" . 1.1907692307692308)
         ))
 #+END_SRC
 
@@ -195,8 +189,6 @@ Doom modeline 관련 수정
 ;;gccemacs로 넘어 오기 전에는 라인넘버를 껐었는데
 ;;넘어오니까 완전 빨라져서 다시 라인넘버를 사용하기 시작함.
 (setq display-line-numbers-type 'relative)
-;; (setq display-line-numbers-type t)
-;; (setq display-line-numbers-type nil)
 
 ;; 더블버퍼링이 동작하도록 설정한다.
 (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
@@ -244,14 +236,16 @@ Doom modeline 관련 수정
 **** Bindings 1
 단축키 설정
 #+BEGIN_SRC elisp :tangle config.el
-(map! "C-h" #'tmux-pane-omni-window-left)
-(map! "C-j" #'tmux-pane-omni-window-down)
-(map! "C-k" #'tmux-pane-omni-window-up)
-(map! "C-l" #'tmux-pane-omni-window-right)
-;; (map! "C-h" #'evil-window-left)
-;; (map! "C-j" #'evil-window-down)
-;; (map! "C-k" #'evil-window-up)
-;; (map! "C-l" #'evil-window-right)
+;; (map! "C-h" #'tmux-pane-omni-window-left)
+;; (map! "C-j" #'tmux-pane-omni-window-down)
+;; (map! "C-k" #'tmux-pane-omni-window-up)
+;; (map! "C-l" #'tmux-pane-omni-window-right)
+
+(define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
+(define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
+(define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
+(define-key evil-normal-state-map (kbd "C-l") 'evil-window-right)
+
 (map! :leader :prefix "g" :desc "ediff style diff from working-tree" "d" #'magit-ediff-show-working-tree)
 ;; go back, go references
 (map! :n "gb" #'evil-jump-backward)
@@ -406,8 +400,6 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 	:config '(ccls-initialization-options (quote (compilationDatabaseDirectory :build)))
     :hook ((c-mode c++-mode objc-mode) . (lambda () (require 'ccls) (lsp))))
 
-;;C, C++ 관련 문서화를 할때 코드의 주석 스타일을 통일한다.
- ;; (use-package gendoxy)
 #+END_SRC
 
 *** LSP / Language Mode Hooks
@@ -421,17 +413,6 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 ;; disable CamelCase syntax
 (global-subword-mode nil)
 
-;; disable lsp-formating
-;; (setq +format-with-lsp nil)
-;;       '(not emacs-lisp-mode
-;;             sql-mode
-;;             tex-mode
-;;             latex-mode))
-
-;; (add-hook 'web-mode-hook #'format-all-mode)
-;; (add-hook 'cc-mode-hook #'format-all-mode)
-;; (add-hook 'typescript-mode-hook #'format-all-mode)
-;; (add-hook 'typescript-tsx-mode-hook #'format-all-mode)
 (add-hook 'web-mode-hook 'custom-web-mode)
 (add-hook 'web-mode-hook 'prettier-js-mode)
 (add-hook 'typescript-mode-hook 'custom-ts-mode)
@@ -464,7 +445,6 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 ;; 1초라도 빨리 팝업 띄우고 싶어서
 ;; 그러나 실제 체감속도 향상은 없음
 (setq company-idle-delay 0)
-;; (setq company-dabbrev-downcase 0)
 
 ;; Dash Documents랑 연동이 되도록 각각 메이저에 관련 정보들을 추가한다.
 (set-docsets! 'c++-mode "Qt" "C++" "C")
@@ -486,9 +466,8 @@ magit이나 dired등과 같이 유틸리티 관련 설정들을 모아 놓았다
 (setq magit-set-upstream-on-push 'askifnotset)
 (setq magit-diff-refine-hunk 'all)
 
-;; (magit-delta-mode)
+(magit-delta-mode)
 (magit-todos-mode)
-;; (setq ghub-use-workaround-for-emacs-bug 'force)
 (setq forge-topic-list-limit '(200 . 10))
 
 ;; ediff를 닫을때 항상 물어보는 거 금지!!
@@ -746,7 +725,6 @@ ORG모드를 위한 함수들
     org-super-agenda-header-separator ""
     ;; org-agenda-time-grid '((daily today require-timed) "----------------------" nil)
     org-super-agenda-groups '((:auto-group t)))
-  ;; (org-agenda-list)
     ;; capture 설정들을 모아 놓았다.
   (setq org-capture-templates
                   '(("s" "Personal Schedule" entry
@@ -785,10 +763,8 @@ ORG모드를 위한 함수들
   (set-face-attribute 'org-level-5 nil :weight 'normal)
   (set-face-attribute 'org-level-6 nil :weight 'normal)
   (set-face-attribute 'org-document-title nil :foreground "White" :height 1.2 :weight 'bold)
-  ;; (run-with-timer 0 200 'my/org-gcal-sync)
   ;;저장된 파일 리스트를 불러온다.
   ;;이맥스가 종료될때 어젠다 파일 목록을 자동 저장하도록 한다.
-  ;; (run-with-timer 0 100 'my/search-org-project-files)
   ;; 기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
   (org-agenda-load-file-list)
   (use-package org-bullets
@@ -815,7 +791,6 @@ ORG모드를 위한 함수들
 #+END_SRC
 *** Org Agenda Custom Style
 나만의 스타일로 조금씩 바꾸어 나간다. 어째 점점더 못생겨저 가는 것 같은 느낌이 드는건 착각이 아닐수도...
-
 #+begin_src elisp :tangle config.el
 (defun my/style-org-agenda()
   (set-face-attribute 'org-agenda-date nil :height 1.1)
