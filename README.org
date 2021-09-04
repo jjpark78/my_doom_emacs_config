@@ -15,8 +15,9 @@
     - [[#programming-etc][Programming ETC]]
   - [[#magit--forge][Magit & Forge]]
   - [[#org][ORG]]
-    - [[#basic-setup][Basic Setup]]
-    - [[#org-capture-설정][Org Capture 설정]]
+    - [[#basic--agenda--capture-setup][Basic & Agenda & Capture Setup]]
+    - [[#org-agenda-custom-style][Org Agenda Custom Style]]
+    - [[#org-super-agenda-keybinding][Org Super Agenda Keybinding]]
     - [[#src-block--babel--lsp][SRC Block & Babel & LSP]]
     - [[#search-all-org-file][Search All Org file]]
     - [[#manage-org-agenda-files][Manage org-agenda-files]]
@@ -100,7 +101,11 @@
    ))
 
 ;; 수동으로 직접 프레임 위치를 지정해줘 본다.
-(setq initial-frame-alist '((top . 32) (left . 1130) (width . 125) (height . 61)))
+;; 언제부터 이맥스에 픽셀단위로 크기 지정이 가능해졌지 ?? 찾아보니 2015년 이후란다. 이맥스를 사랑하는 개발자로서
+;; 이런 중요한 업데이트를 모르고 있다뉘...
+(setq frame-resize-pixelwise t)
+(set-frame-position (selected-frame) 1128 32)
+(set-frame-size (selected-frame) 1240 1378 t)
 
 (global-evil-matchit-mode)
 
@@ -713,7 +718,7 @@ ORG모드를 위한 함수들
   # ;;      ((ejira-jql "resolution = unresolved and assignee = currentUser()"
   # ;;                  ((org-agenda-overriding-header "Jira Assigned to me")))))))
   # ;; (add-hook 'org-mode-hook 'my-org-config/after-org-mode-load)
-*** Basic Setup
+*** Basic & Agenda & Capture Setup
 요즘 열공중인 그렇게 대단하다 침이 마르지 않게 칭찬해대는 ORG모드에 대한 설정들을 따로 모아 놓았다.
 #+BEGIN_SRC elisp :tangle config.el
 ;; start my org settings
@@ -723,39 +728,50 @@ ORG모드를 위한 함수들
     org-hide-emphasis-markers t
     org-directory "~/OneDrive/org"
     org-ellipsis " ▾ "
-    org-tags-column -80
-    org-agenda-span 21
-    org-adapt-indentation nil
+    ;; org-tags-column -80
+    ;; org-adapt-indentation t
     org-log-done 'time
     org-refile-targets (quote ((nil :maxlevel . 1)))
-    +org-capture-todo-file "tasks.org"
     org-edit-src-content-indentation 0
     org-src-tab-acts-natively t
     org-src-preserve-indentation t
     ;; config org-super-agenda
     org-super-agenda-mode t
+    org-agenda-span 30
     org-deadline-warning-days 7
     org-agenda-skip-scheduled-if-done t
-    org-agenda-block-separator 9472
+    org-agenda-skip-deadline-if-done t
+    org-agenda-include-deadlines t
+    org-agenda-block-separator 61
+    org-super-agenda-header-separator ""
+    ;; org-agenda-time-grid '((daily today require-timed) "----------------------" nil)
     org-super-agenda-groups '((:auto-group t)))
-  (org-agenda-list)
+  ;; (org-agenda-list)
     ;; capture 설정들을 모아 놓았다.
   (setq org-capture-templates
                   '(("s" "Personal Schedule" entry
                     (file "~/OneDrive/org/personal_schedule.org")
-                    "* %?\n SCHEDULE:%t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
+                    "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
                     :prepend t :kill-buffer t)
                     ("t" "Personal TODO" entry
                     (file "~/OneDrive/org/tasks.org")
-                    "* %?\n TODO:%t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
+                    "* TODO%?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
+                    :prepend t :kill-buffer t)
+                    ("j" "JW TODO" entry
+                    (file "~/OneDrive/org/jw-todos.org")
+                    "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
                     :prepend t :kill-buffer t)
                     ("m" "프로임명" entry
                     (file "~/OneDrive/org/jw.org")
-                    "* %?\n SCHEDULE:%t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
+                    "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
                     :prepend t :kill-buffer t)
-                    ("b" "벧엘일과" entry
+                    ("b" "BRV일정" entry
                     (file "~/OneDrive/org/bethel.org")
-                    "* %?\n SCHEDULE:%t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
+                    "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
+                    :prepend t :kill-buffer t)
+                    ("B" "BRV TODO" entry
+                    (file "~/OneDrive/org/bethel.org")
+                    "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
                     :prepend t :kill-buffer t)
                 ))
   (org-super-agenda-mode)
@@ -797,10 +813,37 @@ ORG모드를 위한 함수들
 
   )
 #+END_SRC
-*** Org Capture 설정
-템플릿을 용도에 따라 많이 만들어 놓는다.
+*** Org Agenda Custom Style
+나만의 스타일로 조금씩 바꾸어 나간다. 어째 점점더 못생겨저 가는 것 같은 느낌이 드는건 착각이 아닐수도...
+
 #+begin_src elisp :tangle config.el
+(defun my/style-org-agenda()
+  (set-face-attribute 'org-agenda-date nil :height 1.1)
+  (set-face-attribute 'org-agenda-date-today nil :height 1.2 :foreground "sky")
+  (set-face-attribute 'org-super-agenda-header nil :foreground "lightgreen")
+  (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
+
+(add-hook 'org-agenda-mode-hook 'my/style-org-agenda)
+
+(setq org-agenda-breadcrumbs-separator nil
+      ;; org-agenda-current-time-string "⌚ ┈┈┈┈┈┈┈┈┈┈┈ now"
+      ;; org-agenda-time-grid '((weekly today require-timed)
+      ;;                        (800 1000 1200 1400 1600 1800 2000)
+      ;;                        nil "┈┈┈┈┈┈┈┈┈┈┈┈┈")
+      org-agenda-prefix-format '((agenda . "%i   %-20:c%?-12t%s")
+                                 (todo . " %i   %-20:c")
+                                 (tags . " %i   %-20:c")
+                                 (search . " %i   %-20:c")))
 #+end_src
+*** Org Super Agenda Keybinding
+몇가지 바인딩이 evil과 충돌이 있어서 변경한다.
+#+begin_src elisp :tangle config.el
+(after! org-super-agenda
+  (map! :map org-super-agenda-header-map "j" 'org-agenda-next-line)
+  (map! :map org-super-agenda-header-map "k" 'org-agenda-previous-line)
+)
+#+end_src
+
 *** SRC Block & Babel & LSP
 #+begin_src  elisp :tangle config.el
 ;; 몇몇 언어들을 로딩해서 소스 블럭의 실행 결과를 볼 수 있도록 한다.

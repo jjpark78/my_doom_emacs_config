@@ -16,7 +16,7 @@
 
 
 (doom! :input
-       ;; chinese
+       chinese
        ;; japanese
 
        :completion

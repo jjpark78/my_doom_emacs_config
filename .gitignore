@@ -1,3 +1,4 @@
 +private.el
 config.el
 packages.el
+org-agenda-list.el
