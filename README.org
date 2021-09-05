@@ -15,9 +15,10 @@
     - [[#programming-etc][Programming ETC]]
   - [[#magit--forge][Magit & Forge]]
   - [[#org][ORG]]
+    - [[#org모드를-위한-함수들][ORG모드를 위한 함수들]]
     - [[#basic--agenda--capture-setup][Basic & Agenda & Capture Setup]]
     - [[#org-agenda-custom-style][Org Agenda Custom Style]]
-    - [[#org-super-agenda-keybinding][Org Super Agenda Keybinding]]
+    - [[#org-agenda--keybinding--tune][Org Agenda & Keybinding & Tune]]
     - [[#src-block--babel--lsp][SRC Block & Babel & LSP]]
     - [[#search-all-org-file][Search All Org file]]
     - [[#manage-org-agenda-files][Manage org-agenda-files]]
@@ -46,24 +47,17 @@
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
-(package! org-super-agenda)
 (package! org-bullets)
 (package! gitlab-ci-mode)
-(package! beacon)
-(package! carbon-now-sh)
-(package! google-this)
 (package! rg)
 (package! swiper)
-(package! magit-delta)
 (package! exec-path-from-shell)
 (package! evil-matchit)
 (package! evil-textobj-anyblock)
 (package! git-link)
 (package! magit-todos)
-(package! npm-mode)
-(package! org-jira)
+(package! magit-delta)
 (package! w3m)
-(package! platformio-mode)
 (package! ccls)
 (package! prettier-js)
 (package! oauth2)
@@ -71,6 +65,7 @@
 (package! ob-typescript)
 (package! ob-restclient)
 #+END_SRC
+
 *** Custom Setup
 **** Startup Setup
 이맥스 관련 일반적인 사항들을 지정한다.
@@ -84,11 +79,7 @@
 
 ;; 바쁘게 버퍼전환 하는 와중에 화면이 울렁거리는게 멀미날것 같아서 프리뷰 옵션을 껐다
 (setq avy-all-windows t)
-;; (setq ivy-read-action-function #'ivy-hydra-read-action)
-;; dired를 두개 열어 놓고 왔다 갔다하며 복사 붙여넣기 할때 편하다
-;; (setq dired-dwim-target t)
 
-(drag-stuff-mode t)
 (setq confirm-kill-emacs nil)
 (setq which-key-idle-delay 0.5)
 (setq which-key-allow-multiple-replacements t)
@@ -104,7 +95,7 @@
 ;; 이런 중요한 업데이트를 모르고 있다뉘...
 (setq frame-resize-pixelwise t)
 (set-frame-position (selected-frame) 1128 32)
-(set-frame-size (selected-frame) 1240 1378 t)
+(set-frame-size (selected-frame) 1230 1378 t)
 
 (global-evil-matchit-mode)
 
@@ -131,17 +122,15 @@
 (setq default-input-method "korean-hangul")
 (set-language-environment "Korean")
 (setq locale-coding-system 'utf-8)
-(set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 (set-selection-coding-system 'utf-8)
 (prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)               ; Default to utf-8 encoding
+(set-default-coding-systems 'utf-8)
 (require 'ucs-normalize)
 (set-file-name-coding-system 'utf-8-hfs)
 
 ;; 편집모드에서 빠져나갈때 한글이 켜져있으면 이후에 노멀 모드에서 커맨드가 안먹히는 짜증이 발생한다.
-;; 그냥 편집모드에서 빠져나갈때 무조건 리셋시킨다.
-;; 엄청 편리함
+;; 그냥 편집모드에서 빠져나갈때 무조건 리셋시킨다. 엄청 편리함
 (add-hook 'evil-insert-state-exit-hook (lambda ()
                                          (setq evil-input-method nil)))
 #+END_SRC
@@ -154,17 +143,15 @@
 
 ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
 (setq doom-font (font-spec :family "FiraMono NF" :size 16))
-
-;; (set-fringe-style '(nil . 0))
+(setq doom-unicode-font (font-spec :family "FiraMono NF" :size 16))
 
 ;; 한글 관련 폰트 스케일링 설정
-(set-face-attribute 'default nil :height 130)
 (set-fontset-font t 'hangul (font-spec :name "AppleGothic"))
 (set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
 (set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
 
 (setq face-font-rescale-alist
-      '(("AppleGothic" . 1.1907692307692308)
+      '(("AppleGothic" . 1.3007692307692308)
         ))
 #+END_SRC
 
@@ -192,7 +179,6 @@ Doom modeline 관련 수정
 
 ;; 더블버퍼링이 동작하도록 설정한다.
 (add-to-list 'default-frame-alist '(inhibit-double-buffering . t))
-(setq scroll-conservatively 101)
 
 ;; lsp 관련 설정 메뉴들
 ;; 이맥스를 느리게 만드는 범인중 십중팔구 LSP가 관련되어져 있다고 함.
@@ -230,17 +216,11 @@ Doom modeline 관련 수정
   (define-key evil-inner-text-objects-map "q" 'my-evil-textobj-anyblock-inner-quote)
   (define-key evil-outer-text-objects-map "q" 'my-evil-textobj-anyblock-a-quote)
   )
-
  #+END_SRC
 
 **** Bindings 1
 단축키 설정
 #+BEGIN_SRC elisp :tangle config.el
-;; (map! "C-h" #'tmux-pane-omni-window-left)
-;; (map! "C-j" #'tmux-pane-omni-window-down)
-;; (map! "C-k" #'tmux-pane-omni-window-up)
-;; (map! "C-l" #'tmux-pane-omni-window-right)
-
 (define-key evil-normal-state-map (kbd "C-j") 'evil-window-down)
 (define-key evil-normal-state-map (kbd "C-k") 'evil-window-up)
 (define-key evil-normal-state-map (kbd "C-h") 'evil-window-left)
@@ -254,6 +234,8 @@ Doom modeline 관련 수정
 (map! :leader :prefix "s" :desc "Search Google.com" "g" #'google-search)
 (map! :leader :prefix "s" :desc "Search StackOverFlow" "v" #'stackoverflow-search)
 (map! :leader :prefix "s" :desc "Search Github" "h" #'github-search)
+(map! :leader :prefix "s" :desc "Search Online Watchtower Library" "w" #'jw-wol-search)
+
 (map! :leader :prefix "s" :desc "Search Buffers" "b" #'swiper-all)
 (map! :leader :prefix "s" :desc "new project search file" "p" #'rg-project)
 ;; 가끔씩 즐겨보는 블로그들의 rss를 피드로 받아와서 읽을때 사용한다.
@@ -326,7 +308,6 @@ Doom modeline 관련 수정
 (defun execute-chrome ()
   (interactive)
   (call-process-shell-command "run-window-chrome&" nil 0))
-
 
 ; 편리하게 외부 프로그램을 실행한다.
 (map! :leader :prefix "r" :desc "Run Command - Gitkraken" "gk" 'execute-gitkraken)
@@ -466,7 +447,7 @@ magit이나 dired등과 같이 유틸리티 관련 설정들을 모아 놓았다
 (setq magit-set-upstream-on-push 'askifnotset)
 (setq magit-diff-refine-hunk 'all)
 
-(magit-delta-mode)
+;; (magit-delta-mode)
 (magit-todos-mode)
 (setq forge-topic-list-limit '(200 . 10))
 
@@ -660,109 +641,64 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
 #  #+END_SRC
 
 ** ORG
-ORG모드를 위한 함수들
+*** ORG모드를 위한 함수들
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
-(defun my-org-config/after-org-mode-load ()
-  ;; (visual-line-mode)
+(defun my/after-org-mode-load ()
   (require 'org-indent)
   (org-indent-mode)
   )
 #+END_SRC
 
-# ;; 회사에서 지라를 사용해서 프로젝트의 큰 이슈들과 진행사항드을 관리하지 때문에
-# ;; org-mode와 지라를 연동시킨다.
-  # ;; (use-package ejira
-  # ;;   :init
-  # ;;   (setq jiralib2-url             "jltechrnd.atlassian.net"
-  # ;;         jiralib2-auth            'basic
-  # ;;         jiralib2-user-login-name "jjpark@jltech.co.kr"
-  # ;;         jiralib2-token           nil
-  # ;;         ejira-org-directory      "~/org"
-  # ;;         ejira-projects           '("SUSB")
-  # ;;         ejira-priorities-alist   '(("Highest" . ?A)
-  # ;;                                    ("High"    . ?B)
-  # ;;                                    ("Medium"  . ?C)
-  # ;;                                    ("Low"     . ?D)
-  # ;;                                    ("Lowest"  . ?E))
-  # ;;         ejira-todo-states-alist  '(("TO Do"       . 1)
-  # ;;                                    ("In Progress" . 2)
-  # ;;                                    ("Done"        . 3)))
-  # ;;   :config
-  # ;;   (add-hook 'jiralib2-post-login-hook #'ejira-guess-epic-sprint-fields)
-  # ;;   ;; (add-hook 'jiralib2-post-login-hook #'ejira-epic-type-name)
-  # ;;   (require 'ejira-agenda)
-  # ;;   (add-to-list 'org-agenda-files ejira-org-directory)
-  # ;;   (org-add-agenda-custom-command
-  # ;;    '("j" "My Jira Issues"
-  # ;;      ((ejira-jql "resolution = unresolved and assignee = currentUser()"
-  # ;;                  ((org-agenda-overriding-header "Jira Assigned to me")))))))
-  # ;; (add-hook 'org-mode-hook 'my-org-config/after-org-mode-load)
 *** Basic & Agenda & Capture Setup
 요즘 열공중인 그렇게 대단하다 침이 마르지 않게 칭찬해대는 ORG모드에 대한 설정들을 따로 모아 놓았다.
 #+BEGIN_SRC elisp :tangle config.el
-;; start my org settings
 (after! org
   ;;basic org mode config
   (setq
     org-hide-emphasis-markers t
-    org-directory "~/OneDrive/org"
+    org-directory "/mnt/c/Users/jaejinpark/OneDrive/org"
     org-ellipsis " ▾ "
     ;; org-tags-column -80
     ;; org-adapt-indentation t
     org-log-done 'time
     org-refile-targets (quote ((nil :maxlevel . 1)))
-    org-edit-src-content-indentation 0
     org-src-tab-acts-natively t
     org-src-preserve-indentation t
     ;; config org-super-agenda
-    org-super-agenda-mode t
-    org-agenda-span 30
+    ;; org-super-agenda-mode t
+    org-agenda-span 21
     org-deadline-warning-days 7
-    org-agenda-skip-scheduled-if-done t
-    org-agenda-skip-deadline-if-done t
+    org-agenda-skip-scheduled-if-done nil
+    org-agenda-skip-deadline-if-done nil
     org-agenda-include-deadlines t
-    org-agenda-block-separator 61
-    org-super-agenda-header-separator ""
-    ;; org-agenda-time-grid '((daily today require-timed) "----------------------" nil)
-    org-super-agenda-groups '((:auto-group t)))
+    org-agenda-block-separator 61)
     ;; capture 설정들을 모아 놓았다.
   (setq org-capture-templates
                   '(("s" "Personal Schedule" entry
-                    (file "~/OneDrive/org/personal_schedule.org")
+                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/personal_schedule.org")
                     "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
                     :prepend t :kill-buffer t)
                     ("t" "Personal TODO" entry
-                    (file "~/OneDrive/org/tasks.org")
+                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/tasks.org")
                     "* TODO%?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
                     :prepend t :kill-buffer t)
                     ("j" "JW TODO" entry
-                    (file "~/OneDrive/org/jw-todos.org")
+                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/jw-todos.org")
                     "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
                     :prepend t :kill-buffer t)
                     ("m" "프로임명" entry
-                    (file "~/OneDrive/org/jw.org")
+                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org")
                     "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
                     :prepend t :kill-buffer t)
                     ("b" "BRV일정" entry
-                    (file "~/OneDrive/org/bethel.org")
+                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/bethel.org")
                     "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
                     :prepend t :kill-buffer t)
                     ("B" "BRV TODO" entry
-                    (file "~/OneDrive/org/bethel.org")
+                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/bethel.org")
                     "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
                     :prepend t :kill-buffer t)
                 ))
-  (org-super-agenda-mode)
-  (set-face-attribute 'org-link nil :weight 'normal :background nil)
-  (set-face-attribute 'org-code nil :foreground "#a9a1e1" :background nil)
-  (set-face-attribute 'org-date nil :foreground "#5B6268" :background nil)
-  (set-face-attribute 'org-level-1 nil :foreground "steelblue2" :background nil :height 1.0 :weight 'normal)
-  (set-face-attribute 'org-level-2 nil :foreground "slategray2" :background nil :height 1.0 :weight 'normal)
-  (set-face-attribute 'org-level-3 nil :foreground "SkyBlue2" :background nil :height 1.0 :weight 'normal)
-  (set-face-attribute 'org-level-4 nil :foreground "DodgerBlue2" :background nil :height 1.0 :weight 'normal)
-  (set-face-attribute 'org-level-5 nil :weight 'normal)
-  (set-face-attribute 'org-level-6 nil :weight 'normal)
-  (set-face-attribute 'org-document-title nil :foreground "White" :height 1.2 :weight 'bold)
   ;;저장된 파일 리스트를 불러온다.
   ;;이맥스가 종료될때 어젠다 파일 목록을 자동 저장하도록 한다.
   ;; 기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
@@ -772,51 +708,67 @@ ORG모드를 위한 함수들
     (setq org-bullets-bullet-list '("⊙" "⊙" "⊙" "⊙"))
     :config
     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-  ;;기타 ORG모드 설정
-  ;; (use-package! org-mac-link
-  ;;   :after org
-  ;;   :config
-  ;;   (setq
-  ;;    org-mac-grab-Acrobat-app-p nil
-  ;;    org-mac-grab-devonthink-app-p nil
-  ;;    org-html-htmlize-output-type 'css
-  ;;    org-download-method 'attach
-  ;;    global-org-pretty-table-mode t)
-  ;;   (map! :leader
-  ;;         :map org-mode-map
-  ;;         :desc "link from mac apps"
-  ;;         "mlm"  #'org-mac-grab-link))
-
   )
 #+END_SRC
+# 기타 ORG모드 설정
+# (use-package! org-mac-link
+#  :after org
+#    :config
+#    (setq
+#     org-mac-grab-Acrobat-app-p nil
+#     org-mac-grab-devonthink-app-p nil
+#     org-html-htmlize-output-type 'css
+#     org-download-method 'attach
+#     global-org-pretty-table-mode t)
+#    (map! :leader
+#          :map org-mode-map
+#          :desc "link from mac apps"
+#          "mlm"  #'org-mac-grab-link))
 *** Org Agenda Custom Style
 나만의 스타일로 조금씩 바꾸어 나간다. 어째 점점더 못생겨저 가는 것 같은 느낌이 드는건 착각이 아닐수도...
 #+begin_src elisp :tangle config.el
+(defun my/style-org-buffer()
+  (set-face-attribute 'org-link nil :weight 'normal :background nil)
+  (set-face-attribute 'org-code nil :foreground "#a9a1e1" :background nil)
+  (set-face-attribute 'org-date nil :foreground "#5B6268" :background nil)
+  (set-face-attribute 'org-level-1 nil :foreground "steelblue2" :background nil :height 1.0 :weight 'normal)
+  (set-face-attribute 'org-level-2 nil :foreground "slategray2" :background nil :height 1.0 :weight 'normal)
+  (set-face-attribute 'org-level-3 nil :foreground "SkyBlue2" :background nil :height 1.0 :weight 'normal)
+  (set-face-attribute 'org-level-4 nil :foreground "DodgerBlue2" :background nil :height 1.0 :weight 'normal)
+  (set-face-attribute 'org-level-5 nil :weight 'normal)
+  (set-face-attribute 'org-level-6 nil :weight 'normal)
+  (set-face-attribute 'org-document-title nil :foreground "White" :height 1.2 :weight 'bold))
+
 (defun my/style-org-agenda()
   (set-face-attribute 'org-agenda-date nil :height 1.1)
   (set-face-attribute 'org-agenda-date-today nil :height 1.2 :foreground "sky")
-  (set-face-attribute 'org-super-agenda-header nil :foreground "lightgreen")
   (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
 
 (add-hook 'org-agenda-mode-hook 'my/style-org-agenda)
+(add-hook 'org-mode-hook 'my/after-org-mode-load)
+(add-hook 'org-mode-hook 'my/style-org-buffer)
 
 (setq org-agenda-breadcrumbs-separator nil
       ;; org-agenda-current-time-string "⌚ ┈┈┈┈┈┈┈┈┈┈┈ now"
-      ;; org-agenda-time-grid '((weekly today require-timed)
-      ;;                        (800 1000 1200 1400 1600 1800 2000)
-      ;;                        nil "┈┈┈┈┈┈┈┈┈┈┈┈┈")
+      org-agenda-time-grid '((weekly today require-timed)
+                             (800 1000 1200 1400 1600 1800 2000)
+                             nil "┈┈┈┈┈┈┈┈┈┈┈┈┈")
       org-agenda-prefix-format '((agenda . "%i   %-20:c%?-12t%s")
                                  (todo . " %i   %-20:c")
                                  (tags . " %i   %-20:c")
                                  (search . " %i   %-20:c")))
 #+end_src
-*** Org Super Agenda Keybinding
+
+*** Org Agenda & Keybinding & Tune
 몇가지 바인딩이 evil과 충돌이 있어서 변경한다.
+인터넷에서 알게된 몇가지 속도 튜닝 옵션도 함께 포함한다.
 #+begin_src elisp :tangle config.el
-(after! org-super-agenda
-  (map! :map org-super-agenda-header-map "j" 'org-agenda-next-line)
-  (map! :map org-super-agenda-header-map "k" 'org-agenda-previous-line)
-)
+(map! :leader :prefix "o" :desc "Open Agenda List" "a" 'org-agenda-list)
+
+;; from google search, thanks to experts
+(setq org-agenda-inhibit-startup t)
+(setq org-agenda-use-tag-inheritance nil)
+(setq org-agenda-dim-blocked-tasks nil)
 #+end_src
 
 *** SRC Block & Babel & LSP
@@ -827,28 +779,25 @@ ORG모드를 위한 함수들
                                                          (typescript . t)
                                                          (python . t)
                                                          (jupyter . t)
-                                                         (plantuml . t)
                                                          (shell . t)
                                                          (js . t)))
 #+end_src
 
 *** Search All Org file
+어쩌다가 한번 수행하는 함수, 아래의 파일로 만들어 관리하도록 하는데 실수로 저장된 파일을 날려먹거나 하면
+이 함수를 수행해서 다시 값을 복구 한다.
 #+begin_src elisp :tangle +custom_funcs.el
-; 어쩌다가 한번 수행하는 함수, 아래의 파일로 만들어 관리하도록 하는데 실수로 저장된 파일을 날려먹거나 하면
-; 이 함수를 수행해서 다시 값을 복구 한다.
 (defun my/search-org-project-files()
   (interactive)
+  ;;시간이 많이 걸리기 때문에 비동기 모드로 수행한다.
   (async-start
-    ;;시간이 많이 걸리기 때문에 비동기 모드로 수행한다.
       (lambda ()
         (append (directory-files-recursively "~/develop/jltech/" "\\.org$")
                 ;; (directory-files-recursively "/mnt/c/Users/jaejinpark/Development" "\\.org$")
-                (directory-files-recursively "~/OneDrive/org")))
+                (directory-files-recursively "/mnt/c/Users/jaejinpark/OneDrive/org")))
       (lambda (result)
         (setq org-agenda-files result))))
-
 #+end_src
-
 
 *** Manage org-agenda-files
 org-agenda-files 변수를 파일에 저장하도록 만들어서 매번 스캔을 수행하지 않아도 되도록 한다.
@@ -881,7 +830,7 @@ org-agenda-files 변수를 파일에 저장하도록 만들어서 매번 스캔�
         (message "org-agenda file list loaded from: %s" org-agenda-list-save-path))))
 #+END_SRC
 
-그리고 설정 파일에서 저장된 파일을 다시 읽어 들이도록 한다.
+그리고 종료하기 전에 파일 목록을 저장하도록 한다.
 #+begin_src elisp :tangle config.el
 (add-hook 'kill-emacs-hook 'org-agenda-save-file-list)
 #+end_src
@@ -933,6 +882,7 @@ org-agenda-files 변수를 파일에 저장하도록 만들어서 매번 스캔�
                      "https://engineering.linecorp.com/ko/feed/"
                      "http://sachachua.com/blog/category/emacs/feed"
                      ))
+(map! :leader :map elfeed-show-map "U" 'elfeed-update)
 #+END_SRC
 
 ** Utils
@@ -942,9 +892,16 @@ org-agenda-files 변수를 파일에 저장하도록 만들어서 매번 스캔�
 (defun execute-chrome-with-args (url)
   (call-process-shell-command (concat "run-window-chrome " url " &") nil 0))
 (setq browse-url-browser-function #'execute-chrome-with-args)
+
 #+end_src
 
-
+run-window-chrome은 윈도우의 적당한 폴더에 생성한 bat 파일인데 (ps파일도 가능) 크롬을 좀 더 편하게 실행 할 수 있게
+도와주는 스크립트이다. 대략 다음과 같이 생겼다.
+#+begin_src shell
+  #!/bin/zsh
+  # execute windows chrome
+  /mnt/c/Program\ Files/Google/Chrome/Application/chrome.exe $1
+#+end_src
 *** Ripgrep
 rg.el 관련 설정.
 #+BEGIN_SRC elisp :tangle config.el
@@ -987,6 +944,14 @@ rg.el 관련 설정.
     (require 'w3m)
     (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text: "))))
       (execute-chrome-with-args (concat "https://www.google.com/search\\?q=" keyword "+site:github.com")))
+)
+
+(defun jw-wol-search ()
+"과연 이맥스에서 온라인 라이브러리 검색을 익숙하게 할 수 있을까 ?? org-protocol을 활용한 브라우저와의 연동을 시험해본다"
+   (interactive)
+   (require 'w3m)
+   (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text:"))))
+     (execute-chrome-with-args (concat "https://www.google.com/search\\?q=" keyword "+site:wol.jw.org")))
 )
 #+END_SRC
 
