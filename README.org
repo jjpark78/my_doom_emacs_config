@@ -895,13 +895,13 @@ org-agenda-files 변수를 파일에 저장하도록 만들어서 매번 스캔�
 
 #+end_src
 
-run-window-chrome은 윈도우의 적당한 폴더에 생성한 bat 파일인데 (ps파일도 가능) 크롬을 좀 더 편하게 실행 할 수 있게
-도와주는 스크립트이다. 대략 다음과 같이 생겼다.
+run-window-chrome은 적당한 shell script 파일인데 크롬을 좀 더 편하게 실행 할 수 있게 도와주는 스크립트이다. 대략 다음과 같이 생겼다.
 #+begin_src shell
   #!/bin/zsh
   # execute windows chrome
   /mnt/c/Program\ Files/Google/Chrome/Application/chrome.exe $1
 #+end_src
+
 *** Ripgrep
 rg.el 관련 설정.
 #+BEGIN_SRC elisp :tangle config.el
@@ -1003,23 +1003,23 @@ Forge에서 브라우저로 바로 열수 있는 함수를 사용한다. 역시 
 단축기와 연동하여 사용한다.
 zsh관련 설정 파일을 만질 일이 있을때 요긴하게 잘 사용한다.
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
-(defun er-find-alacritty-init-file ()
+(defun my/find-alacritty-init-file ()
   "Edit the shell init file in another window."
   (interactive)
     (find-file-other-window (expand-file-name ".config/alacritty/alacritty.yml" (getenv "HOME"))))
 
-(defun er-find-tmuxconfig-file ()
+(defun my/find-tmuxconfig-file ()
   "Edit the shell init file in another window."
   (interactive)
     (find-file-other-window (expand-file-name ".tmux.conf" (getenv "HOME"))))
 
-(defun er-find-tmuxinator-file ()
+(defun my/find-tmuxinator-file ()
   "Brows tmuxinator session definition"
   (interactive)
   (find-file-other-window "~/.config/tmuxinator")
   )
 
-(defun er-find-shell-init-file ()
+(defun my/find-shell-init-file ()
   "Edit the shell init file in another window."
   (interactive)
   (let* ((shell (car (reverse (split-string (getenv "SHELL") "/"))))
