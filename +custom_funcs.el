@@ -1,3 +1,29 @@
+(defun my/custom-ts-mode ()
+  (if (not (equal buffer-file-name 'nil))
+      (let ((extname (file-name-extension buffer-file-name)))
+        (when (or (string-equal "tsx" extname)
+                  (string-equal "ts" extname))
+          (setup-custom-jsts-mode)
+          (flycheck-select-checker 'javascript-eslint)))))
+
+(defun my/custom-js-mode ()
+  (if (not (equal buffer-file-name 'nil))
+      (let ((extname (file-name-extension buffer-file-name)))
+        (when (or (string-equal "js" extname)
+                  (string-equal "jsx" extname))
+          (setup-custom-jsts-mode)
+          (setq js2-strict-missing-semi-warning nil)
+          (flycheck-select-checker 'javascript-eslint)))))
+
+(defun my/custom-web-mode ()
+  "Custom hooks for vue-mode"
+  (if (not (equal buffer-file-name 'nil))
+      (let ((extname (file-name-extension buffer-file-name)))
+        (when (string-equal "vue" extname)
+          (setup-custom-jsts-mode)
+          (flycheck-select-checker 'javascript-eslint)
+          ))))
+
 (defun setup-custom-jsts-mode ()
   ;; 기본 인덴테이션을 설정한다.
   (lsp)
@@ -12,17 +38,10 @@
   (my/use-eslint-from-node-modules)
   (flycheck-add-mode 'javascript-eslint 'web-mode)
   (flycheck-add-mode 'javascript-eslint 'typescript-mode)
+  (flycheck-add-mode 'javascript-eslint 'js2-mode)
   (setq lsp-ui-peek-fontify 'always)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
   )
-
-(defun custom-ts-mode ()
-  (if (not (equal buffer-file-name 'nil))
-      (let ((extname (file-name-extension buffer-file-name)))
-        (when (or (string-equal "tsx" extname)
-                  (string-equal "ts" extname))
-          (setup-custom-jsts-mode)
-          (flycheck-select-checker 'javascript-eslint)))))
 
 (defun my/use-eslint-from-node-modules ()
   (let* ((root (locate-dominating-file
@@ -34,59 +53,9 @@
     (when (and eslint (file-exists-p eslint))
       (setq-local flycheck-javascript-eslint-executable eslint))))
 
-(defun custom-web-mode ()
-  "Custom hooks for vue-mode"
-  (if (not (equal buffer-file-name 'nil))
-      (let ((extname (file-name-extension buffer-file-name)))
-        (when (string-equal "vue" extname)
-          (setup-custom-jsts-mode)
-          (flycheck-select-checker 'javascript-eslint)
-          ))))
-
-(defun my-org-config/after-org-mode-load ()
-  ;; (visual-line-mode)
-  (require 'org-indent)
+(defun my/after-org-mode-load ()
   (org-indent-mode)
   )
-
-; 어쩌다가 한번 수행하는 함수, 아래의 파일로 만들어 관리하도록 하는데 실수로 저장된 파일을 날려먹거나 하면
-; 이 함수를 수행해서 다시 값을 복구 한다.
-(defun my/search-org-project-files()
-  (interactive)
-  (async-start
-    ;;시간이 많이 걸리기 때문에 비동기 모드로 수행한다.
-      (lambda ()
-        (append (directory-files-recursively "~/develop/jltech/" "\\.org$")
-                ;; (directory-files-recursively "/mnt/c/Users/jaejinpark/Development" "\\.org$")
-                (directory-files-recursively "~/OneDrive/org")))
-      (lambda (result)
-        (setq org-agenda-files result))))
-
-  (defvar org-agenda-list-save-path
-    "~/.doom.d/org-agenda-list.el"
-  "Path to save the list of files belonging to the agenda.")
-
-  (defun org-agenda-save-file-list ()
-    "Save list of desktops from file in org-agenda-list-save-path"
-    (interactive)
-    (save-excursion
-      (let ((buf (find-file-noselect org-agenda-list-save-path)))
-        (set-buffer buf)
-        (erase-buffer)
-        (print (list 'quote org-agenda-files) buf)
-        (save-buffer)
-        (kill-buffer)
-        (message "org-agenda file list saved to: %s" org-agenda-list-save-path))))
-
-  (defun org-agenda-load-file-list ()
-    "Load list of desktops from file in org-agenda-list-save-path"
-    (interactive)
-    (save-excursion
-      (let ((buf (find-file-noselect org-agenda-list-save-path)))
-        (set-buffer buf)
-        (setq org-agenda-files (eval (read (buffer-string))))
-        (kill-buffer)
-        (message "org-agenda file list loaded from: %s" org-agenda-list-save-path))))
 
 (defun feed-reader/search-print (entry)
       "Print ENTRY to the buffer."
@@ -143,6 +112,14 @@
       (execute-chrome-with-args (concat "https://www.google.com/search\\?q=" keyword "+site:github.com")))
 )
 
+(defun jw-wol-search ()
+"과연 이맥스에서 온라인 라이브러리 검색을 익숙하게 할 수 있을까 ?? org-protocol을 활용한 브라우저와의 연동을 시험해본다"
+   (interactive)
+   (require 'w3m)
+   (let ((keyword (w3m-url-encode-string (read-string "Enter Search Text:"))))
+     (execute-chrome-with-args (concat "https://www.google.com/search\\?q=" keyword "+site:wol.jw.org")))
+)
+
 (defun forge-custom-open-url ()
   (interactive)
   (if-let ((url (forge-get-url (or (forge-post-at-point)
@@ -177,23 +154,23 @@
           (select-window first-win)
           (if this-win-2nd (other-window 1))))))
 
-(defun er-find-alacritty-init-file ()
+(defun my/find-alacritty-init-file ()
   "Edit the shell init file in another window."
   (interactive)
     (find-file-other-window (expand-file-name ".config/alacritty/alacritty.yml" (getenv "HOME"))))
 
-(defun er-find-tmuxconfig-file ()
+(defun my/find-tmuxconfig-file ()
   "Edit the shell init file in another window."
   (interactive)
     (find-file-other-window (expand-file-name ".tmux.conf" (getenv "HOME"))))
 
-(defun er-find-tmuxinator-file ()
+(defun my/find-tmuxinator-file ()
   "Brows tmuxinator session definition"
   (interactive)
   (find-file-other-window "~/.config/tmuxinator")
   )
 
-(defun er-find-shell-init-file ()
+(defun my/find-shell-init-file ()
   "Edit the shell init file in another window."
   (interactive)
   (let* ((shell (car (reverse (split-string (getenv "SHELL") "/"))))

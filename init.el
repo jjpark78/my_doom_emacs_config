@@ -16,27 +16,28 @@
 
 
 (doom! :input
-       chinese
+       ;; chinese
        ;; japanese
 
        :completion
        (company +auto)             ; the ultimate code completion backend
        ;; helm              ; the *other* search engine for love and life
        ;;ido               ; the other *other* search engine...
-       ;; (ivy +icons)               ; a search engine for love and life
-       (vertico +icons)
+       (ivy +icons)               ; a search engine for love and life
+       ;; (vertico +icons)
 
        :ui
-       deft              ; notational velocity for Emacs
+       ;; deft              ; notational velocity for Emacs
        doom                ; what makes DOOM look the way it does
        doom-dashboard      ; a nifty splash screen for Emacs
+       ;; (emoji +unicode)
        ;; doom-quit           ; DOOM quit-message prompts when you quit Emacs
        ;; fill-column       ; a `fill-column' indicator
        hl-todo             ; highlight TODO/FIXME/NOTE/DEPRECATED/HACK/REVIEW
        ;; hydra
        ;; indent-guides    ; highlighted indent columns
        ;; minimap             ; show a map of the code on the side
-       (modeline +icons)   ; snazzy, Atom-inspired modeline, plus API
+       (modeline)   ; snazzy, Atom-inspired modeline, plus API
        nav-flash           ; blink cursor line after big motions
        ;; neotree          ; a project drawer, like NERDTree for vim
        ophints             ; highlight the region an operation acts on
@@ -86,11 +87,11 @@
 
        :os
        ;; macos               ; recent new feature
-       ;; tty                    ;
+       tty                    ;
 
        :tools
        ;;ansible
-       debugger         ; FIXME stepping through code, to help you add bugs
+       ;; debugger         ; FIXME stepping through code, to help you add bugs
        ;; direnv
        docker
        ;;editorconfig      ; let someone else argue about tabs vs spaces
@@ -102,7 +103,7 @@
        (magit +forge)             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
-       pdf               ; pdf enhancements
+       ;; pdf               ; pdf enhancements
        ;; prodigy           ; FIXME managing external services & code builders
        rgb               ; creating color strings
        taskrunner        ; taskrunner for all your projects
@@ -152,12 +153,11 @@
         +babel
         +capture
         +export
-        +dragndrop
         )
                                         ;php               ; perl's insecure younger brother
        ;; plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
-       python            ; beautiful is better than ugly
+       ;; python            ; beautiful is better than ugly
        ;; (qt +lsp)                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
@@ -182,7 +182,7 @@
        ;; (wanderlust +gmail)
 
        :app
-       calendar
+       ;; calendar
        ;;irc               ; how neckbeards socialize
        rss       ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
@@ -191,4 +191,3 @@
        ;;literate
        (default +bindings +smartparens)
        )
-

@@ -1,3 +1,29 @@
+
+   (defvar org-agenda-list-save-path
+     "~/.doom.d/org-agenda-list.el"
+   "Path to save the list of files belonging to the agenda.")
+
+   (defun org-agenda-save-file-list ()
+     "Save list of desktops from file in org-agenda-list-save-path"
+     (interactive)
+     (save-excursion
+       (let ((buf (find-file-noselect org-agenda-list-save-path)))
+         (set-buffer buf)
+         (erase-buffer)
+         (print (list 'quote org-agenda-files) buf)
+         (save-buffer)
+         (kill-buffer)
+         (message "org-agenda file list saved to: %s" org-agenda-list-save-path))))
+
+   (defun org-agenda-load-file-list ()
+     "Load list of desktops from file in org-agenda-list-save-path"
+     (interactive)
+     (save-excursion
+       (let ((buf (find-file-noselect org-agenda-list-save-path)))
+         (set-buffer buf)
+         (setq org-agenda-files (eval (read (buffer-string))))
+         (kill-buffer)
+         (message "org-agenda file list loaded from: %s" org-agenda-list-save-path))))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
