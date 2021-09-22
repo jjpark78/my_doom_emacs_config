@@ -125,7 +125,6 @@
   (if-let ((url (forge-get-url (or (forge-post-at-point)
                                    (forge-current-topic)))))
       (progn
-        (message "Open Url: %S" url)
         (execute-chrome-with-args url)))
   )
 

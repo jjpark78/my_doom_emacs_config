@@ -9,9 +9,9 @@
     - [[#custom-setup][Custom Setup]]
     - [[#useful-bindings][Useful Bindings]]
   - [[#programming][Programming]]
-    - [[#vue--typescript-custom-setting][Vue & Typescript Custom Setting]]
     - [[#cc-mode--ccls-setting][CC-Mode & CCLS Setting]]
     - [[#lsp--language-mode-hooks][LSP / Language Mode Hooks]]
+    - [[#vue--typescript-custom-setting][Vue & Typescript Custom Setting]]
     - [[#programming-etc][Programming ETC]]
     - [[#interact-persp-mode-and-tmux][Interact Persp-mode and Tmux]]
   - [[#magit--forge][Magit & Forge]]
@@ -61,8 +61,8 @@
 (package! prettier-js)
 (package! oauth2)
 (package! nyan-mode)
-(package! ob-typescript)
-(package! ob-restclient)
+;; (package! ob-typescript)
+;; (package! ob-restclient)
 (package! emacs-async)
 ;; (package! emamux)
 ;; ejira 를 사용하기 위한 디펜던시들, 연동이 잘 되지 않아서 일단 놔둔다.
@@ -120,10 +120,10 @@
 ;; gendoxy
 (add-to-list 'load-path (expand-file-name "~/.doom.d/elisps/gendoxy"))
 
-;; (when (file-exists-p "~/.doom.d/emacs-dash.png")
-;;   (setq +doom-dashboard-banner-padding '(8 . 4)
-;;         +doom-dashboard-banner-file "emacs-dash.png"
-;;         +doom-dashboard-banner-dir "~/.doom.d"))
+(when (and (file-exists-p "~/.doom.d/emacs-dash.png"))
+  (setq +doom-dashboard-banner-padding '(8 . 4)
+        +doom-dashboard-banner-file "emacs-dash.png"
+        +doom-dashboard-banner-dir "~/.doom.d"))
 #+END_SRC
 
 **** UTF & Korean Input
@@ -154,8 +154,8 @@
 (setq doom-theme 'doom-one)
 
 ;; ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
-(setq doom-font (font-spec :family "FiraMono NF" :size 16))
-(setq doom-unicode-font (font-spec :family "FiraMono NF" :size 16))
+(setq doom-font (font-spec :family "FiraMono NF" :size 14))
+(setq doom-unicode-font (font-spec :family "FiraMono NF" :size 14))
 
 ;; ;; 한글 관련 폰트 스케일링 설정
 (set-fontset-font "fontset-default" 'hangul (font-spec :registry "NanumGothic"))
@@ -251,6 +251,10 @@ Doom modLiene 관련 수정
 (map! :leader :prefix "w" :desc "open ace window to select window" "a" #'ace-window)
 ;; evil 에서 라인 처음과 마지막으로 더 빨리 점프할 수 있도록 한다.
 (map! :leader :prefix "c" :desc "run npm script" "n" #'npm-mode-npm-run)
+
+(map! :leader :prefix "q" :desc "quit frame without prompt" "f" #'delete-frame)
+(map! :leader :prefix "q" :desc "quit frame without prompt" "q" #'delete-frame)
+
 (define-key evil-visual-state-map (kbd "H") 'beginning-of-line-text)
 (define-key evil-visual-state-map (kbd "L") 'evil-end-of-line)
 (define-key evil-normal-state-map (kbd "H") 'beginning-of-line-text)
@@ -277,22 +281,43 @@ Doom modLiene 관련 수정
 ;; <SPC> w C-o 는 너무 누르기 힘들지만 이게 의외로 많이 쓰인다. 쓰이지 않는 키 바인딩에 할당해서 더 간단히 만든다.
 (map! :leader :prefix "w" :desc "Close Other Windows Fast Binding" "O" 'delete-other-windows)
 ;; (map! :leader :n "," 'switch-to-buffer)
+(defun move-text-internal (arg)
+   (cond
+    ((and mark-active transient-mark-mode)
+     (if (> (point) (mark))
+            (exchange-point-and-mark))
+     (let ((column (current-column))
+              (text (delete-and-extract-region (point) (mark))))
+       (forward-line arg)
+       (move-to-column column t)
+       (set-mark (point))
+       (insert text)
+       (exchange-point-and-mark)
+       (setq deactivate-mark nil)))
+    (t
+     (beginning-of-line)
+     (when (or (> arg 0) (not (bobp)))
+       (forward-line)
+       (when (or (< arg 0) (not (eobp)))
+            (transpose-lines arg))
+       (forward-line -1)))))
 
-(defun move-line-up ()
-  (interactive)
-  (transpose-lines 1)
-  (previous-line 2))
+(defun move-line-down (arg)
+   "Move region (transient-mark-mode active) or current line
+  arg lines down."
+   (interactive "*p")
+   (move-text-internal arg))
 
-(defun move-line-down ()
-  (interactive)
-  (next-line 1)
-  (transpose-lines 1)
-  (previous-line 1))
+(defun move-line-up (arg)
+   "Move region (transient-mark-mode active) or current line
+  arg lines up."
+   (interactive "*p")
+   (move-text-internal (- arg)))
 
-(define-key evil-normal-state-map (kbd "M-k") #'move-line-up)
-(define-key evil-visual-state-map (kbd "M-k") #'move-line-up)
-(define-key evil-normal-state-map (kbd "M-j") #'move-line-down)
-(define-key evil-visual-state-map (kbd "M-j") #'move-line-down)
+(define-key evil-normal-state-map (kbd "M-k") 'move-line-up)
+(define-key evil-visual-state-map (kbd "M-k") 'move-line-up)
+(define-key evil-normal-state-map (kbd "M-j") 'move-line-down)
+(define-key evil-visual-state-map (kbd "M-j") 'move-line-down)
 
 (defun execute-gitkraken ()
   (interactive)
@@ -308,6 +333,65 @@ Doom modLiene 관련 수정
 #+END_SRC
 
 ** Programming
+*** CC-Mode & CCLS Setting
+#+BEGIN_SRC elisp :tangle config.el
+(defun custom-cc-mode ()
+  "Custom cc-mode make support platfomio, qml, qmake etc."
+  (interactive)
+  (lsp)
+  (setq lsp-prefer-flymake nil
+        lsp-ui-peek-fontify 'always
+        lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
+        lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
+  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
+
+(use-package ccls
+  :config '(ccls-initialization-options (quote (compilationDatabaseDirectory :build)))
+    :hook ((c-mode c++-mode objc-mode) . (lambda () (require 'ccls) (lsp))))
+#+END_SRC
+
+*** LSP / Language Mode Hooks
+주로 사용하는 언어들 관련 설정. lsp관련 설정들을 모아 놓았다.
+#+BEGIN_SRC elisp :tangle config.el
+;; 뷰모드가 느리게 동작하고 아직 버그가 많아서 웹 모드로 바꾼다.
+(add-to-list 'auto-mode-alist '("\\.vue$" . web-mode))
+(add-to-list 'auto-mode-alist '("\\.env$" . dotenv-mode))
+(add-to-list 'auto-mode-alist '("\\.ino$" . cpp-mode))
+(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.jsx$" . js2-mode))
+(add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
+(add-to-list 'auto-mode-alist '("\\.tsx$" . typescript-mode))
+
+;; disable CamelCase syntax
+(global-subword-mode nil)
+
+(add-hook 'web-mode-hook 'my/custom-web-mode)
+(add-hook 'web-mode-hook 'prettier-js-mode)
+(add-hook 'js2-mode-hook 'prettier-js-mode)
+(add-hook 'js2-mode-hook 'my/custom-js-mode)
+(add-hook 'typescript-mode-hook 'my/custom-ts-mode)
+(add-hook 'typescript-mode-hook 'prettier-js-mode)
+(add-hook 'typescript-tsx-mode-hook 'my/custom-ts-mode)
+(add-hook 'typescript-tsx-mode-hook 'prettier-js-mode)
+(add-hook 'cc-mode-hook 'custom-cc-mode)
+(add-hook 'cpp-mode-hook 'custom-cc-mode)
+
+(setq lsp-auto-guess-root t)
+
+(set-company-backend! 'typescript-mode '(company-capf))
+(setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
+
+(setq lsp-ui-sideline-show-code-actions nil
+      lsp-ui-sideline-show-diagnostics t
+      lsp-modeline-diagnostics-mode nil
+      lsp-modeline-diagnostics-enable nil
+      lsp-signature-render-all t)
+
+;; 린트 에러 버퍼를 오픈하면 포커스가 자동으로 이동하지 않는다.
+;; 이거 없으면 생각보다 귀찮아진다.
+(add-hook 'flycheck-error-list-mode-hook (lambda () (switch-to-buffer-other-window "*Flycheck errors*")))
+#+END_SRC
+
 *** Vue & Typescript Custom Setting
 Vue와 타입스크립트를 위한 커스텀 설정 모드.
 #+BEGIN_SRC elisp :tangle +custom_funcs.el
@@ -366,63 +450,6 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
     (when (and eslint (file-exists-p eslint))
       (setq-local flycheck-javascript-eslint-executable eslint))))
 
-#+END_SRC
-
-*** CC-Mode & CCLS Setting
-#+BEGIN_SRC elisp :tangle config.el
-(defun custom-cc-mode ()
-  "Custom cc-mode make support platfomio, qml, qmake etc."
-  (interactive)
-  (lsp)
-  (setq lsp-prefer-flymake nil
-        lsp-ui-peek-fontify 'always
-        lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
-        lsp-ui-sideline-show-symbol nil)  ; don't show symbol on the right of info
-  (setq-default flycheck-disabled-checkers '(c/c++-clang c/c++-cppcheck c/c++-gcc)))
-
-(use-package ccls
-  :config '(ccls-initialization-options (quote (compilationDatabaseDirectory :build)))
-    :hook ((c-mode c++-mode objc-mode) . (lambda () (require 'ccls) (lsp))))
-#+END_SRC
-
-*** LSP / Language Mode Hooks
-주로 사용하는 언어들 관련 설정. lsp관련 설정들을 모아 놓았다.
-#+BEGIN_SRC elisp :tangle config.el
-;; 뷰모드가 느리게 동작하고 아직 버그가 많아서 웹 모드로 바꾼다.
-(add-to-list 'auto-mode-alist '("\\.vue\\'" . web-mode))
-(add-to-list 'auto-mode-alist '("\\.env\\'" . dotenv-mode))
-(add-to-list 'auto-mode-alist '("\\.ino\\'" . cpp-mode))
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-(add-to-list 'auto-mode-alist '("\\.jsx\\'" . js2-mode))
-
-;; disable CamelCase syntax
-(global-subword-mode nil)
-
-(add-hook 'web-mode-hook 'my/custom-web-mode)
-(add-hook 'web-mode-hook 'prettier-js-mode)
-(add-hook 'js2-mode-hook 'prettier-js-mode)
-(add-hook 'js2-mode-hook 'my/custom-js-mode)
-(add-hook 'typescript-mode-hook 'my/custom-ts-mode)
-(add-hook 'typescript-mode-hook 'prettier-js-mode)
-(add-hook 'typescript-tsx-mode-hook 'my/custom-ts-mode)
-(add-hook 'typescript-tsx-mode-hook 'prettier-js-mode)
-(add-hook 'cc-mode-hook 'custom-cc-mode)
-(add-hook 'cpp-mode-hook 'custom-cc-mode)
-
-(setq lsp-auto-guess-root t)
-
-(set-company-backend! 'typescript-mode '(company-capf))
-(setq flycheck-global-modes '(not conf-colon-mode gfm-mode forge-post-mode gitlab-ci-mode dockerfile-mode Org-mode org-mode))
-
-(setq lsp-ui-sideline-show-code-actions nil
-      lsp-ui-sideline-show-diagnostics t
-      lsp-modeline-diagnostics-mode nil
-      lsp-modeline-diagnostics-enable nil
-      lsp-signature-render-all t)
-
-;; 린트 에러 버퍼를 오픈하면 포커스가 자동으로 이동하지 않는다.
-;; 이거 없으면 생각보다 귀찮아진다.
-(add-hook 'flycheck-error-list-mode-hook (lambda () (switch-to-buffer-other-window "*Flycheck errors*")))
 #+END_SRC
 
 *** Programming ETC
@@ -658,14 +685,14 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
 처음에는 함수를 만들어 관리를 했는제 자주 이맥스 설정을 손보다가 한번 뻑이 나면, 저장된 파일들까지 다 날라가는
 불상사가 여러번 발생해서 그냥 리스트로 직접 관리하고 파일이 추가될때 마다 수동으로 고치도록 변경한다.
 #+begin_src elisp :tangle config.el
-(setq org-agenda-files '(
-  "/mnt/c/Users/jaejinpark/OneDrive/org/bethel.org"
-  "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org"
-  "/mnt/c/Users/jaejinpark/OneDrive/org/jltech_schedule.org"
-  "/mnt/c/Users/jaejinpark/OneDrive/org/personal_schedule.org"
-  "/mnt/c/Users/jaejinpark/OneDrive/org/notes.org"
-  "/mnt/c/Users/jaejinpark/OneDrive/org/tasks.org"
-  ))
+;; (setq org-agenda-files '(
+;;   "/mnt/c/Users/jaejinpark/OneDrive/org/bethel.org"
+;;   "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org"
+;;   "/mnt/c/Users/jaejinpark/OneDrive/org/jltech_schedule.org"
+;;   "/mnt/c/Users/jaejinpark/OneDrive/org/personal_schedule.org"
+;;   "/mnt/c/Users/jaejinpark/OneDrive/org/notes.org"
+;;   "/mnt/c/Users/jaejinpark/OneDrive/org/tasks.org"
+;;   ))
 
 #+end_src
 *** ORG모드를 위한 함수들
