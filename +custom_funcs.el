@@ -3,8 +3,8 @@
       (let ((extname (file-name-extension buffer-file-name)))
         (when (or (string-equal "tsx" extname)
                   (string-equal "ts" extname))
-          (setup-custom-jsts-mode)
-          (flycheck-select-checker 'javascript-eslint)))))
+          (setup-custom-jsts-mode)))))
+          ;; (flycheck-select-checker 'javascript-eslint)))))
 
 (defun my/custom-js-mode ()
   (if (not (equal buffer-file-name 'nil))
@@ -12,8 +12,8 @@
         (when (or (string-equal "js" extname)
                   (string-equal "jsx" extname))
           (setup-custom-jsts-mode)
-          (setq js2-strict-missing-semi-warning nil)
-          (flycheck-select-checker 'javascript-eslint)))))
+          (setq js2-strict-missing-semi-warning nil)))))
+          ;; (flycheck-select-checker 'javascript-eslint)))))
 
 (defun my/custom-web-mode ()
   "Custom hooks for vue-mode"
@@ -21,12 +21,12 @@
       (let ((extname (file-name-extension buffer-file-name)))
         (when (string-equal "vue" extname)
           (setup-custom-jsts-mode)
-          (flycheck-select-checker 'javascript-eslint)
+          ;; (flycheck-select-checker 'javascript-eslint)
           ))))
 
 (defun setup-custom-jsts-mode ()
   ;; 기본 인덴테이션을 설정한다.
-  (lsp)
+  (lsp!)
   (setq typescript-indent-level 2)
   (setq emmet-indentation 2)
   (setq js-indent-level 2)
@@ -35,27 +35,23 @@
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-markup-indent-offset 2)
   (flycheck-mode +1)
-  (my/use-eslint-from-node-modules)
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
-  (flycheck-add-mode 'javascript-eslint 'typescript-mode)
-  (flycheck-add-mode 'javascript-eslint 'js2-mode)
+  ;; (my/use-eslint-from-node-modules)
+  ;; (flycheck-add-mode 'javascript-eslint 'web-mode)
+  ;; (flycheck-add-mode 'javascript-eslint 'typescript-mode)
+  ;; (flycheck-add-mode 'javascript-eslint 'js2-mode)
   (setq lsp-ui-peek-fontify 'always)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
   )
 
-(defun my/use-eslint-from-node-modules ()
-  (let* ((root (locate-dominating-file
-                (or (buffer-file-name) default-directory)
-                "node_modules"))
-         (eslint (and root
-                      (expand-file-name "node_modules/eslint/bin/eslint.js"
-                                        root))))
-    (when (and eslint (file-exists-p eslint))
-      (setq-local flycheck-javascript-eslint-executable eslint))))
-
-(defun my/after-org-mode-load ()
-  (org-indent-mode)
-  )
+;; (defun my/use-eslint-from-node-modules ()
+;;   (let* ((root (locate-dominating-file
+;;                 (or (buffer-file-name) default-directory)
+;;                 "node_modules"))
+;;          (eslint (and root
+;;                       (expand-file-name "node_modules/eslint/bin/eslint.js"
+;;                                         root))))
+;;     (when (and eslint (file-exists-p eslint))
+;;       (setq-local flycheck-javascript-eslint-executable eslint))))
 
 (defun feed-reader/search-print (entry)
       "Print ENTRY to the buffer."

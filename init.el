@@ -29,7 +29,7 @@
        :ui
        ;; deft              ; notational velocity for Emacs
        doom                ; what makes DOOM look the way it does
-       ;; doom-dashboard      ; a nifty splash screen for Emacs
+       doom-dashboard      ; a nifty splash screen for Emacs
        (emoji +unicode)
        ;; doom-quit           ; DOOM quit-message prompts when you quit Emacs
        ;; fill-column       ; a `fill-column' indicator
@@ -41,8 +41,8 @@
        nav-flash           ; blink cursor line after big motions
        ;; neotree          ; a project drawer, like NERDTree for vim
        ophints             ; highlight the region an operation acts on
-       (popup +defaults)   ; tame sudden yet inevitable temporary windows
-       ;; pretty-code       ; ligatures or substitute text with pretty symbols
+       ;; (popup +defaults)   ; tame sudden yet inevitable temporary windows
+       pretty-code       ; ligatures or substitute text with pretty symbols
        ;; tabs                ; an tab bar for Emacs
        ;; treemacs            ; a rroject drawer, like neotree but cooler"doom-color"
 
@@ -98,7 +98,7 @@
        ;;ein               ; tame Jupyter notebooks with emacs
        (eval +overlay)     ; run code, run (also, repls)
        ;;gist              ; interacting with github gists
-       ;; (lookup +docsets)   ; navigate your code and its documentation
+       (lookup +docsets)   ; navigate your code and its documentation
        (lsp +peek)
        (magit +forge)             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
@@ -157,14 +157,14 @@
                                         ;php               ; perl's insecure younger brother
        ;; plantuml          ; diagrams for confusing people more
        ;;purescript        ; javascript, but functional
-       ;; python            ; beautiful is better than ugly
+       (python +lsp)            ; beautiful is better than ugly
        ;; (qt +lsp)                ; the 'cutest' gui framework ever
        ;;racket            ; a DSL for DSLs
        ;;raku              ; the artist formerly known as perl6
        rest              ; Emacs as a REST client
        ;;rst               ; ReST in peace
        ;; (ruby +rails)     ; 1.step {|i| p "Ruby is #{i.even? ? 'love' : 'life'}"}
-       ;; (rust +lsp)              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
+       (rust +lsp)              ; Fe2O3.unwrap().unwrap().unwrap().unwrap()
        ;;scala             ; java, but good
        ;;scheme            ; a fully conniving family of lisps
        sh                ; she sells {ba,z,fi}sh shells on the C xor
@@ -184,7 +184,7 @@
        :app
        ;; calendar
        ;;irc               ; how neckbeards socialize
-       rss       ; emacs as an RSS reader
+       ;; rss       ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
 
        :config

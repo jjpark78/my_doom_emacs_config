@@ -15,14 +15,6 @@
     - [[#programming-etc][Programming ETC]]
     - [[#interact-persp-mode-and-tmux][Interact Persp-mode and Tmux]]
   - [[#magit--forge][Magit & Forge]]
-  - [[#org][ORG]]
-    - [[#org-agenda-파일-목록][ORG Agenda 파일 목록]]
-    - [[#org모드를-위한-함수들][ORG모드를 위한 함수들]]
-    - [[#basic--agenda--capture-setup][Basic & Agenda & Capture Setup]]
-    - [[#org-agenda-custom-style][Org Agenda Custom Style]]
-    - [[#org-agenda--keybinding--tune][Org Agenda & Keybinding & Tune]]
-    - [[#src-block--babel--lsp][SRC Block & Babel & LSP]]
-    - [[#deft][Deft]]
   - [[#rss-feed][RSS Feed]]
     - [[#custom-elfeed-search-column][Custom Elfeed Search Column]]
   - [[#utils][Utils]]
@@ -40,7 +32,7 @@
 파일을 나누어 관리한다.
 #+BEGIN_SRC elisp :tangle config.el
 (load! "+custom_funcs")
-(load! "+private")
+;; (load! "+private")
 #+END_SRC
 +private.el 파일에는 공개하기 곤란한 개인 토큰이나 패스워드등이 담겨 있다.
 *** Packages
@@ -48,22 +40,23 @@
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
-(package! org-bullets)
+;; (package! org-bullets)
 (package! gitlab-ci-mode)
 (package! rg)
-(package! swiper)
+;; (package! swiper)
 (package! evil-matchit)
-(package! carbon-now-sh)
+(package! drag-stuff)
+;; (package! carbon-now-sh)
 (package! evil-textobj-anyblock)
 (package! git-link)
 (package! w3m)
-(package! ccls)
+;; (package! ccls)
 (package! prettier-js)
-(package! oauth2)
+;; (package! oauth2)
 (package! nyan-mode)
 ;; (package! ob-typescript)
 ;; (package! ob-restclient)
-(package! emacs-async)
+;; (package! emacs-async)
 ;; (package! emamux)
 ;; ejira 를 사용하기 위한 디펜던시들, 연동이 잘 되지 않아서 일단 놔둔다.
 ;; (package! dash-functional)
@@ -120,10 +113,10 @@
 ;; gendoxy
 (add-to-list 'load-path (expand-file-name "~/.doom.d/elisps/gendoxy"))
 
-(when (and (file-exists-p "~/.doom.d/emacs-dash.png"))
-  (setq +doom-dashboard-banner-padding '(8 . 4)
-        +doom-dashboard-banner-file "emacs-dash.png"
-        +doom-dashboard-banner-dir "~/.doom.d"))
+;; (when (and (file-exists-p "~/.doom.d/emacs-dash.png"))
+;;   (setq +doom-dashboard-banner-padding '(8 . 4)
+;;         +doom-dashboard-banner-file "emacs-dash.png"
+;;         +doom-dashboard-banner-dir "~/.doom.d"))
 #+END_SRC
 
 **** UTF & Korean Input
@@ -155,21 +148,20 @@
 
 ;; ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
 (setq doom-font (font-spec :family "FiraMono NF" :size 14))
-(setq doom-unicode-font (font-spec :family "FiraMono NF" :size 14))
+(setq doom-unicode-font (font-spec :family "FiraMonr NF" :size 14))
 
-;; ;; 한글 관련 폰트 스케일링 설정
-(set-fontset-font "fontset-default" 'hangul (font-spec :registry "NanumGothic"))
+;; ;; 한글 관련 폰트 스케일링 설정 (set-fontset-font "fontset-default" 'hangul
+(font-spec :registry "NanumGothic")
 ;; (set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
 ;; (set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
 
-(setq face-font-rescale-alist
-      '(("AppleGothic" . 1.3007692307692308)
-        ))
-#+END_SRC
+(setq face-font-rescale-alist '(("AppleGothic" . 1.3007692307692308) ))
+      #+END_SRC
+
 ***** Popup Rules
-이맥스에서 몇가지 자주 쓰는 버퍼들이 정해진 위치에 표시되도록 해서 레이아웃을 망치지 않고 작업 효율을 높이도록 한다.
-DOOM 이맥스는 기본 키 바인딩인 'SPC ~' 조합을 사용해서 해당 버퍼의 윈도우를 빠르게 토글 시킬 수 있어서
-정말 편하다.
+이맥스에서 몇가지 자주 쓰는 버퍼들이 정해진 위치에 표시되도록 해서 레이아웃을
+망치지 않고 작업 효율을 높이도록 한다.  DOOM 이맥스는 기본 키 바인딩인 'SPC ~'
+조합을 사용해서 해당 버퍼의 윈도우를 빠르게 토글 시킬 수 있어서 정말 편하다.
 #+begin_src elisp :tangle config.el
 (set-popup-rule! "^\\*Messages\\*" :ttl t :side 'bottom :height 12 :quit t)
 (set-popup-rule! "^\\*doom:vterm*" :ttl t :side 'bottom :height 20 :quit t)
@@ -179,11 +171,8 @@ DOOM 이맥스는 기본 키 바인딩인 'SPC ~' 조합을 사용해서 해당 
 **** Doom Modeline
 Doom modLiene 관련 수정
 #+BEGIN_SRC elisp :tangle config.el
-(after! doom-modeline
-  (setq
-    doom-modeline-major-mode-icon t
-    doom-modeline-buffer-encoding nil
-    doom-modeline-mu4e nil
+(after! doom-modeline (setq doom-modeline-major-mode-icon t
+  doom-modeline-buffer-encoding nil doom-modeline-mu4e nil
     doom-modeline-buffer-file-name-style 'truncate-with-project))
 #+END_SRC
 
@@ -280,44 +269,51 @@ Doom modLiene 관련 수정
 (map! :after org-mode :map org-mode-map ">" 'org-cycle-level)
 ;; <SPC> w C-o 는 너무 누르기 힘들지만 이게 의외로 많이 쓰인다. 쓰이지 않는 키 바인딩에 할당해서 더 간단히 만든다.
 (map! :leader :prefix "w" :desc "Close Other Windows Fast Binding" "O" 'delete-other-windows)
-;; (map! :leader :n "," 'switch-to-buffer)
-(defun move-text-internal (arg)
-   (cond
-    ((and mark-active transient-mark-mode)
-     (if (> (point) (mark))
-            (exchange-point-and-mark))
-     (let ((column (current-column))
-              (text (delete-and-extract-region (point) (mark))))
-       (forward-line arg)
-       (move-to-column column t)
-       (set-mark (point))
-       (insert text)
-       (exchange-point-and-mark)
-       (setq deactivate-mark nil)))
-    (t
-     (beginning-of-line)
-     (when (or (> arg 0) (not (bobp)))
-       (forward-line)
-       (when (or (< arg 0) (not (eobp)))
-            (transpose-lines arg))
-       (forward-line -1)))))
+;; (defun move-text-internal (arg)
+;;   (cond
+;;    ((and mark-active transient-mark-mode)
+;;     (if (> (point) (mark))
+;;         (exchange-point-and-mark))
+;;     (let ((column (current-column))
+;;           (text (delete-and-extract-region (point) (mark))))
+;;       (forward-line arg)
+;;       (move-to-column column t)
+;;       (set-mark (point))
+;;       (insert text)
+;;       (exchange-point-and-mark)
+;;       (setq deactivate-mark nil)))
+;;    (t
+;;     (let ((column (current-column)))
+;;       (beginning-of-line)
+;;       (when (or (> arg 0) (not (bobp)))
+;;         (forward-line)
+;;         (when (or (< arg 0) (not (eobp)))
+;;           (transpose-lines arg)
+;;           (when (and (eval-when-compile
+;;                        '(and (>= emacs-major-version 24)
+;;                              (>= emacs-minor-version 3)))
+;;                      (< arg 0))
+;;             (forward-line -1)))
+;;         (forward-line -1))
+;;       (move-to-column column t)))))
 
-(defun move-line-down (arg)
-   "Move region (transient-mark-mode active) or current line
-  arg lines down."
-   (interactive "*p")
-   (move-text-internal arg))
+;; (defun move-text-down (arg)
+;;   "Move region (transient-mark-mode active) or current line
+;;   arg lines down."
+;;   (interactive "*p")
+;;   (move-text-internal arg))
 
-(defun move-line-up (arg)
-   "Move region (transient-mark-mode active) or current line
-  arg lines up."
-   (interactive "*p")
-   (move-text-internal (- arg)))
+;; (defun move-text-up (arg)
+;;   "Move region (transient-mark-mode active) or current line
+;;   arg lines up."
+;;   (interactive "*p")
+;;   (move-text-internal (- arg)))
 
-(define-key evil-normal-state-map (kbd "M-k") 'move-line-up)
-(define-key evil-visual-state-map (kbd "M-k") 'move-line-up)
-(define-key evil-normal-state-map (kbd "M-j") 'move-line-down)
-(define-key evil-visual-state-map (kbd "M-j") 'move-line-down)
+(drag-stuff-global-mode t)
+(define-key evil-normal-state-map (kbd "M-k") 'drag-stuff-up)
+(define-key evil-visual-state-map (kbd "M-k") 'drag-stuff-up)
+(define-key evil-normal-state-map (kbd "M-j") 'drag-stuff-down)
+(define-key evil-visual-state-map (kbd "M-j") 'drag-stuff-down)
 
 (defun execute-gitkraken ()
   (interactive)
@@ -338,7 +334,7 @@ Doom modLiene 관련 수정
 (defun custom-cc-mode ()
   "Custom cc-mode make support platfomio, qml, qmake etc."
   (interactive)
-  (lsp)
+  ;; (lsp)
   (setq lsp-prefer-flymake nil
         lsp-ui-peek-fontify 'always
         lsp-ui-doc-include-signature nil  ; don't include type signature in the child fram
@@ -361,9 +357,6 @@ Doom modLiene 관련 수정
 (add-to-list 'auto-mode-alist '("\\.jsx$" . js2-mode))
 (add-to-list 'auto-mode-alist '("\\.ts$" . typescript-mode))
 (add-to-list 'auto-mode-alist '("\\.tsx$" . typescript-mode))
-
-;; disable CamelCase syntax
-(global-subword-mode nil)
 
 (add-hook 'web-mode-hook 'my/custom-web-mode)
 (add-hook 'web-mode-hook 'prettier-js-mode)
@@ -400,8 +393,8 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
       (let ((extname (file-name-extension buffer-file-name)))
         (when (or (string-equal "tsx" extname)
                   (string-equal "ts" extname))
-          (setup-custom-jsts-mode)
-          (flycheck-select-checker 'javascript-eslint)))))
+          (setup-custom-jsts-mode)))))
+          ;; (flycheck-select-checker 'javascript-eslint)))))
 
 (defun my/custom-js-mode ()
   (if (not (equal buffer-file-name 'nil))
@@ -409,8 +402,8 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
         (when (or (string-equal "js" extname)
                   (string-equal "jsx" extname))
           (setup-custom-jsts-mode)
-          (setq js2-strict-missing-semi-warning nil)
-          (flycheck-select-checker 'javascript-eslint)))))
+          (setq js2-strict-missing-semi-warning nil)))))
+          ;; (flycheck-select-checker 'javascript-eslint)))))
 
 (defun my/custom-web-mode ()
   "Custom hooks for vue-mode"
@@ -418,12 +411,12 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
       (let ((extname (file-name-extension buffer-file-name)))
         (when (string-equal "vue" extname)
           (setup-custom-jsts-mode)
-          (flycheck-select-checker 'javascript-eslint)
+          ;; (flycheck-select-checker 'javascript-eslint)
           ))))
 
 (defun setup-custom-jsts-mode ()
   ;; 기본 인덴테이션을 설정한다.
-  (lsp)
+  (lsp!)
   (setq typescript-indent-level 2)
   (setq emmet-indentation 2)
   (setq js-indent-level 2)
@@ -432,25 +425,28 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-markup-indent-offset 2)
   (flycheck-mode +1)
-  (my/use-eslint-from-node-modules)
-  (flycheck-add-mode 'javascript-eslint 'web-mode)
-  (flycheck-add-mode 'javascript-eslint 'typescript-mode)
-  (flycheck-add-mode 'javascript-eslint 'js2-mode)
+  ;; (my/use-eslint-from-node-modules)
+  ;; (flycheck-add-mode 'javascript-eslint 'web-mode)
+  ;; (flycheck-add-mode 'javascript-eslint 'typescript-mode)
+  ;; (flycheck-add-mode 'javascript-eslint 'js2-mode)
   (setq lsp-ui-peek-fontify 'always)
   (setq flycheck-check-syntax-automatically '(save mode-enabled))
   )
 
-(defun my/use-eslint-from-node-modules ()
-  (let* ((root (locate-dominating-file
-                (or (buffer-file-name) default-directory)
-                "node_modules"))
-         (eslint (and root
-                      (expand-file-name "node_modules/eslint/bin/eslint.js"
-                                        root))))
-    (when (and eslint (file-exists-p eslint))
-      (setq-local flycheck-javascript-eslint-executable eslint))))
+;; (defun my/use-eslint-from-node-modules ()
+;;   (let* ((root (locate-dominating-file
+;;                 (or (buffer-file-name) default-directory)
+;;                 "node_modules"))
+;;          (eslint (and root
+;;                       (expand-file-name "node_modules/eslint/bin/eslint.js"
+;;                                         root))))
+;;     (when (and eslint (file-exists-p eslint))
+;;       (setq-local flycheck-javascript-eslint-executable eslint))))
 
 #+END_SRC
+
+#+RESULTS:
+: setup-custom-jsts-mode
 
 *** Programming ETC
 개발관련 기타 설정들
@@ -458,6 +454,7 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 ;; 1초라도 빨리 팝업 띄우고 싶어서, 그러나 실제 체감속도 향상은 없음
 (setq company-idle-delay 0)
 
+(drag-stuff-mode t)
 ;; persp 모드에서 터미널도 지원하도록 한다.
 (persp-def-buffer-save/load
   :mode 'eshell-mode :tag-symbol 'def-eshell-buffer
@@ -680,245 +677,245 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
 # # ;; (map! :leader :prefix "o" :desc "update email index manually" "M" #'refresh-mu4e-alert-mode-line)
 # #  #+END_SRC
 
-** ORG
-*** ORG Agenda 파일 목록
-처음에는 함수를 만들어 관리를 했는제 자주 이맥스 설정을 손보다가 한번 뻑이 나면, 저장된 파일들까지 다 날라가는
-불상사가 여러번 발생해서 그냥 리스트로 직접 관리하고 파일이 추가될때 마다 수동으로 고치도록 변경한다.
-#+begin_src elisp :tangle config.el
-;; (setq org-agenda-files '(
-;;   "/mnt/c/Users/jaejinpark/OneDrive/org/bethel.org"
-;;   "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org"
-;;   "/mnt/c/Users/jaejinpark/OneDrive/org/jltech_schedule.org"
-;;   "/mnt/c/Users/jaejinpark/OneDrive/org/personal_schedule.org"
-;;   "/mnt/c/Users/jaejinpark/OneDrive/org/notes.org"
-;;   "/mnt/c/Users/jaejinpark/OneDrive/org/tasks.org"
-;;   ))
-
-#+end_src
-*** ORG모드를 위한 함수들
-#+BEGIN_SRC elisp :tangle +custom_funcs.el
-(defun my/after-org-mode-load ()
-  (org-indent-mode)
-  )
-#+END_SRC
-
-*** Basic & Agenda & Capture Setup
-요즘 열공중인 그렇게 대단하다 침이 마르지 않게 칭찬해대는 ORG모드에 대한 설정들을 따로 모아 놓았다.
-#+BEGIN_SRC elisp :tangle config.el
-(after! org
-  ;; ORG 패키지를 초기활때 이미 어젠다 파일 목록을 불러오도록 한다.
-  (setq
-    org-hide-emphasis-markers t
-    org-directory "/mnt/c/Users/jaejinpark/OneDrive/org"
-    org-ellipsis " ▾ "
-    ;; org-tags-column -80
-    ;; org-adapt-indentation t
-    org-log-done 'time
-    org-refile-targets (quote ((nil :maxlevel . 1)))
-    org-src-tab-acts-natively t
-    org-src-preserve-indentation t
-    org-agenda-span 31
-    org-deadline-warning-days 7
-    org-agenda-skip-scheduled-if-done t
-    org-agenda-skip-deadline-if-done t
-    org-agenda-include-deadlines t
-    org-agenda-block-separator 61)
-    ;; capture 설정들을 모아 놓았다.
-  (setq org-capture-templates
-                  '(("s" "Personal Schedule" entry
-                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/personal_schedule.org")
-                    "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
-                    :prepend t :kill-buffer t)
-                    ("o" "WORK at JLTECH" entry
-                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/jltech_schedule.org")
-                    "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
-                    :prepend t :kill-buffer t)
-                    ("t" "Personal TODO" entry
-                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/tasks.org")
-                    "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
-                    :prepend t :kill-buffer t)
-                    ("j" "JW SCHEDULE" entry
-                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org")
-                    "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
-                    :prepend t :kill-buffer t)
-                    ("w" "JW TODO" entry
-                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org")
-                    "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
-                    :prepend t :kill-buffer t)
-                    ("m" "프로임명" entry
-                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org")
-                    "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
-                    :prepend t :kill-buffer t)
-                    ("b" "BRV일정" entry
-                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/bethel.org")
-                    "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
-                    :prepend t :kill-buffer t)
-                    ("B" "BRV TODO" entry
-                    (file "/mnt/c/Users/jaejinpark/OneDrive/org/bethel.org")
-                    "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
-                    :prepend t :kill-buffer t)))
-  ;;저장된 파일 리스트를 불러온다.
-  ;;이맥스가 종료될때 어젠다 파일 목록을 자동 저장하도록 한다.
-  ;;기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
-  (use-package org-bullets
-    :init
-    (setq org-bullets-bullet-list '("⊙" "⊙" "⊙" "⊙" "⊙" "⊙"))
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-  )
-#+END_SRC
-
-*** Org Agenda Custom Style
-나만의 스타일로 조금씩 바꾸어 나간다. 어째 점점더 못생겨저 가는 것 같은 느낌이 드는건 착각이 아닐수도...
-#+begin_src elisp :tangle config.el
-(defun my/style-org-buffer()
-  (set-face-attribute 'org-link nil :weight 'normal :background nil)
-  (set-face-attribute 'org-code nil :foreground "#a9a1e1" :background nil)
-  (set-face-attribute 'org-date nil :foreground "#5B6268" :background nil)
-  (set-face-attribute 'org-level-1 nil :foreground "DodgerBlue2" :background nil :height 1.0 :weight 'normal)
-  (set-face-attribute 'org-level-2 nil :foreground "slategray2" :background nil :height 1.0 :weight 'normal)
-  (set-face-attribute 'org-level-3 nil :foreground "SkyBlue2" :background nil :height 1.0 :weight 'normal)
-  (set-face-attribute 'org-level-4 nil :foreground "steelblue2" :background nil :height 1.0 :weight 'normal)
-  (set-face-attribute 'org-level-5 nil :weight 'normal)
-  (set-face-attribute 'org-level-6 nil :weight 'normal)
-  (set-face-attribute 'org-document-title nil :foreground "White" :height 1.2 :weight 'bold))
-
-(defun my/style-org-agenda()
-  (set-face-attribute 'org-agenda-date nil :height 1.1)
-  (set-face-attribute 'org-agenda-date-today nil :height 1.2 :foreground "sky")
-  (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
-
-(add-hook 'org-agenda-mode-hook 'my/style-org-agenda)
-(add-hook 'org-mode-hook 'my/after-org-mode-load)
-(add-hook 'org-mode-hook 'my/style-org-buffer)
-
-(setq org-agenda-breadcrumbs-separator nil
-      ;; org-agenda-current-time-string "⌚ ┈┈┈┈┈┈┈┈┈┈┈ now"
-      org-agenda-time-grid '((weekly today require-timed)
-                             (800 1000 1200 1400 1600 1800 2000)
-                             nil "┈┈┈┈┈┈┈┈┈┈┈┈┈")
-      org-agenda-prefix-format '((agenda . "%i   %-20:c%?-12t%s")
-                                 (todo . " %i   %-20:c")
-                                 (tags . " %i   %-20:c")
-                                 (search . " %i   %-20:c")))
-#+end_src
-
-*** Org Agenda & Keybinding & Tune
-몇가지 바인딩이 evil과 충돌이 있어서 변경한다.
-인터넷에서 알게된 몇가지 속도 튜닝 옵션도 함께 포함한다.
-#+begin_src elisp :tangle config.el
-(map! :leader :prefix "o" :desc "Open Agenda List" "a" 'org-agenda-list)
-
-;; from google search, thanks to experts
-(setq org-agenda-inhibit-startup t)
-(setq org-agenda-use-tag-inheritance nil)
-(setq org-agenda-dim-blocked-tasks nil)
-#+end_src
-
-*** SRC Block & Babel & LSP
-#+begin_src  elisp :tangle config.el
-;; 몇몇 언어들을 로딩해서 소스 블럭의 실행 결과를 볼 수 있도록 한다.
-;; 그런데 아래의 함수를 그냥 실행하면 스타트업 시간이 정말 느려져서 async로 실행한다.
-;; (defun my/add-more-language-to-babel-org()
-;;     (interactive)
-;;     (async-start
-;;         (lambda ()
-;;             (org-babel-do-load-languages 'org-babel-load-languages '((emacs-lisp . t)
-;;                                                                      (typescript . t)
-;;                                                                      (shell . t))))
-;;         (lambda (result)
-;;             (message "load babel done"))))
-
-;; (add-hook 'org-mode-hook 'my/add-more-language-to-babel-org)
-#+end_src
-
-# *** Manage org-agenda-files
-#  org-agenda-files 변수를 파일에 저장하도록 만들어서 매번 스캔을 수행하지 않아도 되도록 한다.
-#  여러 디렉토리에 org파일이 분산되어 있어서 이렇게 관리하는게 본인은 편한다.
-#  #+BEGIN_SRC elisp :tangle +custom_funcs.el
-#    (defvar org-agenda-list-save-path
-#      "~/.doom.d/org-agenda-list.el"
-#    "Path to save the list of files belonging to the agenda.")
-
-#    (defun org-agenda-save-file-list ()
-#      "Save list of desktops from file in org-agenda-list-save-path"
-#      (interactive)
-#      (save-excursion
-#        (let ((buf (find-file-noselect org-agenda-list-save-path)))
-#          (set-buffer buf)
-#          (erase-buffer)
-#          (print (list 'quote org-agenda-files) buf)
-#          (save-buffer)
-#          (kill-buffer)
-#          (message "org-agenda file list saved to: %s" org-agenda-list-save-path))))
-
-#    (defun org-agenda-load-file-list ()
-#      "Load list of desktops from file in org-agenda-list-save-path"
-#      (interactive)
-#      (save-excursion
-#        (let ((buf (find-file-noselect org-agenda-list-save-path)))
-#          (set-buffer buf)
-#          (setq org-agenda-files (eval (read (buffer-string))))
-#          (kill-buffer)
-#          (message "org-agenda file list loaded from: %s" org-agenda-list-save-path))))
-#  #+END_SRC
-
-# 그리고 종료하기 전에 파일 목록을 저장하도록 한다.
+# ** ORG
+# *** ORG Agenda 파일 목록
+# 처음에는 함수를 만들어 관리를 했는제 자주 이맥스 설정을 손보다가 한번 뻑이 나면, 저장된 파일들까지 다 날라가는
+# 불상사가 여러번 발생해서 그냥 리스트로 직접 관리하고 파일이 추가될때 마다 수동으로 고치도록 변경한다.
 # #+begin_src elisp :tangle config.el
-# (add-hook 'kill-emacs-hook 'org-agenda-save-file-list)
+# ;; (setq org-agenda-files '(
+# ;;   "/mnt/c/Users/jaejinpark/OneDrive/org/bethel.org"
+# ;;   "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org"
+# ;;   "/mnt/c/Users/jaejinpark/OneDrive/org/jltech_schedule.org"
+# ;;   "/mnt/c/Users/jaejinpark/OneDrive/org/personal_schedule.org"
+# ;;   "/mnt/c/Users/jaejinpark/OneDrive/org/notes.org"
+# ;;   "/mnt/c/Users/jaejinpark/OneDrive/org/tasks.org"
+# ;;   ))
+
 # #+end_src
-# *** JIRA 연동
+# *** ORG모드를 위한 함수들
+# #+BEGIN_SRC elisp :tangle +custom_funcs.el
+# (defun my/after-org-mode-load ()
+#   (org-indent-mode)
+#   )
+# #+END_SRC
+
+# *** Basic & Agenda & Capture Setup
+# 요즘 열공중인 그렇게 대단하다 침이 마르지 않게 칭찬해대는 ORG모드에 대한 설정들을 따로 모아 놓았다.
+# #+BEGIN_SRC elisp :tangle config.el
+# (after! org
+#   ;; ORG 패키지를 초기활때 이미 어젠다 파일 목록을 불러오도록 한다.
+#   (setq
+#     org-hide-emphasis-markers t
+#     org-directory "/mnt/c/Users/jaejinpark/OneDrive/org"
+#     org-ellipsis " ▾ "
+#     ;; org-tags-column -80
+#     ;; org-adapt-indentation t
+#     org-log-done 'time
+#     org-refile-targets (quote ((nil :maxlevel . 1)))
+#     org-src-tab-acts-natively t
+#     org-src-preserve-indentation t
+#     org-agenda-span 31
+#     org-deadline-warning-days 7
+#     org-agenda-skip-scheduled-if-done t
+#     org-agenda-skip-deadline-if-done t
+#     org-agenda-include-deadlines t
+#     org-agenda-block-separator 61)
+#     ;; capture 설정들을 모아 놓았다.
+#   (setq org-capture-templates
+#                   '(("s" "Personal Schedule" entry
+#                     (file "/mnt/c/Users/jaejinpark/OneDrive/org/personal_schedule.org")
+#                     "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
+#                     :prepend t :kill-buffer t)
+#                     ("o" "WORK at JLTECH" entry
+#                     (file "/mnt/c/Users/jaejinpark/OneDrive/org/jltech_schedule.org")
+#                     "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
+#                     :prepend t :kill-buffer t)
+#                     ("t" "Personal TODO" entry
+#                     (file "/mnt/c/Users/jaejinpark/OneDrive/org/tasks.org")
+#                     "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: PERSONAL\n :END:\n"
+#                     :prepend t :kill-buffer t)
+#                     ("j" "JW SCHEDULE" entry
+#                     (file "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org")
+#                     "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
+#                     :prepend t :kill-buffer t)
+#                     ("w" "JW TODO" entry
+#                     (file "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org")
+#                     "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
+#                     :prepend t :kill-buffer t)
+#                     ("m" "프로임명" entry
+#                     (file "/mnt/c/Users/jaejinpark/OneDrive/org/jw.org")
+#                     "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
+#                     :prepend t :kill-buffer t)
+#                     ("b" "BRV일정" entry
+#                     (file "/mnt/c/Users/jaejinpark/OneDrive/org/bethel.org")
+#                     "* %?\nSCHEDULED: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
+#                     :prepend t :kill-buffer t)
+#                     ("B" "BRV TODO" entry
+#                     (file "/mnt/c/Users/jaejinpark/OneDrive/org/bethel.org")
+#                     "* TODO %?\nDEADLINE: %t\n :PROPERTIES:\n :agenda-group: JW.ORG\n :END:\n"
+#                     :prepend t :kill-buffer t)))
+#   ;;저장된 파일 리스트를 불러온다.
+#   ;;이맥스가 종료될때 어젠다 파일 목록을 자동 저장하도록 한다.
+#   ;;기본 단추들이 맘에 안들어서 커보이는 것들 순으로 다시 조정했다.
+#   (use-package org-bullets
+#     :init
+#     (setq org-bullets-bullet-list '("⊙" "⊙" "⊙" "⊙" "⊙" "⊙"))
+#     :config
+#     (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#   )
+# #+END_SRC
+
+# *** Org Agenda Custom Style
+# 나만의 스타일로 조금씩 바꾸어 나간다. 어째 점점더 못생겨저 가는 것 같은 느낌이 드는건 착각이 아닐수도...
 # #+begin_src elisp :tangle config.el
-# (add-to-list 'load-path (expand-file-name "~/.doom.d/elisps/ejira"))
-# (use-package ejira
-#   :init
-#   (setq jiralib2-url              "https://jltechrnd.atlassian.net"
-#         jiralib2-auth             'token
-#         jiralib2-user-login-name  "jjpark@jltech.co.kr"
-#         jiralib2-token            "nvN2wwUsP5kUjtveJzWA5DAD"
+# (defun my/style-org-buffer()
+#   (set-face-attribute 'org-link nil :weight 'normal :background nil)
+#   (set-face-attribute 'org-code nil :foreground "#a9a1e1" :background nil)
+#   (set-face-attribute 'org-date nil :foreground "#5B6268" :background nil)
+#   (set-face-attribute 'org-level-1 nil :foreground "DodgerBlue2" :background nil :height 1.0 :weight 'normal)
+#   (set-face-attribute 'org-level-2 nil :foreground "slategray2" :background nil :height 1.0 :weight 'normal)
+#   (set-face-attribute 'org-level-3 nil :foreground "SkyBlue2" :background nil :height 1.0 :weight 'normal)
+#   (set-face-attribute 'org-level-4 nil :foreground "steelblue2" :background nil :height 1.0 :weight 'normal)
+#   (set-face-attribute 'org-level-5 nil :weight 'normal)
+#   (set-face-attribute 'org-level-6 nil :weight 'normal)
+#   (set-face-attribute 'org-document-title nil :foreground "White" :height 1.2 :weight 'bold))
 
-#         ejira-org-directory       "~/jira"
-#         ejira-projects            '("DRONE" "SUSB")
+# (defun my/style-org-agenda()
+#   (set-face-attribute 'org-agenda-date nil :height 1.1)
+#   (set-face-attribute 'org-agenda-date-today nil :height 1.2 :foreground "sky")
+#   (set-face-attribute 'org-agenda-date-weekend nil :height 1.1))
 
-#         ejira-priorities-alist    '(("Highest" . ?A)
-#                                     ("High"    . ?B)
-#                                     ("Medium"  . ?C)
-#                                     ("Low"     . ?D)
-#                                     ("Lowest"  . ?E))
-#         ejira-todo-states-alist   '(("To Do"       . 1)
-#                                     ("In Progress" . 2)
-#                                     ("Done"        . 3)))
-#   :config
-#   ;; Tries to auto-set custom fields by looking into /editmeta
-#   ;; of an issue and an epic.
-#   (add-hook 'jiralib2-post-login-hook #'ejira-guess-epic-sprint-fields)
+# (add-hook 'org-agenda-mode-hook 'my/style-org-agenda)
+# (add-hook 'org-mode-hook 'my/after-org-mode-load)
+# (add-hook 'org-mode-hook 'my/style-org-buffer)
 
-#   ;; They can also be set manually if autoconfigure is not used.
-#   ;; (setq ejira-sprint-field       'customfield_10001
-#   ;;       ejira-epic-field         'customfield_10002
-#   ;;       ejira-epic-summary-field 'customfield_10004)
-
-#   (require 'ejira-agenda)
-
-#   ;; Make the issues visisble in your agenda by adding `ejira-org-directory'
-#   ;; into your `org-agenda-files'.
-#   (add-to-list 'org-agenda-files ejira-org-directory)
-
-#   ;; Add an agenda view to browse the issues that
-#   (org-add-agenda-custom-command
-#    '("j" "My JIRA issues"
-#      ((ejira-jql "resolution = unresolved and assignee = currentUser()"
-#                  ((org-agenda-overriding-header "Assigned to me")))))))
+# (setq org-agenda-breadcrumbs-separator nil
+#       ;; org-agenda-current-time-string "⌚ ┈┈┈┈┈┈┈┈┈┈┈ now"
+#       org-agenda-time-grid '((weekly today require-timed)
+#                              (800 1000 1200 1400 1600 1800 2000)
+#                              nil "┈┈┈┈┈┈┈┈┈┈┈┈┈")
+#       org-agenda-prefix-format '((agenda . "%i   %-20:c%?-12t%s")
+#                                  (todo . " %i   %-20:c")
+#                                  (tags . " %i   %-20:c")
+#                                  (search . " %i   %-20:c")))
 # #+end_src
 
-*** Deft
-빠른 검색을 위해서 deft모드를 사용하고 싶지만, 한글 검색이 안되서 포기
-#+begin_src elisp :tangle config.el
-;; (use-package deft
-;;   :config
-;;     (setq deft-directory "/mnt/c/Users/jaejinpark/OneDrive/org")
-;;     (setq deft-extensions '("org" "txt")))
-#+end_src
+# *** Org Agenda & Keybinding & Tune
+# 몇가지 바인딩이 evil과 충돌이 있어서 변경한다.
+# 인터넷에서 알게된 몇가지 속도 튜닝 옵션도 함께 포함한다.
+# #+begin_src elisp :tangle config.el
+# (map! :leader :prefix "o" :desc "Open Agenda List" "a" 'org-agenda-list)
+
+# ;; from google search, thanks to experts
+# (setq org-agenda-inhibit-startup t)
+# (setq org-agenda-use-tag-inheritance nil)
+# (setq org-agenda-dim-blocked-tasks nil)
+# #+end_src
+
+# *** SRC Block & Babel & LSP
+# #+begin_src  elisp :tangle config.el
+# ;; 몇몇 언어들을 로딩해서 소스 블럭의 실행 결과를 볼 수 있도록 한다.
+# ;; 그런데 아래의 함수를 그냥 실행하면 스타트업 시간이 정말 느려져서 async로 실행한다.
+# ;; (defun my/add-more-language-to-babel-org()
+# ;;     (interactive)
+# ;;     (async-start
+# ;;         (lambda ()
+# ;;             (org-babel-do-load-languages 'org-babel-load-languages '((emacs-lisp . t)
+# ;;                                                                      (typescript . t)
+# ;;                                                                      (shell . t))))
+# ;;         (lambda (result)
+# ;;             (message "load babel done"))))
+
+# ;; (add-hook 'org-mode-hook 'my/add-more-language-to-babel-org)
+# #+end_src
+
+# # *** Manage org-agenda-files
+# #  org-agenda-files 변수를 파일에 저장하도록 만들어서 매번 스캔을 수행하지 않아도 되도록 한다.
+# #  여러 디렉토리에 org파일이 분산되어 있어서 이렇게 관리하는게 본인은 편한다.
+# #  #+BEGIN_SRC elisp :tangle +custom_funcs.el
+# #    (defvar org-agenda-list-save-path
+# #      "~/.doom.d/org-agenda-list.el"
+# #    "Path to save the list of files belonging to the agenda.")
+
+# #    (defun org-agenda-save-file-list ()
+# #      "Save list of desktops from file in org-agenda-list-save-path"
+# #      (interactive)
+# #      (save-excursion
+# #        (let ((buf (find-file-noselect org-agenda-list-save-path)))
+# #          (set-buffer buf)
+# #          (erase-buffer)
+# #          (print (list 'quote org-agenda-files) buf)
+# #          (save-buffer)
+# #          (kill-buffer)
+# #          (message "org-agenda file list saved to: %s" org-agenda-list-save-path))))
+
+# #    (defun org-agenda-load-file-list ()
+# #      "Load list of desktops from file in org-agenda-list-save-path"
+# #      (interactive)
+# #      (save-excursion
+# #        (let ((buf (find-file-noselect org-agenda-list-save-path)))
+# #          (set-buffer buf)
+# #          (setq org-agenda-files (eval (read (buffer-string))))
+# #          (kill-buffer)
+# #          (message "org-agenda file list loaded from: %s" org-agenda-list-save-path))))
+# #  #+END_SRC
+
+# # 그리고 종료하기 전에 파일 목록을 저장하도록 한다.
+# # #+begin_src elisp :tangle config.el
+# # (add-hook 'kill-emacs-hook 'org-agenda-save-file-list)
+# # #+end_src
+# # *** JIRA 연동
+# # #+begin_src elisp :tangle config.el
+# # (add-to-list 'load-path (expand-file-name "~/.doom.d/elisps/ejira"))
+# # (use-package ejira
+# #   :init
+# #   (setq jiralib2-url              "https://jltechrnd.atlassian.net"
+# #         jiralib2-auth             'token
+# #         jiralib2-user-login-name  "jjpark@jltech.co.kr"
+# #         jiralib2-token            "nvN2wwUsP5kUjtveJzWA5DAD"
+
+# #         ejira-org-directory       "~/jira"
+# #         ejira-projects            '("DRONE" "SUSB")
+
+# #         ejira-priorities-alist    '(("Highest" . ?A)
+# #                                     ("High"    . ?B)
+# #                                     ("Medium"  . ?C)
+# #                                     ("Low"     . ?D)
+# #                                     ("Lowest"  . ?E))
+# #         ejira-todo-states-alist   '(("To Do"       . 1)
+# #                                     ("In Progress" . 2)
+# #                                     ("Done"        . 3)))
+# #   :config
+# #   ;; Tries to auto-set custom fields by looking into /editmeta
+# #   ;; of an issue and an epic.
+# #   (add-hook 'jiralib2-post-login-hook #'ejira-guess-epic-sprint-fields)
+
+# #   ;; They can also be set manually if autoconfigure is not used.
+# #   ;; (setq ejira-sprint-field       'customfield_10001
+# #   ;;       ejira-epic-field         'customfield_10002
+# #   ;;       ejira-epic-summary-field 'customfield_10004)
+
+# #   (require 'ejira-agenda)
+
+# #   ;; Make the issues visisble in your agenda by adding `ejira-org-directory'
+# #   ;; into your `org-agenda-files'.
+# #   (add-to-list 'org-agenda-files ejira-org-directory)
+
+# #   ;; Add an agenda view to browse the issues that
+# #   (org-add-agenda-custom-command
+# #    '("j" "My JIRA issues"
+# #      ((ejira-jql "resolution = unresolved and assignee = currentUser()"
+# #                  ((org-agenda-overriding-header "Assigned to me")))))))
+# # #+end_src
+
+# *** Deft
+# 빠른 검색을 위해서 deft모드를 사용하고 싶지만, 한글 검색이 안되서 포기
+# #+begin_src elisp :tangle config.el
+# ;; (use-package deft
+# ;;   :config
+# ;;     (setq deft-directory "/mnt/c/Users/jaejinpark/OneDrive/org")
+# ;;     (setq deft-extensions '("org" "txt")))
+# #+end_src
 
 ** RSS Feed
 *** Custom Elfeed Search Column
