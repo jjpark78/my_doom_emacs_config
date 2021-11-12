@@ -40,21 +40,17 @@
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
-;; (package! org-bullets)
 (package! gitlab-ci-mode)
 (package! rg)
-;; (package! swiper)
 (package! evil-matchit)
 (package! drag-stuff)
-;; (package! carbon-now-sh)
 (package! evil-textobj-anyblock)
 (package! git-link)
 (package! w3m)
-;; (package! ccls)
 (package! prettier-js)
-;; (package! oauth2)
 (package! nyan-mode)
 ;; (package! ob-typescript)
+;; (package! unicode-fonts)
 ;; (package! ob-restclient)
 ;; (package! emacs-async)
 ;; (package! emamux)
@@ -102,6 +98,8 @@
 (setq evil-snipe-scope 'whole-visible)
 (setq evil-snipe-repeat-scope 'whole-visible)
 
+;; unicode
+(unicode-fonts-setup)
 ;; just for fun
 (nyan-mode)
 (nyan-start-animation)
@@ -147,16 +145,16 @@
 (setq doom-theme 'doom-one)
 
 ;; ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
-(setq doom-font (font-spec :family "FiraMono NF" :size 14))
-(setq doom-unicode-font (font-spec :family "FiraMonr NF" :size 14))
+(setq doom-font (font-spec :family "FiraMono NF" :size 16))
+(setq doom-unicode-font (font-spec :family "FiraMonr NF" :size 16))
 
-;; ;; 한글 관련 폰트 스케일링 설정 (set-fontset-font "fontset-default" 'hangul
-(font-spec :registry "NanumGothic")
+;; ;; 한글 관련 폰트 스케일링 설정
+;; (set-fontset-font "fontset-default" 'hangul (font-spec :family "AppleGothic"))
+(set-fontset-font "fontset-default" 'hangul (font-spec :family "MaruBuri" :size 14))
 ;; (set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
 ;; (set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
-
-(setq face-font-rescale-alist '(("AppleGothic" . 1.3007692307692308) ))
-      #+END_SRC
+;; (setq face-font-rescale-alist '(("AppleGothic" . 1.3007692307692308) ))
+#+END_SRC
 
 ***** Popup Rules
 이맥스에서 몇가지 자주 쓰는 버퍼들이 정해진 위치에 표시되도록 해서 레이아웃을
@@ -168,8 +166,9 @@
 (set-popup-rule! "^\\*npm*" :ttl t :side 'bottom :height 20 :quit t)
 (set-popup-rule! "^\\*Flycheck*" :ttl t :side 'bottom :height 20 :quit t)
 #+end_src
+
 **** Doom Modeline
-Doom modLiene 관련 수정
+Doom ModeLine 관련 수정
 #+BEGIN_SRC elisp :tangle config.el
 (after! doom-modeline (setq doom-modeline-major-mode-icon t
   doom-modeline-buffer-encoding nil doom-modeline-mu4e nil
@@ -179,8 +178,7 @@ Doom modLiene 관련 수정
 **** Fine-tune
 이맥스를 맥과 고해상도(FHD이상의 해상도)에서 쓰다보면 스크롤이 엄청 느려지는 경우가 있다.
 여러 이슈들을 확인한 결과 어쩔수 없다 함.
-해당 현상을 완화하는데 조금이나마 도움이 된다하여서
-구글링을 통해 찾은 각종 튜닝들을 여기다가 넣어 놓았다.
+해당 현상을 완화하는데 조금이나마 도움이 된다하여서 구글링을 통해 찾은 각종 튜닝들을 여기다가 넣어 놓았다.
 #+BEGIN_SRC elisp :tangle config.el
 
 ;;gccemacs로 넘어 오기 전에는 라인넘버를 껐었는데

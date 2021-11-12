@@ -42,7 +42,7 @@
        ;; neotree          ; a project drawer, like NERDTree for vim
        ophints             ; highlight the region an operation acts on
        ;; (popup +defaults)   ; tame sudden yet inevitable temporary windows
-       pretty-code       ; ligatures or substitute text with pretty symbols
+       ;; pretty-code       ; ligatures or substitute text with pretty symbols
        ;; tabs                ; an tab bar for Emacs
        ;; treemacs            ; a rroject drawer, like neotree but cooler"doom-color"
 
@@ -184,7 +184,7 @@
        :app
        ;; calendar
        ;;irc               ; how neckbeards socialize
-       ;; rss       ; emacs as an RSS reader
+       rss       ; emacs as an RSS reader
        ;;twitter           ; twitter client https://twitter.com/vnought
 
        :config
