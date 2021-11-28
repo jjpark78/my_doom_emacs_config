@@ -12,6 +12,7 @@
     - [[#cc-mode--ccls-setting][CC-Mode & CCLS Setting]]
     - [[#lsp--language-mode-hooks][LSP / Language Mode Hooks]]
     - [[#vue--typescript-custom-setting][Vue & Typescript Custom Setting]]
+    - [[#tabnine][Tabnine]]
     - [[#programming-etc][Programming ETC]]
     - [[#interact-persp-mode-and-tmux][Interact Persp-mode and Tmux]]
   - [[#magit--forge][Magit & Forge]]
@@ -49,16 +50,15 @@
 (package! w3m)
 (package! prettier-js)
 (package! nyan-mode)
-;; (package! ob-typescript)
-;; (package! unicode-fonts)
-;; (package! ob-restclient)
-;; (package! emacs-async)
-;; (package! emamux)
-;; ejira 를 사용하기 위한 디펜던시들, 연동이 잘 되지 않아서 일단 놔둔다.
-;; (package! dash-functional)
-;; (package! jiralib2)
-;; (package! ox-jira)
-;; (package! language-detection)
+(package! company-tabnine :recipe (:host github :repo "TommyX12/company-tabnine"))
+;; (package! dash)
+;; (package! org-jira)
+;; (package! ejira
+;; :recipe
+;; (:host github
+;; :repo "nyyManni/ejira"
+;; :files ("*.el")
+;; ))
 #+END_SRC
 
 *** Custom Setup
@@ -93,13 +93,12 @@
   (set-frame-size (selected-frame) 1230 1378 t))
 
 (global-evil-matchit-mode)
+(global-auto-revert-mode t)
 
 ;; 스나이프를 화면에 보이는 영역으로 한다.
 (setq evil-snipe-scope 'whole-visible)
 (setq evil-snipe-repeat-scope 'whole-visible)
 
-;; unicode
-(unicode-fonts-setup)
 ;; just for fun
 (nyan-mode)
 (nyan-start-animation)
@@ -146,20 +145,18 @@
 
 ;; ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
 (setq doom-font (font-spec :family "FiraMono NF" :size 16))
-(setq doom-unicode-font (font-spec :family "FiraMonr NF" :size 16))
+;; (setq doom-unicode-font (font-spec :family "FiraMono NF" :size 16))
 
 ;; ;; 한글 관련 폰트 스케일링 설정
 ;; (set-fontset-font "fontset-default" 'hangul (font-spec :family "AppleGothic"))
-(set-fontset-font "fontset-default" 'hangul (font-spec :family "MaruBuri" :size 14))
+(set-fontset-font "fontset-default" 'hangul (font-spec :family "MaruBuri" :size 18))
 ;; (set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
 ;; (set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
 ;; (setq face-font-rescale-alist '(("AppleGothic" . 1.3007692307692308) ))
 #+END_SRC
 
 ***** Popup Rules
-이맥스에서 몇가지 자주 쓰는 버퍼들이 정해진 위치에 표시되도록 해서 레이아웃을
-망치지 않고 작업 효율을 높이도록 한다.  DOOM 이맥스는 기본 키 바인딩인 'SPC ~'
-조합을 사용해서 해당 버퍼의 윈도우를 빠르게 토글 시킬 수 있어서 정말 편하다.
+이맥스에서 몇가지 자주 쓰는 버퍼들이 정해진 위치에 표시되도록 해서 레이아웃을 망치지 않고 작업 효율을 높이도록 한다.  DOOM 이맥스는 기본 키 바인딩인 'SPC ~' 조합을 사용해서 해당 버퍼의 윈도우를 빠르게 토글 시킬 수 있어서 정말 편하다.
 #+begin_src elisp :tangle config.el
 (set-popup-rule! "^\\*Messages\\*" :ttl t :side 'bottom :height 12 :quit t)
 (set-popup-rule! "^\\*doom:vterm*" :ttl t :side 'bottom :height 20 :quit t)
@@ -170,9 +167,13 @@
 **** Doom Modeline
 Doom ModeLine 관련 수정
 #+BEGIN_SRC elisp :tangle config.el
-(after! doom-modeline (setq doom-modeline-major-mode-icon t
-  doom-modeline-buffer-encoding nil doom-modeline-mu4e nil
-    doom-modeline-buffer-file-name-style 'truncate-with-project))
+(after! doom-modeline
+  (setq doom-modeline-major-mode-icon t
+        doom-modeline-buffer-encoding nil
+        doom-modeline-persp-name t
+        doom-modeline-mu4e nil
+        doom-modeline-buffer-file-name-style 'truncate-with-project))
+
 #+END_SRC
 
 **** Fine-tune
@@ -205,7 +206,6 @@ Doom ModeLine 관련 수정
 
 (map! :leader :prefix "g" :desc "ediff style diff from working-tree" "d" #'magit-ediff-show-working-tree)
 ;; go back, go references
-(map! :n "gb" #'evil-jump-backward)
 (map! :n "gr" #'+lookup/references)
 ;; 검색할때 브라우저를 찾는 수고를 줄여 준다.
 (map! :leader :prefix "s" :desc "Search Google.com" "g" #'google-search)
@@ -226,7 +226,7 @@ Doom ModeLine 관련 수정
 ;; 커스텀 함수로 정의해둔 설정 파일불러오는 함수에게 단축기를 할당했음.
 ;; 자주 쓰지는 않는데 있어보이는 척 할때 아주 좋다.
 (map! :leader :prefix "f" :desc "Open Shell init file on other windows" "gs" #'my/find-shell-init-file)
-(map! :leader :prefix "f" :desc "Open alacritty init file on other windows" "ga" #'my/find-alacritty-init-file)
+;; (map! :leader :prefix "f" :desc "Open alacritty init file on other windows" "ga" #'my/find-alacritty-init-file)
 (map! :leader :prefix "f" :desc "Edit Tmuxinator Session File" "gi" 'my/find-tmuxinator-file)
 (map! :leader :prefix "f" :desc "Edit Tmux Configuration File" "gt" 'my/find-tmuxconfig-file)
 ;; 코드를 입력받아서 이쁜 화면으로 만들어주는 패키지에 단축기를 할당했다.
@@ -267,47 +267,9 @@ Doom ModeLine 관련 수정
 (map! :after org-mode :map org-mode-map ">" 'org-cycle-level)
 ;; <SPC> w C-o 는 너무 누르기 힘들지만 이게 의외로 많이 쓰인다. 쓰이지 않는 키 바인딩에 할당해서 더 간단히 만든다.
 (map! :leader :prefix "w" :desc "Close Other Windows Fast Binding" "O" 'delete-other-windows)
-;; (defun move-text-internal (arg)
-;;   (cond
-;;    ((and mark-active transient-mark-mode)
-;;     (if (> (point) (mark))
-;;         (exchange-point-and-mark))
-;;     (let ((column (current-column))
-;;           (text (delete-and-extract-region (point) (mark))))
-;;       (forward-line arg)
-;;       (move-to-column column t)
-;;       (set-mark (point))
-;;       (insert text)
-;;       (exchange-point-and-mark)
-;;       (setq deactivate-mark nil)))
-;;    (t
-;;     (let ((column (current-column)))
-;;       (beginning-of-line)
-;;       (when (or (> arg 0) (not (bobp)))
-;;         (forward-line)
-;;         (when (or (< arg 0) (not (eobp)))
-;;           (transpose-lines arg)
-;;           (when (and (eval-when-compile
-;;                        '(and (>= emacs-major-version 24)
-;;                              (>= emacs-minor-version 3)))
-;;                      (< arg 0))
-;;             (forward-line -1)))
-;;         (forward-line -1))
-;;       (move-to-column column t)))))
-
-;; (defun move-text-down (arg)
-;;   "Move region (transient-mark-mode active) or current line
-;;   arg lines down."
-;;   (interactive "*p")
-;;   (move-text-internal arg))
-
-;; (defun move-text-up (arg)
-;;   "Move region (transient-mark-mode active) or current line
-;;   arg lines up."
-;;   (interactive "*p")
-;;   (move-text-internal (- arg)))
 
 (drag-stuff-global-mode t)
+
 (define-key evil-normal-state-map (kbd "M-k") 'drag-stuff-up)
 (define-key evil-visual-state-map (kbd "M-k") 'drag-stuff-up)
 (define-key evil-normal-state-map (kbd "M-j") 'drag-stuff-down)
@@ -321,9 +283,14 @@ Doom ModeLine 관련 수정
   (interactive)
   (call-process-shell-command "run-window-chrome&" nil 0))
 
+(defun execute-alacritty ()
+  (interactive)
+  (call-process-shell-command "/mnt/c/alacritty.exe -e \"wsl.exe tmux\"" nil 0))
+
 ; 편리하게 외부 프로그램을 실행한다.
 (map! :leader :prefix "r" :desc "Run Command - Gitkraken" "gk" 'execute-gitkraken)
 (map! :leader :prefix "r" :desc "Run Command - Google Chrome" "gh" 'execute-chrome)
+(map! :leader :prefix "r" :desc "Run Command - Google Chrome" "ga" 'execute-alacritty)
 #+END_SRC
 
 ** Programming
@@ -380,7 +347,16 @@ Doom ModeLine 관련 수정
 
 ;; 린트 에러 버퍼를 오픈하면 포커스가 자동으로 이동하지 않는다.
 ;; 이거 없으면 생각보다 귀찮아진다.
-(add-hook 'flycheck-error-list-mode-hook (lambda () (switch-to-buffer-other-window "*Flycheck errors*")))
+(defun my/custom-diagnostics ()
+    (interactive)
+    (flycheck-list-errors)
+    (switch-to-buffer-other-window "*Flycheck errors*"))
+
+(map! :leader :prefix "c" :desc "Display LSP Errors" "x" 'my/custom-diagnostics)
+
+;; (add-hook 'flycheck-error-list-mode-hook (lambda () (progn
+;;                                                       (message "called lambda function")
+;;                                                       (switch-to-buffer-other-window "*Flycheck errors*"))))
 #+END_SRC
 
 *** Vue & Typescript Custom Setting
@@ -442,10 +418,15 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 ;;       (setq-local flycheck-javascript-eslint-executable eslint))))
 
 #+END_SRC
-
-#+RESULTS:
-: setup-custom-jsts-mode
-
+*** Tabnine
+제대로 설정할 수 있게 되었기 때문에 다시 사용한다.
+#+BEGIN_SRC elisp :tangle config.el
+(after! company
+  (setq +lsp-company-backends '(company-tabnine :separate company-capf company-yasnippet))
+  (setq company-show-numbers t)
+  (setq company-idle-delay 0)
+)
+#+END_SRC
 *** Programming ETC
 개발관련 기타 설정들
 #+BEGIN_SRC elisp :tangle config.el
@@ -453,23 +434,22 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 (setq company-idle-delay 0)
 
 (drag-stuff-mode t)
-;; persp 모드에서 터미널도 지원하도록 한다.
-(persp-def-buffer-save/load
-  :mode 'eshell-mode :tag-symbol 'def-eshell-buffer
-  :save-vars '(major-mode default-directory))
+;; ;; persp 모드에서 터미널도 지원하도록 한다.
+;; (persp-def-buffer-save/load
+;;   :mode 'eshell-mode :tag-symbol 'def-eshell-buffer
+;;   :save-vars '(major-mode default-directory))
 #+END_SRC
 *** Interact Persp-mode and Tmux
 이맥스에서 Persp모드를 많이 활용하는데 Tmux의 window와 동기화를 시키면 매우 편리하다.
 이맥스에서 직접 터미널을 만져도 되지만, 가끔 이유없이 터미널 버퍼가 사라지기도 하고, 터미널 버퍼를 여러개 사용하면, 이맥스가 무거워지고 또 Persp-mode에서 버퍼를 포함해서 세선파일로 저장하는 방법을 아직 몰라서
 코딩과 문서는 이맥스에서 하고 빌드나 스크립트 실행은 Tmux에서 수행하는 워크플로우가 익숙하다.
 #+begin_src elisp :tangle config.el
-(defun my/persp-tmux-sync (name window)
-  (let ((tmux-command (concat "tmux " "select-window " "-t " name " > /dev/null 2>&1")))
+(defun my/persp-tmux-sync (file hash name)
+  (let ((tmux-command (concat "tmux " "switch-client " "-t " (file-name-nondirectory file) " > /dev/null 2>&1")))
+        (message tmux-command)
         (shell-command tmux-command nil nil)))
-
-(add-hook! 'persp-before-switch-functions 'my/persp-tmux-sync)
+(add-hook! 'persp-after-load-state-functions 'my/persp-tmux-sync)
 #+end_src
-
 ** Magit & Forge
 magit이나 dired등과 같이 유틸리티 관련 설정들을 모아 놓았다.
 #+BEGIN_SRC elisp :tangle config.el
@@ -549,7 +529,50 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
           (pullreqs . show)))
   )
 #+END_SRC
+# ** Jira Integration
+# 회사에서 JIRA로 이슈 관리를 하기로 하였다. 강력하게 깃랩의 이슈만으로 하드웨어도 커버가 된다고 의견을 올렸지만, 끝내 받아들여지지 않았다. 이제 Atlassian이 망하는 걸 바라만 보고 있어야 하겠구나... 그때까지 이걸로 어떻게든 버텨보자..
+# 왜 Magit Forge는 지라를 지원하지 않을까... 쩝...
+# #+begin_src emacs-lisp :tangle config.el
+# (use-package ejira
+#   :init
+#   (setq jiralib2-url              "https://jltechrnd.atlassian.net"
+#         jiralib2-auth             'basic
+#         jiralib2-user-login-name  "jjpark@jltech.co.kr"
+#         jiralib2-token            "rrqo4xEhIvUK8UlZk8AS3B7B"
 
+#         ejira-org-directory       "~/.jira"
+#         ejira-projects            '("DRONE" "SUSB" "SMARTFAC")
+
+#         ejira-priorities-alist    '(("Highest" . ?A)
+#                                     ("High"    . ?B)
+#                                     ("Medium"  . ?C)
+#                                     ("Low"     . ?D)
+#                                     ("Lowest"  . ?E))
+#         ejira-todo-states-alist   '(("To Do"       . 1)
+#                                     ("In Progress" . 2)
+#                                     ("Done"        . 3)))
+#   :config
+#   ;; Tries to auto-set custom fields by looking into /editmeta
+#   ;; of an issue and an epic.
+#   (add-hook 'jiralib2-post-login-hook #'ejira-guess-epic-sprint-fields)
+
+#   ;; They can also be set manually if autoconfigure is not used.
+#   ;; (setq ejira-sprint-field       'customfield_10001
+#   ;;       ejira-epic-field         'customfield_10002
+#   ;;       ejira-epic-summary-field 'customfield_10004)
+
+#   (require 'ejira-agenda)
+
+#   ;; Make the issues visisble in your agenda by adding `ejira-org-directory'
+#   ;; into your `org-agenda-files'.
+#   (add-to-list 'org-agenda-files ejira-org-directory)
+
+#   ;; Add an agenda view to browse the issues that
+#   (org-add-agenda-custom-command
+#    '("j" "My JIRA issues"
+#      ((ejira-jql "resolution = unresolved and assignee = currentUser()"
+#                  ((org-agenda-overriding-header "Assigned to me")))))))
+# #+end_src
 # # ** Mail
 # # *** Basic Coonfiguration
 # # Mail관련 설정을 추가 한다.
@@ -961,9 +984,12 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
                      "https://d2.naver.com/d2.atom"
                      "https://engineering.linecorp.com/ko/feed/"
                      "http://sachachua.com/blog/category/emacs/feed"
+                     "https://blog.rust-embedded.org/rss.xml"
                      ))
 (map! :leader :map elfeed-show-map "U" 'elfeed-update)
+(setq elfeed-search-filter "@6-month-ago +unread")
 #+END_SRC
+
 
 ** Utils
 *** Web-browser for WSL
