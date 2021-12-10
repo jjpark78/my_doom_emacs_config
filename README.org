@@ -19,6 +19,7 @@
   - [[#rss-feed][RSS Feed]]
     - [[#custom-elfeed-search-column][Custom Elfeed Search Column]]
   - [[#utils][Utils]]
+    - [[#persp-mode-and-special-buffers][Persp-mode and Special Buffers]]
     - [[#web-browser-for-wsl][Web-browser for WSL]]
     - [[#ripgrep][Ripgrep]]
     - [[#google-stackoverflow-search][Google, StackOverFlow Search]]
@@ -38,6 +39,7 @@
 +private.el 파일에는 공개하기 곤란한 개인 토큰이나 패스워드등이 담겨 있다.
 *** Packages
 #+BEGIN_SRC elisp :tangle packages.el
+(package! tramp)
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
@@ -50,7 +52,9 @@
 (package! w3m)
 (package! prettier-js)
 (package! nyan-mode)
+(package! emacs-async)
 (package! company-tabnine :recipe (:host github :repo "TommyX12/company-tabnine"))
+;; (package! code-review)
 ;; (package! dash)
 ;; (package! org-jira)
 ;; (package! ejira
@@ -90,7 +94,7 @@
 (when (display-graphic-p)
   (setq frame-resize-pixelwise t)
   (set-frame-position (selected-frame) 1128 32)
-  (set-frame-size (selected-frame) 1230 1378 t))
+  (set-frame-size (selected-frame) 1230 1350 t))
 
 (global-evil-matchit-mode)
 (global-auto-revert-mode t)
@@ -193,7 +197,7 @@ Doom ModeLine 관련 수정
 ;; 이맥스를 느리게 만드는 범인중 십중팔구 LSP가 관련되어져 있다고 함.
 ;; 해당 튜닝도 구글링을 통해서 찾았다.
 (setq lsp-file-watch-threshold (* 1024 1024))
-(setq read-process-output-max (* 100 1024 1024))
+(setq read-process-output-max (* 10 1024 1024))
 #+END_SRC
 
 *** Useful Bindings
@@ -265,6 +269,7 @@ Doom ModeLine 관련 수정
 
 ;; ORG 모드에서 헤더 레벨 설정할때 쓰기 편한 단축키
 (map! :after org-mode :map org-mode-map ">" 'org-cycle-level)
+
 ;; <SPC> w C-o 는 너무 누르기 힘들지만 이게 의외로 많이 쓰인다. 쓰이지 않는 키 바인딩에 할당해서 더 간단히 만든다.
 (map! :leader :prefix "w" :desc "Close Other Windows Fast Binding" "O" 'delete-other-windows)
 
@@ -290,7 +295,7 @@ Doom ModeLine 관련 수정
 ; 편리하게 외부 프로그램을 실행한다.
 (map! :leader :prefix "r" :desc "Run Command - Gitkraken" "gk" 'execute-gitkraken)
 (map! :leader :prefix "r" :desc "Run Command - Google Chrome" "gh" 'execute-chrome)
-(map! :leader :prefix "r" :desc "Run Command - Google Chrome" "ga" 'execute-alacritty)
+(map! :leader :prefix "r" :desc "Run Command - alacritty" "ga" 'execute-alacritty)
 #+END_SRC
 
 ** Programming
@@ -446,7 +451,6 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 #+begin_src elisp :tangle config.el
 (defun my/persp-tmux-sync (file hash name)
   (let ((tmux-command (concat "tmux " "switch-client " "-t " (file-name-nondirectory file) " > /dev/null 2>&1")))
-        (message tmux-command)
         (shell-command tmux-command nil nil)))
 (add-hook! 'persp-after-load-state-functions 'my/persp-tmux-sync)
 #+end_src
@@ -992,6 +996,12 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
 
 
 ** Utils
+*** Persp-mode and Special Buffers
+#+begin_src elisp :tangle config.el
+(persp-def-buffer-save/load
+  :mode 'vterm-mode :tag-symbol 'def-vterm-buffer
+  :save-vars '(major-mode default-directory))
+#+end_src
 *** Web-browser for WSL
 #+begin_src elisp :tangle config.el
 ; browse-url-function용 설정 함수
