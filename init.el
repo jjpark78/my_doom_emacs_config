@@ -73,7 +73,7 @@
        vc                ; version-control and Emacs, sitting in a tree
 
        :term
-       ;; eshell            ; the elisp shell that works everywhere
+       eshell            ; the elisp shell that works everywhere
        ;; shell             ; simple shell REPL for Emacs
        ;; term              ; basic terminal emulator for Emacs
        vterm             ; the best terminal emulation in Emacs
@@ -132,11 +132,11 @@
        ;;fsharp            ; ML stands for Microsoft's Language
        ;;fstar             ; (dependent) types and (monadic) effects and Z3
        ;;gdscript          ; the language you waited for
-       ;;(go +lsp)         ; the hipster dialect
+       (go +lsp)         ; the hipster dialect
        ;;(haskell +lsp)    ; a language that's lazier than I am
        ;;hy                ; readability of scheme w/ speed of python
        ;;idris             ; a language you can depend on
-       ;;json              ; At least it ain't XML
+       json              ; At least it ain't XML
        ;;(java +meghanada) ; the poster child for carpal tunnel syndrome
        (javascript +lsp)        ; all(hope(abandon(ye(who(enter(here))))))
        ;;julia             ; a better, faster MATLAB

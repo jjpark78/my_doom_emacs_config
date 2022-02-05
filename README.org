@@ -41,7 +41,6 @@
 +private.el 파일에는 공개하기 곤란한 개인 토큰이나 패스워드등이 담겨 있다.
 *** Packages
 #+BEGIN_SRC elisp :tangle packages.el
-(package! tramp)
 (package! rainbow-delimiters)
 (package! expand-region)
 (package! dotenv-mode)
@@ -57,7 +56,7 @@
 (package! emacs-async)
 (package! company-tabnine :recipe (:host github :repo "TommyX12/company-tabnine"))
 (package! exec-path-from-shell)
-;; (package! code-review)
+(package! code-review)
 ;; (package! dash)
 ;; (package! org-jira)
 ;; (package! ejira
@@ -150,8 +149,6 @@
 
 #+BEGIN_SRC elisp :tangle config.el
 ;; 이것 저것 많이 바꿔봤지만 역시 기본 테마가 젤 이쁘다
-;; (setq doom-theme 'doom-dracula)
-;; (setq doom-theme 'doom-palenight)
 (setq doom-theme 'doom-one)
 
 ;; ;; 노안이 왔는지 이제는 이정도 폰트 크기는 되어야 잘 보임
@@ -159,10 +156,7 @@
 (setq doom-unicode-font (font-spec :family "FiraCode NF" :size 17))
 
 ;; ;; 한글 관련 폰트 스케일링 설정
-;; (set-fontset-font "fontset-default" 'hangul (font-spec :family "AppleGothic"))
 (set-fontset-font "fontset-default" 'hangul (font-spec :family "MaruBuri" :size 18))
-;; (set-fontset-font t 'japanese-jisx0213.2004-1 (font-spec :name "AppleGothic"))
-;; (set-fontset-font t 'katakana-jisx0201 (font-spec :name "AppleGothic"))
 ;; (setq face-font-rescale-alist '(("AppleGothic" . 1.3007692307692308) ))
 #+END_SRC
 ***** Popup Rules
@@ -449,9 +443,9 @@ Vue와 타입스크립트를 위한 커스텀 설정 모드.
 
 (drag-stuff-mode t)
 ;; ;; persp 모드에서 터미널도 지원하도록 한다.
-;; (persp-def-buffer-save/load
-;;   :mode 'eshell-mode :tag-symbol 'def-eshell-buffer
-;;   :save-vars '(major-mode default-directory))
+(persp-def-buffer-save/load
+  :mode 'eshell-mode :tag-symbol 'def-eshell-buffer
+  :save-vars '(major-mode default-directory))
 #+END_SRC
 *** Interact Persp-mode and Tmux
 이맥스에서 Persp모드를 많이 활용하는데 Tmux의 window와 동기화를 시키면 매우 편리하다.
@@ -527,9 +521,11 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
   (define-key forge-post-section-map (kbd "dt") 'forge-delete-comment)
   (define-key forge-topic-mode-map (kbd "ar") 'forge-create-post)
 
-  ;새끼손가락을 보호하기 위한 또 다른 키매핑
-  (define-key forge-post-mode-map (kbd " cc") 'forge-post-submit)
-  (define-key forge-post-mode-map (kbd " ck") 'forge-post-cancel)
+  ;왼쪽 새끼손가락을 보호하기 위한 또 다른 키매핑
+  (map! :mode 'forge-post-mode-map :leader :prefix "k" :desc "Ok for create forge post"  "k" #'forge-post-submit)
+  (map! :mode 'forge-post-mode-map :leader :prefix "k" :desc "Ok for create forge post"  "c" #'forge-post-cancel)
+  (map! :mode 'text-mode-map :leader :prefix "k" :desc "Ok for Commit Message" "k" #'with-editor-finish)
+  (map! :mode 'text-mode-map :leader :prefix "k" :desc "Ok for Commit Message" "c" #'with-editor-cancel)
 
   ;; 팝업을 별도의 버퍼로 띄우도록 한다.
   ;; (setq magit-display-buffer-function #'+magit-my-display-buffer-fn)
@@ -1006,7 +1002,8 @@ Magit의 Forge를 사용하면 깃랩 이슈나 머지리퀘스트를 이맥스�
                      "https://blog.rust-embedded.org/rss.xml"
                      ))
 ;; (map! :leader :map elfeed-show-map "U" 'elfeed-update)
-(setq elfeed-search-filter "@6-month-ago +unread")
+(after! elfeed
+   (setq elfeed-search-filter "@50-month-ago +unread"))
 #+END_SRC
 
 
